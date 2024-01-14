@@ -1,0 +1,23 @@
+{
+  "name": "kings-ecommerse",
+  "version": "1.0.0",
+  "description": "Ecommerse Platform",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "M-H-V",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongoose": "^8.0.4",
+    "mongosh": "^2.1.1",
+    "node": "^21.2.0",
+    "nodemon": "^3.0.2"
+  }
+}
