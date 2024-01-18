@@ -1,0 +1,50 @@
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+const addressSchema = new Schema({
+  Address : String,
+  City : String,
+  House_no: String,
+  State : String,
+  altr_number : Number,
+  Postcode : Number,
+});
+
+const detailsSchema = new mongoose.Schema({
+
+  name:{
+    type : String,
+    required : true,
+  },
+  email:{
+    type : String,
+    required : true,
+    unique : true,
+  },
+  password : {
+    type : String,
+  },
+  confirmpassword : {
+    type : String,
+  },
+  phone : {
+    type : Number,
+  },
+  block : {
+    types : String,
+  },
+  address : addressSchema,
+  status : {
+    type : String,
+  },
+  wallet : {
+    type : Number,
+    default : 0.0,
+  },
+  verified : Boolean,
+  address : [addressSchema],
+});
+
+const userDB = mongoose.model('userdb',detailsSchema);
+module.exports = userDB;
