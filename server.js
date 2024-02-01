@@ -1,53 +1,59 @@
 const express = require("express");
 const app = express();
 const path = require("path");
-const cors = require("cors")
+const cors = require("cors");
 const session = require('express-session');
 const dotenv = require("dotenv");
 const connectDB = require('./servers/database/connection');
 const userRouter = require('./servers/routes/userRouter');
+const adminRouter = require('./servers/routes/adminRouter');
+const morgan = require('morgan');
 
+// Mongodb connection
+connectDB();
 
- //  mongodb connection
- connectDB();
- 
-// enviorment variable
+// Environment variable
 dotenv.config();
-const PORT = 8000
-// session
+
+// Session
 app.use(
   session({
-    secret : "secret-key",
-    resave : true,
-    saveUninitialized : true,
+    secret: "your-strong-random-secret",
+    resave: false,
+    saveUninitialized: true,
   })
 );
 
+// Logger (Morgan)
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-// parse request to express
+// Parse requests
 app.use(express.json());
-app.use(express.urlencoded({extended : true}));
-app.use(cors())
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
-// set view engine
-app.set('view engine',"ejs");
-
-//load Routers
-app.use("/",userRouter);
-
-app.use('/stylesheet',express.static(path.resolve(__dirname,"assets/stylesheet")));
-app.use('/javascript',express.static(path.resolve(__dirname,"assets/javascript")));
-app.use('/images',express.static(path.resolve(__dirname,"assets/images")));
-
-app.listen(PORT,()=>{
-  console.log(`PORT ${PORT} is Running`);
+// Clear cache
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
 });
 
+// Set view engine
+app.set('view engine', 'ejs');
 
+// Load Routers
+app.use("/", userRouter);
+app.use("/", adminRouter);
 
+// Static assets
+app.use('/stylesheet', express.static(path.resolve(__dirname, "assets/stylesheet")));
+app.use('/javascript', express.static(path.resolve(__dirname, "assets/javascript")));
+app.use('/images', express.static(path.resolve(__dirname, "assets/images")));
 
-
-
-
-
-
+// Server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on PORT ${PORT}`);
+});

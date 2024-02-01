@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Kings</title>
 
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
@@ -52,7 +52,7 @@
                   stroke-width: 1px;
                   stroke: #000;
                   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));"
-                  required  placeholder="Name " 
+                  placeholder="Name " 
                     />
                 </div>
                 <p class="errorP <%= !nameRequired?'d-none':''  %>" ><%=nameRequired  %></p>
@@ -63,18 +63,19 @@
                   stroke-width: 1px;
                   stroke: #000;
                   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));"
-                   required  placeholder="Email" value="<%= savedEmail?savedEmail:""%>" />
+                  placeholder="Email" value="<%= savedEmail?savedEmail:""%>" />
                 </div>
                 <p class="errorP <%= !emailRequired?'d-none':''  %>" ><%=emailRequired  %></p>
 
 
                 <div class="form mb-4">
                   <input type="number" name="phone" id="form3Example4cdg" class="form-control form-control-lg <%=(invalidPhone)?'border-danger':'' %>"  
+                  
                   style="fill: #FFF;
                   stroke-width: 1px;
                   stroke: #000;
                   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));"
-                   required placeholder="Phone Number" value="<%= savedPhone?savedPhone:""%>" />
+                    placeholder="Phone Number" value="<%= savedPhone?savedPhone:""%>" />
                 </div>
                 <p class="errorP <%= !phoneRequired?'d-none':''  %>" ><%=phoneRequired  %></p>
 
@@ -84,7 +85,7 @@
                   stroke-width: 1px;
                   stroke: #000;
                   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));"
-                  required  placeholder="password" />
+                  placeholder="password" />
                 </div>
                 <p class="errorP <%= !passwordRequired?'d-none':''  %>" ><%=passwordRequired  %></p>
 
@@ -94,12 +95,14 @@
                   stroke-width: 1px;
                   stroke: #000;
                   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));"
-                    class="form-control form-control-lg <%=(invalidPassword)?'border-danger':'' %>" required placeholder="confirmPassword" />
+                    class="form-control form-control-lg <%=(invalidPassword)?'border-danger':'' %>"  placeholder="confirmPassword" />
                 </div>
                 <p class="errorP <%= !passwordRequired2?'d-none':''  %>" ><%=passwordRequired2  %></p>
                 <p class="errorP <%= !invalidPassword?'d-none':''  %>" ><%=invalidPassword  %></p>
 
                 <p class="errorP <%= !userExists?'d-none':''  %>" ><%=userExists  %></p>
+
+                <p class="errorP <%= !terms?'d-none':''  %>" ><%=terms  %></p>
 
                 <div class="form-check d-flex justify-content-center mb-5">
                   <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3cg" />
@@ -107,9 +110,7 @@
                     I agree all statements in <a href="#!" class="text-body"  ><u style="color:#ff0000">Terms of service</u></a>
                   </label>
                 </div>
-                <% if(exist){%>
-                  <h1> </h1>
-                  <% } %>
+                
                     <div class="d-flex justify-content-center">
                       <button  class="btn btn-success btn-block btn-lg  "
                         style="border: 1px solid #000;
@@ -129,6 +130,7 @@
     </div>
     </div>
   </section>
+  <!-- <script src="/javascript/registerField.js"></script> -->
 </body>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
 

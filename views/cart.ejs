@@ -1,0 +1,159 @@
+<!-- include header -->
+<%- include('include/header') %>
+  <!-- /include header -->
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+  <!-- cart + summary -->
+  <section class=" my-5" style="background-color:#f5f5f7;">
+    <div class="container">
+      <div class="row">
+        <!-- cart -->
+        <div class="col-lg-9">
+          <div class="card border shadow-0">
+            <div class="m-4">
+              <h4 class="card-title mb-4">Your shopping cart</h4>
+              
+                  <div class="row gy-3 mb-4">
+                    <div class="col-lg-5 outofstock" >
+                      <div class="me-lg-5">
+                        <div class="d-flex">
+                          <img src="/" class="border rounded me-3"
+                            style="width: 96px; height: 96px;" />
+                          <div class="">
+                            <a href="#" class="nav-link">
+                              
+                            </a>
+                            <p class="text-muted">
+                              
+                            </p>
+                            
+                              <p style="color: red;">Product Not available </p>
+
+                              <style>
+                                .outofstock {
+                                  opacity: 90%;
+                                  pointer-events: none;
+                                }
+                              </style>
+                              
+
+                                
+                                
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-2 col-sm-6 col-6 d-flex flex-row flex-lg-column flex-xl-row text-nowrap">
+
+                      <div class="">
+                        
+                              <text id="indPrice" class="h6">₹ </text> <br />
+                              <small class="text-muted text-nowrap">₹/ per item
+                              </small>
+                      </div>
+                    </div>
+                    <div class="col-lg-2 col-sm-6 col-6 d-flex flex-row flex-lg-column flex-xl-row text-nowrap">
+                      <div class="col-md-4 col-6 mb-3">
+                        <label class="mb-2 d-block">Quantity</label>
+                        <div class="input-group mb-3 quantity-container" style="width: 170px;">
+
+
+                          <button class="btn btn-white border border-secondary px-3 decrease-btn" type="button"
+                            >
+                            <i class="fas fa-minus"></i>
+                          </button>
+
+                          <input id="quInput" type="text"
+                            class="form-control text-center border border-secondary quantity-input"
+                            placeholder="" disabled />
+
+                          <button class="btn btn-white border border-secondary px-3 increase-btn" type="button"
+                            >
+                            <i class="fas fa-plus"></i>
+                          </button>
+
+                        </div>
+                        <label id='stock' style="color: red; display: none;">No More Stock
+                          available</label>
+                      </div>
+                    </div>
+                    <div
+                      class="col-lg col-sm-6 d-flex justify-content-sm-center justify-content-md-start justify-content-lg-center justify-content-xl-end mb-2">
+                      <div class="float-md-end">
+                        <a href="#!" class="btn btn-light border px-2 icon-hover-primary"><i
+                            class="fas fa-heart fa-lg px-1 text-secondary"></i></a>
+                        <a href="/remove-product?id="
+                          class="btn btn-light border text-danger icon-hover-danger"> Remove</a>
+                      </div>
+                    </div>
+                  </div>
+                  
+                      <p>No Items In Cart</p>
+                      
+
+
+            </div>
+
+            <div class="border-top pt-4 mx-4 mb-4">
+              <p><i class="fas fa-truck text-muted fa-lg"></i> Free Delivery within 1-2 weeks</p>
+              <p class="text-muted">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                aliquip
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- cart -->
+        <!-- summary -->
+        <div class="col-lg-3">
+
+          <div class="card shadow-0 border">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">Total price:</p>
+                <p class="mb-2" id="total-price-before">
+                  
+                </p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">Total Items</p>
+                <p class="mb-2 text-success">
+                  
+                </p>
+              </div>
+              <hr />
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">Total price:</p>
+                <p class="mb-2 fw-bold" id="total-price">
+                  
+                </p>
+              </div>
+              <form action="/checkout-page" method="post">
+                <input type="hidden" name="totalsum" value="" hidden>
+                <button class="btn btn-success w-100 shadow-0 mb-2" type="submit">Make Purchase </button>
+              </form>
+              <div class="mt-3">
+                <a href=" /" class="btn btn-light w-100 border mt-2"> Back to shop </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- summary -->
+      </div>
+    </div>
+  </section>
+  <!-- cart + summary -->
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+
+
+
+
+  </body>
+  <!-- include footer -->
+  <%- include('include/footer') %>
+    <!-- /include footer -->
+
+    </html>

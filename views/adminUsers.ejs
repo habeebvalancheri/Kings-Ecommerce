@@ -1,0 +1,110 @@
+<!-- include footer -->
+<%- include('include/adminBase.ejs') %>
+    <!-- /include footer -->
+
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <script src="https://kit.fontawesome.com/23d1247997.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
+
+    <!-- CONTENT -->
+    <section id="content">
+        <!-- NAVBAR -->
+
+        <!-- NAVBAR -->
+
+        <!-- MAIN -->
+
+
+
+
+        <main>
+
+
+
+            <div class="table-data">
+                <div class="order">
+                    <div class="head">
+                        <h3>Users</h3>
+
+                        <div>
+                            <label for="name" class="text-dark">Search Here</label>
+                            <input type="text" name="name" placeholder="Search....." id="name-search"
+                                oninput="searchUsers()"
+                                style="width: 60%; padding: .6em 4.5em; margin: .5em 0; height: 2rem; font-family: 'Barlow', sans-serif; font-size: 1em; border: 0.1px solid black; border-radius: .2em;" />
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>&nbsp;</th>
+                                <th>SI NO</th>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Action</th>
+                            </tr>
+                           
+                        </thead>
+                        <tbody>
+                            <% for(let i=0;i<users.length;i++){%>
+                                <tr style="cursor: pointer;">
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <%= i + 1 %>
+                                    </td>
+                                    <td>
+                                        <%= users[i]._id %>
+                                    </td>
+                                    <td>
+                                        <%= users[i].name %>
+                                    </td>
+                                    <td>
+                                        <%= users[i].email %>
+                                    </td>
+                                    <td>
+                                        <%= users[i].phone %>
+                                    </td>
+
+                                    <td>
+
+                                        <% if(users[i].block==false) {%>
+                                            <a href="/block-User?id=<%= users[i]._id %>" onclick="return confirmAction('block')">
+                                                <button type="button" class="btn btn-danger w-50">Block</button>
+                                            </a>
+                                            <% }else{ %>
+                                                <a href="/unblock-User?id=<%= users[i]._id %>" onclick="return confirmAction('Unblock')">
+                                                    <button type="button" class="btn btn-success w-50">UnBlock</button>
+                                                </a>
+
+                                                <% } %>
+                                    </td>
+
+
+                                </tr>
+                                <%}%>
+                        </tbody>
+                    </table>
+
+
+                </div>
+
+
+
+        </main>
+        <!-- MAIN -->
+    </section>
+    <!-- CONTENT -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/javascript/search.js"></script>
+    <script src="/javascript/actionConfirmation.js"></script>
+
+
+    </body>
+
+    </html>

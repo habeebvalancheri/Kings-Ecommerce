@@ -1,0 +1,202 @@
+<!-- include adminBase -->
+<%- include('include/adminBase.ejs') %>
+  <!-- include adminBase -->
+
+  <!-- Include Chart.js from CDN -->
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    integrity="sha384-rw0L4+wER2o89LF0eS/vYFqLXDfIQN7RUaOB1NmmAxDAsj2cFqjjehMaMbzQ+LoD" crossorigin="anonymous">
+
+  <!-- Include Chart.js from CDN -->
+
+
+  <!-- CONTENT -->
+  <section id="content">
+    <main>
+      <div class="head-title">
+        <div class="left">
+          <h1>Dashboard</h1>
+          <ul class="breadcrumb">
+            <li>
+              <a href="#">Admin Dashboard</a>
+            </li>
+            <li><i class='bx bx-chevron-right'></i></li>
+            <li>
+              <a class="active" href="#">Home</a>
+            </li>
+          </ul>
+        </div>
+        <a href="#" class="btn-download" data-bs-toggle="modal" data-bs-target="#dateRangeModal">
+          <i class='bx bxs-cloud-download'></i>
+          <span class="text">Download PDF</span>
+        </a>
+
+      </div>
+      <ul class="box-info">
+        <a href="/admin-Orders">
+        <li>
+          <i class='bx bxs-calendar-check'></i>
+      
+          <span class="text">
+            <h3 class="counter">
+            </h3>
+            <p>Total Order</p>
+          </span>
+        </li>
+      </a>
+      <a href="/admin-Users">
+        <li>
+          <i class='bx bxs-group'></i>
+          <span class="text">
+            <h3 class="counter">
+            
+            </h3>
+            <p>Total Users</p>
+          </span>
+        </li>
+        </a>
+        <li>
+          <i class='bx bxs-dollar-circle'></i>
+          <span class="text">
+       
+            <h3 class="counter">
+             
+            </h3>
+            <p>Total Sales</p>
+          </span>
+        </li>
+      </ul>
+
+      <div class="table-data">
+        <div class="order">
+          <div class="head">
+            <h3>Recent Orders</h3>
+            <i class='bx bx-search'></i>
+            <i class='bx bx-filter'></i>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>product</th>
+                <th>Date Order</th>
+                <th>Status</th>
+
+              </tr>
+            </thead>
+           
+              <tbody>
+                <tr>
+                  <td>
+                    <img src="primg">
+                    <p>
+                      
+                    </p>
+                  </td>
+                  <td>
+                   
+                  </td>
+
+                  <td>
+                  
+                  </td>
+                  <td><span class="status completed">
+                      
+                    </span></td>
+                </tr>
+
+              </tbody>
+              
+          </table>
+        </div>
+
+      </div>
+      <div class="mb-2">
+        <div class="custom-select ms-auto" style="width:200px;">
+          <select id="filterSales">
+            <option value="Monthly">Monthly</option>
+            <option value="Yearly">Yearly</option>
+            <option value="Weekly">Weekly</option>
+            <option value="Daily">Daily</option>
+          </select>
+        </div>
+                
+      </div>
+      <div>
+        <canvas id="myChart"></canvas>
+      </div>
+    </main>
+
+
+
+    <!-- Replace your existing modal code with this Bootstrap modal code -->
+    <div class="modal fade" id="dateRangeModal" tabindex="-1" aria-labelledby="dateRangeModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="dateRangeModalLabel">Date Range</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="dateRangeForm">
+              <div class="mb-3">
+                <label for="startDate" class="form-label">Start Date:</label>
+                <input type="date" class="form-control" id="startDate" required
+                  max="">
+              </div>
+              <div class="mb-3">
+                <label for="endDate" class="form-label">End Date:</label>
+                <input type="date" class="form-control" id="endDate" required
+                  max="">
+              </div>
+              <button type="button" class="btn btn-primary" onclick="downloadPdfWithDateRange()">Download</button>
+              <h1></h1>
+              <button type="button" class="btn btn-secondary" onclick="downloadPdfForToday()">Today's Sales
+                Report</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </section>
+  <!-- CONTENT -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ratOyhjQIINk+CD2EAgjlEqUC5FFtui9cU4J+sk9BbcE3DE3ZcdVo6YQZ5y4bSSUn"
+    crossorigin="anonymous"></script>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+    integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery.counterup@2.1.0/jquery.counterup.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+    integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery.counterup@2.1.0/jquery.counterup.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+  <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> -->
+
+
+
+  <!-- Add this script block at the end of your HTML file -->
+  <script>
+
+  </script>
+
+
+
+
+
+
+
+  </html>

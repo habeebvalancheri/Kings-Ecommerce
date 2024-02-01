@@ -4,156 +4,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>infinity</title>
+  <title>Kings</title>
   <link rel="icon" type="image/x-icon" href="images/fav.png">
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-  <!-- MDB -->
+  <!-- Bootstrap CSS -->
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'>
+  <!-- MDB CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
   <style>
+    .otp-field {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .otp-input {
+      width: 40px;
+      height: 40px;
+      margin: 0 5px;
+      text-align: center;
+      font-size: 1.2em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+    }
+    .verify-heading {
+      text-align: left;
+    }
+
+    .otp-message {
+      text-align: left;
+      margin-bottom: 10px;
+    }
+
+    .resend {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .text-left{
+      text-align:left;
+    }
+    /* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 
   </style>
 </head>
 
-<body style="background-color:rgba(255, 255, 255, 0.63);">
-  <!--Main Navigation-->
-  <header>
-    <!-- Jumbotron -->
-    <div class="p-3 text-center bg-white " style="background-color: #131921 !important;">
-      <div class="container">
-        <div class="row gy-3">
-          <!-- Left elements -->
-          <div class="col-lg-2 col-sm-4 col-4">
-            <a href="/" class="float-start">
-              <h2 style="color: aliceblue; font-weight: bolder;">infinity.</h2>
-            </a>
-          </div>
-          <!-- Left elements -->
+<body>
 
-
-
-          <!-- Right elements -->
-          <div class="col-lg-5 col-md-12 col-12">
-            <div class="input-group float-center">
-              <div class="form-outline">
-                <input type="search" id="form1" class="form-control" />
-                <label class="form-label" for="form1" style="color: aliceblue;">Search</label>
+  <section class="container-fluid bg-body-tertiary d-block" style="height: 100vh;">
+    <div class="row justify-content-center" style="display: flex; align-content: center;">
+      <div class="col-12 col-md-6 col-lg-4" style="min-width: 500px; margin-top: 100px;">
+        <div class="card mb-1 mt-5 border-0">
+          <div class="card-body p-5 text-center" style="
+            border-radius: 39px;
+            background: rgba(220, 220, 220, 0.40);
+            box-shadow: 5px 15px 15px 15px rgba(0, 0, 0, 0.20);
+            ">
+            <h4>Verify OTP</h4>
+            <p class="otp-message">
+              To verify Email, we've sent a One Time password (OTP) to
+              <span style="color: red;"><%=email%></span>
+            </p>
+            <form action="/verifyOTP?email=<%=email%>" method="post">
+              <div class="otp-field mb-4">
+                <input type="number" name="one" class="otp-input" maxlength="1" />
+                <input type="number" name="two"  class="otp-input" maxlength="1" />
+                <input type="number" name="three"  class="otp-input" maxlength="1" />
+                <input type="number" name="four"  class="otp-input" maxlength="1" />
+                <input type="number" name="five"  class="otp-input" maxlength="1" />
+                <input type="number" name="six"  class="otp-input" maxlength="1" />
               </div>
-              <button type="button" class="btn btn-white shadow-0">
-                <i class="fas fa-search"></i>
+
+              <div class="otp-timer mb-3" id="otp-timer" style="text-align:left;">Resend OTP in: <span id="countdown">30</span></div>
+               
+              <input type="text" name="userId" value="<%=id%>" style="display: none;">
+              <input type="text" name="email" value="<%=email%>" style="display: none;">
+            <a href="/resendOTP?id=<%=id%>">  <button class="btn resendBtn mb-3" id="resend" class="text-left" 
+              style="border: 1px solid #00dcfa;background-color: #ffffff; color: #00dcfa;
+              display: none ;
+              " type="button" >
+                resend OTP
               </button>
-            </div>
+              </a>
+               <p class="resend text-muted mb-0" style="text-align:left;">
+              Didn't receive code? Request again 
+            </p> 
+
+              <input type="text" name="userId" value="<%=id%>" style="display: none;">
+              <input type="text" name="email" value="<%=email%>" style="display: none;">
+              <button class="btn verifyBtn  mb-3" style="border: 1px solid #000; background: #00DCFA; color:#000; width: 100%; max-width: 535px; height: 70px; flex-shrink: 0;" type="submit">
+                Verify
+              </button>
+
+            </form>
           </div>
-          <!-- Right elements -->
         </div>
       </div>
     </div>
-    <!-- Jumbotron -->
+  </section>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white" style="background-color: #232F3E !important;">
-      <!-- Container wrapper -->
-      <div class="container justify-content-center justify-content-md-between">
-        <!-- Toggle button -->
-        <button class="navbar-toggler  py-2 text-white" type="button" data-mdb-toggle="collapse"
-          data-mdb-target="#navbarLeftAlignExample" aria-controls="navbarLeftAlignExample" aria-expanded="false"
-          aria-label="Toggle navigation">
-          <i class="fas fa-bars"></i>
-        </button>
+  <script src="/javascript/otp.js"></script>
+</body>
 
-        <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse" id="navbarLeftAlignExample">
-          <!-- Left links -->
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <!-- Navbar dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-white" style="font-weight: bold;" href="#" id="navbarDropdown"
-                role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-                SHOW CATEGORIES
-              </a>
-              <!-- Dropdown menu -->
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li>
-                  <a class="dropdown-item " style="background-color: #232F3E;" href="#">LAPTOP</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" style="background-color: #232F3E;" href="#">SMARTPHONE</a>
-                </li>
-
-                <li>
-                  <a class="dropdown-item" style="background-color: #232F3E;" href="#">HEADSET</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" style="background-color: #232F3E;" href="#">WATCHES</a>
-                </li>
-              </ul>
-            </li>
-
-            <li class="nav-item">
-              <a class="nav-link text-white" style="font-weight: bold;" href="#">HOME</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-white" style="font-weight: bold;" href="#">OUR STORE</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-white" style="font-weight: bold;" href="#">BLOGS</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-white" style="font-weight: bold;" href="#">CONTACT</a>
-            </li>
-
-          </ul>
-          <!-- Left links -->
-        </div>
-      </div>
-      <!-- Container wrapper -->
-    </nav>
-
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'>
-    <section class="container-fluid bg-body-tertiary d-block" style="height: 100vh;">
-      <div class="row justify-content-center " style="display: flex; align-content: center;">
-        <div class="col-12 col-md-6 col-lg-4" style="min-width: 500px ;  margin-top: 100px;">
-          <div class="card bg-white mb-1 mt-5 border-0"
-            style="box-shadow: 0 12px 15px rgba(0, 0, 0, 0.02); display: flex; align-items: center;">
-            <div class="card-body p-5 text-center">
-              <h4>Verify</h4>
-              <p>Your code was sent to <span style="color: red;">
-                  <%=email%>
-                </span> </p>
-              <form action="/verifyOTP?email=<%=email%>" method="post">
-                <div class="otp-field mb-4">
-                  <input type="number" name="digit1" />
-                  <input type="number" name="digit2" disabled />
-                  <input type="number" name="digit3" disabled />
-                  <input type="number" name="digit4" disabled />
-                </div>
-                <input type="text" name="userid" value="<%=id%>" style="display: none;">
-                <input type="text" name="email" value="<%=email%>" style="display: none;">
-                <button class="btn  mb-3" style="background-color: #131921; color: white;" type="submit">
-                  Verify
-                </button>
-              </form>
-
-
-              <div class="otp-timer mb-3" id="otp-timer">resend OTP in :30</div>
-              <!-- Update your form to include the Resend button -->
-              <form action="/resendOTP" method="post">
-                <input type="text" name="userid" value="<%=id%>" style="display: none;">
-                <input type="text" name="email" value="<%=email%>" style="display: none;">
-                <button class="btn mb-3" id="resend" style="background-color: #131921; color: white;display: none ;" type="submit">
-                  resendOTP
-                </button>
-
-              </form>
-
-
-              <p class="resend text-muted mb-0">
-                Didn't receive code? <a href="">Request again</a>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+</html>

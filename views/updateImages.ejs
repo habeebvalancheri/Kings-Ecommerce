@@ -1,0 +1,89 @@
+<%- include('include/adminHead') %>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Add Images</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/
+    <link rel=" stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+
+
+    </head>
+    <style></style>
+
+    <body>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Add Images</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Image Upload Form -->
+                            <form action="/upload-image?id=<%= id  %>" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="image">Select Images:</label>
+                                    <input type="file" class="form-control-file" id="image" name="image" multiple
+                                        accept="image/*">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Upload Images</button>
+                            </form>
+                            <!-- Image Preview Section -->
+                            <!-- <div class="mt-4">
+                            <h5>Image Preview:</h5>
+                            <div id="imagePreview" class="d-flex flex-wrap">
+                               
+                                    <div class="image-container d-inline-block">
+                                        <img src="/images" alt="" class="img-thumbnail m-2" style="width: 20%; height: auto;" >
+                                        <button class="btn btn-danger btn-sm mt-2"
+                                             style="height: 30px; width: 80px;">Remove</button>
+                                    </div>
+                                    
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+        <!-- Cropping Modal -->
+        <div class="modal fade" id="cropModal" tabindex="-1" role="dialog" aria-labelledby="cropModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="height: 100px;">
+                        <img id="cropperImage" src="" alt="" style="height:10px">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveCroppedImage">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Bootstrap JS and Popper.js -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+        <!-- Custom Script for Image Preview -->
+        <script>
+
+        </script>
+    </body>
+
+    </html>

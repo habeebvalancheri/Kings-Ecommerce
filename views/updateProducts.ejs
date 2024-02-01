@@ -1,0 +1,121 @@
+<!-- include header -->
+<%- include('include/adminHead') %>
+  <!-- /include header -->
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+  <!-- MDB -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="dist/themes/toasteur-default.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+
+  <div class="row">
+    <div class="col-md-8 mb-4 mx-auto mb-4  mt-5">
+      <div class="card mb-4" style="background-color:#f5f5f7;">
+        <div class="card-header py-3">
+          <h5 class="mb-0">Update products</h5>
+        </div>
+        <div class="card-body">
+          <form action="/api/update-product" method="POST">
+            <div class="card shadow-0 ">
+              <div class="p-4" style="background-color:#f5f5f7;">
+                <h5 class="card-title mb-3" style="background-color:#f5f5f7;">Product details</h5>
+                <div class="row">
+                </div>
+                <p id="alert"></p>
+                <div class="row">
+                  <div class="col-sm-8 mb-3">
+                    <p class="mb-0">product name</p>
+                    <div class="form-outline">
+                      <input required type="text" name="name" class="form-control" id="productName"
+                        placeholder="Enter Product Name" value="<%=
+                        products.pName  %>">
+                      <input type="text" name="id" class="form-control" value="<%=
+                        products._id  %>" style="display: none;">
+                    </div>
+                  </div>
+                  <div class="col-sm-8 mb-3">
+                    <p class="mb-0">Discription</p>
+                    <div class="form-outline">
+                      <textarea name="description" class="form-control" placeholder="Enter Product Description"> <%=
+                        products.description  %></textarea>
+                    </div>
+                  </div>
+
+
+
+                  <div class="col-sm-4 mb-3">
+                    <p class="mb-0">product price</p>
+                    <div class="form-outline">
+                      <input required type="number" name="price" class="form-control" id="productPrice"
+                        placeholder="Enter Product Price" value="<%=
+                        products.price  %>">
+                    </div>
+                    <p class="mb-0" id="PriceWarning" style="display: none; color: red;">price should be positive value
+                    </p>
+                  </div>
+
+                  <div class="col-sm-4 mb-3">
+                    <p class="mb-0">Add Stock</p>
+                    <div class="form-outline">
+                      <input required type="number" name="stock" class="form-control" id="productStock"
+                        placeholder="Enter Product Stock" value="<%=
+                        products.stock  %>">
+                    </div>
+                    <p class="mb-0" id="PriceStock" style="display: none; color: red;">stock should be positive value
+                    </p>
+
+                  </div>
+
+                  <div class="col-sm-4 col-6 mb-3">
+                    <p class="mb-0">Add Discount(%)</p>
+                    <div class="form-outline">
+                      <input required type="number" name="discound" class="form-control" id="productDiscount"
+                        placeholder="Enter Product Discount" value="<%=
+                        products.discound  %>">
+                    </div>
+                    <p class="mb-0" id="PriceDiscount" style="display: none; color: red;">Discount Less than 90% And
+                      above 0% </p>
+
+                  </div>
+
+                  <div class="col-sm-4 mb-3">
+                    <p class="mb-0">category</p>
+                    <div class="form-outline">
+                      <select name="category" id="productCategory" class="form-control">
+                        <% for(let i=0;i<data.length;i++) { %>
+                          <option value="<%= data[i].name  %>" <%=products.name===data[i].name ? 'selected' : '' %> >
+                            <%= data[i].name %>
+                          </option>
+
+                          <% } %>
+                      </select>
+                    </div>
+                  </div>
+
+
+                </div>
+
+
+                <div class="float-end">
+                  <button type="submit" class="btn btn-dark shadow-0 border"
+                    style="background-color: #00c2ff59;">Continue</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+
+  </script>
+
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>

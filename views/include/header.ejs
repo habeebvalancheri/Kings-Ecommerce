@@ -30,13 +30,14 @@
   <!--Main Navigation-->
   <header>
     <!-- Jumbotron -->
-    <div class="p-3 text-center bg-white " style="background-color: #131921 !important;">
+    <div class="p-3 text-center " style="
+    background: rgba(0, 194, 255, 0.35);">
       <div class="container">
         <div class="row gy-3">
           <!-- Left elements -->
           <div class="col-lg-2 col-sm-4 col-4">
             <a href="/" class="float-start">
-              <h2 style="color: aliceblue; font-weight: bolder; font: size 15px; ">infinity.</h2>
+              <h2 style="color: #000000; font-weight: bolder;">Kings</h2>
             </a>
           </div>
           <!-- Left elements -->
@@ -46,11 +47,11 @@
             <div class="d-flex float-end">
              
               <a href="https://github.com/mdbootstrap/bootstrap-material-design" class="me-1  py-1 px-3 nav-link"
-                style="color:#FFF;" target="_blank"> <i class="fas fa-heart m-1 me-md-2"></i>
+              style="color: #1E3050;" target="_blank"> <i class="fas fa-heart m-1 me-md-2"></i>
                 <p class="d-none d-md-block mb-0">Wishlist</p>
               </a>
               <a href="/MyCart" class=" py-1 px-3 nav-link"
-                style="color: #FFF;" target="_blank"> <i class="fas fa-shopping-cart m-1 me-md-2 "></i>
+              style="color: #1E3050;" target="_blank"> <i class="fas fa-shopping-cart m-1 me-md-2 "></i>
                 <p class="d-none d-md-block mb-0">My cart</p>
               </a>
 
@@ -60,14 +61,22 @@
 
           <!-- Right elements -->
           <div class="col-lg-5 col-md-12 col-12">
-            <div class="input-group float-center">
-              <div class="form-outline">
-                <input type="search" id="form1" class="form-control" />
-                <label class="form-label" for="form1" style="color: aliceblue;">Search</label>
-              </div>
-              <button type="button" class="btn btn-white shadow-0">
-                <i class="fas fa-search"></i>
-              </button>
+            <div class="input-group float-center" >
+
+              <form action="#" method="GET" class="input-group float-center">
+                <button type="submit" class="btn  shadow-0" style="border: 1px solid #000;background: #000;">
+                  <i class="fas fa-search" style="color:#fff"></i>
+                </button>
+                <div class="form-outline">
+                  <input type="search" name="search" id="form1" class="form-control" style="border-radius: 0 5px 5px 0;
+                  border: 1px solid #000;
+                  background: #FFF;width: 350px;
+                  height: 35px;" />
+                  <label class="form-label" for="form1">Search</label>
+                </div>
+
+              </form>
+
             </div>
           </div>
           <!-- Right elements -->
@@ -77,7 +86,7 @@
     <!-- Jumbotron -->
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white" style="background-color: #232F3E !important;">
+    <nav class="navbar navbar-expand-lg navbar-light " style="background: rgba(35, 47, 62, 0.80);">
       <!-- Container wrapper -->
       <div class="container justify-content-center justify-content-md-between">
         <!-- Toggle button -->
@@ -87,51 +96,67 @@
           <i class="fas fa-bars"></i>
         </button>
 
-        <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse" id="navbarLeftAlignExample">
-          <!-- Left links -->
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <!-- Navbar dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
-                data-mdb-toggle="dropdown" aria-expanded="false">
-                SHOW CATEGORIES
-              </a>
-              <!-- Dropdown menu -->
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+      <!-- Collapsible wrapper -->
+      <div class="collapse navbar-collapse" id="navbarLeftAlignExample">
+        <!-- Left links -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- Navbar dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+              data-mdb-toggle="dropdown" aria-expanded="false" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
+              line-height: 18px;
+              font-weight: 400;
+              text-transform: uppercase;
+              letter-spacing: .3px;">
+              SHOW CATEGORIES
+            </a>
+            <!-- Dropdown menu -->
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <% for(let i=0; i<category.length;i++) {%>
                 <li>
-                  <a class="dropdown-item " style="background-color: #232F3E;" href="#">Formal Suit</a>
+                  <a class="dropdown-item "
+                    style="color: white; background-color: #232F3E;font-family: 'Rubik', sans-serif"
+                    href="/products?category=<%= category[i]._id  %>">
+                    <%= category[i].name %>
+                  </a>
                 </li>
-                <li>
-                  <a class="dropdown-item" style="background-color: #232F3E;" href="#">Formal Pant</a>
-                </li>
+                <% } %>
+            </ul>
+          </li>
 
-                <li>
-                  <a class="dropdown-item" style="background-color: #232F3E;" href="#">Festive attire</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" style="background-color: #232F3E;" href="#">Formal Shoes</a>
-                </li>
-              </ul>
-            </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="#" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
+            line-height: 18px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: .3px;">HOME</a>
+          </li>
+          <li class=" nav-item">
+            <a class="nav-link text-white" href="#" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
+            line-height: 18px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: .3px;">OUR STORE</a>
+          </li>
+          <li class=" nav-item">
+            <a class="nav-link text-white" href="#" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
+            line-height: 18px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: .3px;">BLOGS</a>
+          </li>
+          <li class=" nav-item">
+            <a class="nav-link text-white" href="#" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
+            line-height: 18px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: .3px;">CONTACT</a>
+          </li>
 
-            <li class="nav-item">
-              <a class="nav-link text-white" href="/">HOME</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-white" href="/products">OUR STORE</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-white" href="#">BLOGS</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-white" href="#">CONTACT</a>
-            </li>
-
-          </ul>
-          <!-- Left links -->
-        </div>
+        </ul>
+        <!-- Left links -->
       </div>
+    </div>
       <!-- Container wrapper -->
     </nav>
 
@@ -144,8 +169,5 @@
       crossorigin="anonymous"></script>
 
       <script>
-        var loader=document.getElementById("preloader");
-        window.addEventListener("load",function(){
-          loader.style.display="none"
-        })
+       
       </script>
