@@ -4,34 +4,81 @@
     <link rel="icon" type="image/x-icon" href="images/fav.png">
     <title>Admin Login</title>
     <link rel="stylesheet" href="/stylesheet/adminLogin.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <style>
-        
-    </style>
+        .errorP {
+          color: red;
+          font-size: small;
+        }
+      </style>
     <div class="l-form">
-        <form action="/api/adminSignin" class="form" method="POST">
+        <form action="/api/adminSignin" class="form" method="POST" onsubmit="return validateForm()">
             <h1 class="form__title" style="font-weight: bolder;">Welcome Back</h1>
             <h1 class="form__title signin" style="font-weight: bold;">Sign In</h1>
 
             <div class="form__div">
-                <input type="email" name="email" class="form__input" placeholder=" " required>
+                <input type="email" name="email" class="form__input" placeholder=" " id="email">
                 <label for="" class="form__label">Email</label>
             </div>
+            <p class="errorP <%= !emailEmpty ? 'd-none' : '' %>"><%= emailEmpty %></p>
+            <p class="errorP <%= !emailNotValid ? 'd-none' : '' %>"><%= emailNotValid %></p>
 
-         
-            
             <div class="form__div">
-                <input type="password" name="password" class="form__input" placeholder=" " required>
+                <input type="password" name="password" class="form__input" placeholder=" " id="password">
                 <label for="" class="form__label">Password</label>
             </div>
-            
+            <p class="errorP <%= !passwordEmpty ? 'd-none' : '' %>"><%= passwordEmpty %></p>
+            <p class="errorP <%= !passNotValid ? 'd-none' : '' %>"><%= passNotValid %></p>
 
             <input type="submit" class="form__button" value="Sign In" style="color:white">
         </form>
     </div>
+
     <script>
-        
+        function validateForm() {
+            // Get form inputs
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            // Check if email is empty
+            if (email.trim() === "") {
+                showAlert("Email must be filled out");
+                return false;
+            }
+
+            // Check if password is empty
+            if (password.trim() === "") {
+                showAlert("Password must be filled out");
+                return false;
+            }
+
+            if (password !== adminPassword) {
+        showAlert("Password is wrong");
+        return false;
+    }
+
+    if (email !== adminEmail) {
+        showAlert("Email is wrong");
+        return false;
+    }
+
+            
+            // Add additional validation checks as needed
+            
+            // Redirect to admin-Dashboard after successful form submission
+            window.location.href = "/admin-Dashboard";
+            
+            return true; // If all checks pass, form will be submitted
+        }
+
+        function showAlert(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation error',
+                text: message,
+            });
+        }
     </script>
 </body>
 </html>

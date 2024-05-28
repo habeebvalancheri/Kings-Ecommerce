@@ -23,7 +23,7 @@ otpInputs.forEach((input, index) => {
 });
 
 // Initial countDown value
-let countDown = 30;
+let countDown = 60;
 
 function startResendTimer() {
   const countDownElement = document.getElementById('countdown');
@@ -44,7 +44,7 @@ function startResendTimer() {
 
   resendButton.addEventListener('click',()=>{
     clearInterval(timeInterval);
-    countDown = 30;
+    countDown = 60;
     startResendTimer();
   })
 }

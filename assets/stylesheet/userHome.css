@@ -5,65 +5,91 @@
   -webkit-line-clamp: 2;
   /* number of lines to show */
 }
-.cards-list {
-z-index: 0;
-width: 100%;
-display: flex;
-justify-content: space-around;
-flex-wrap: wrap;
-}
 
-.card {
-margin: 30px auto;
-width: 300px;
-height: 300px;
-border-radius: 40px;
-box-shadow: 5px 5px 30px 7px rgba(0,0,0,0.25), -5px -5px 30px 7px rgba(0,0,0,0.22);
-cursor: pointer;
-transition: 0.4s;
-}
+/* Responsive styles */
+@media (max-width: 768px) {
+  .navbar-toggler {
+    margin-top: 10px;
+  }
 
-.card .card_image {
-width: inherit;
-height: inherit;
-border-radius: 40px;
-}
+  .navbar-nav {
+    flex-direction: column;
+    background-color: #232F3E;
+  }
 
-.card .card_image img {
-width: inherit;
-height: inherit;
-border-radius: 40px;
-object-fit: cover;
-}
+  .d-flex {
+    justify-content: center;
+  }
 
-.card .card_title {
-text-align: center;
-border-radius: 0px 0px 40px 40px;
-font-family: sans-serif;
-font-weight: bold;
-font-size: 30px;
-margin-top: -80px;
-height: 40px;
-}
+  .float-end {
+    text-align: center;
+  }
 
-.card:hover {
-transform: scale(0.9, 0.9);
-box-shadow: 5px 5px 30px 15px rgba(0,0,0,0.25), 
-  -5px -5px 30px 15px rgba(0,0,0,0.22);
-  
-}
+  .input-group {
+    width: 100%;
+    margin-top: 10px;
+  }
 
-.title-white {
-color: white;
-}
+  #offerBanner img {
+    object-fit: cover;
+    width: 100%;
+    height: 200px; /* Adjust the height as needed */
+  }
 
-.title-black {
-color: black;
-}
+  .carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    text-align: center;
+  }
 
-@media all and (max-width: 500px) {
-.card-list {
-  /* On small screens, we are no longer using row direction but column */
-  flex-direction: column;
-}
+  .carousel-caption h5,
+  .carousel-caption p {
+    font-size: 14px;
+    margin: 5px;
+  }
+
+  .container.my-5 header h3 {
+    font-size: 20px;
+  }
+
+  .product-link {
+    text-align: center;
+  }
+
+  .main-image,
+  .hover-image {
+    width: 100%;
+    height: 150px; /* Adjust the height as needed */
+    object-fit: cover;
+  }
+
+  .card-title,
+  .card-text {
+    text-align: center;
+  }
+
+  .float-center {
+    text-align: center;
+  }
+
+  .input-group {
+    width: 100%;
+    margin-top: 10px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .input-group .btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .form-outline {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  #form1 {
+    width: 100%;
+  }
 }

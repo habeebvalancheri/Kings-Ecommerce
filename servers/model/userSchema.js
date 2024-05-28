@@ -1,15 +1,5 @@
 const mongoose = require("mongoose");
-
-const Schema = mongoose.Schema;
-
-const addressSchema = new Schema({
-  Address: String,
-  City: String,
-  House_no: String,
-  State: String,
-  altr_number: Number,
-  Postcode: Number,
-});
+const addressSchema = require('../model/addressSchema');
 
 const detailsSchema = new mongoose.Schema({
   name: {
@@ -32,13 +22,17 @@ const detailsSchema = new mongoose.Schema({
   },
   block: {
     type: Boolean,
+    default:false,
   },
-  address: [addressSchema], // Changed to an array if a user can have multiple addresses
+  addresses: [{type : mongoose.Schema.Types.ObjectId, ref : 'addressdb'}], // changed to reference another collection
   wallet: {
     type: Number,
     default: 0.0,
   },
-  verified: Boolean,
+  verified:{
+    type:Boolean,
+    default:false,
+  } 
 });
 
 const userDB = mongoose.model('userdb', detailsSchema);

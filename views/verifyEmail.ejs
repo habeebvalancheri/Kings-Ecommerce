@@ -59,7 +59,11 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+.errorP{
+        color: red;
+        font-size: small;
 
+    }
   </style>
 </head>
 
@@ -81,9 +85,13 @@ input[type=number] {
             <form action="/sendResetPasswordOTP" method="post">
               <!-- Add Email input box -->
               <div class="mb-3">
-                <input type="email" name="email" class="form-control" placeholder="Enter your registered email" required />
+                <input type="email" name="email" class="form-control" placeholder="Enter your registered email" />
               </div>
               
+              <p class="errorP <%= !noUserFound?'d-none':''  %>" ><%=noUserFound  %></p>
+              <p class="errorP <%= !errorEmail3?'d-none':''  %>" ><%=errorEmail3  %></p>
+              <p class="errorP <%= !errorPattern3?'d-none':''  %>" ><%=errorPattern3  %></p>
+
               <!-- Submit button -->
               <button class="btn verifyBtn  mb-3" 
                 style="border: 1px solid #000; background: #00DCFA; color:#000; width: 100%; max-width: 535px; height: 70px; flex-shrink: 0;" 

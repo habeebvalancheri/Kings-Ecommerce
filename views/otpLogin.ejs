@@ -58,7 +58,11 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+    .errorP{
+        color: red;
+        font-size: small;
 
+    }
   </style>
 </head>
 
@@ -79,8 +83,8 @@ input[type=number] {
               <span style="color: red;"><%=email%></span>
             </p>
             <form action="/verifyOTP?email=<%=email%>" method="post">
-              <div class="otp-field mb-4">
-                <input type="number" name="one" class="otp-input" maxlength="1" />
+              <div class="otp-field mb-4<%= (emptyField||invalidCode)?"border-dainger":""  %>">
+                <input type="number" name="one" class="otp-input "  maxlength="1" />
                 <input type="number" name="two"  class="otp-input" maxlength="1" />
                 <input type="number" name="three"  class="otp-input" maxlength="1" />
                 <input type="number" name="four"  class="otp-input" maxlength="1" />
@@ -88,11 +92,16 @@ input[type=number] {
                 <input type="number" name="six"  class="otp-input" maxlength="1" />
               </div>
 
+              <p class="errorP <%= !emptyField?'d-none':''  %>" ><%=emptyField  %></p>
+              <p class="errorP <%= !noRecords?'d-none':''  %>" ><%=noRecords  %></p>
+              <p class="errorP <%= !codeExpired?'d-none':''  %>" ><%=codeExpired  %></p>
+              <p class="errorP <%= !invalidCode?'d-none':''  %>" ><%=invalidCode  %></p>
+
               <div class="otp-timer mb-3" id="otp-timer" style="text-align:left;">Resend OTP in: <span id="countdown">30</span></div>
                
               <input type="text" name="userId" value="<%=id%>" style="display: none;">
               <input type="text" name="email" value="<%=email%>" style="display: none;">
-            <a href="/resendOTP?id=<%=id%>">  <button class="btn resendBtn mb-3" id="resend" class="text-left" 
+            <a href="/resendOTP?email=<%=email%>">  <button class="btn resendBtn mb-3" id="resend" class="text-left" 
               style="border: 1px solid #00dcfa;background-color: #ffffff; color: #00dcfa;
               display: none ;
               " type="button" >
@@ -110,6 +119,7 @@ input[type=number] {
               </button>
 
             </form>
+            
           </div>
         </div>
       </div>

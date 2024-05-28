@@ -17,34 +17,126 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/userHome.css">
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
 
 
 </head>
+
 <style>
-  .card-title {
+.card-title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
     -webkit-line-clamp: 2;
     /* number of lines to show */
   }
+
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .navbar-toggler {
+      margin-top: 10px;
+    }
+
+    .navbar-nav {
+      flex-direction: column;
+      background-color: #232F3E;
+    }
+
+    .d-flex {
+      justify-content: center;
+    }
+
+    .float-end {
+      text-align: center;
+    }
+
+    .input-group {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    #offerBanner img {
+      object-fit: cover;
+      width: 100%;
+      height: 200px; /* Adjust the height as needed */
+    }
+
+    .carousel-caption {
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      text-align: center;
+    }
+
+    .carousel-caption h5,
+    .carousel-caption p {
+      font-size: 14px;
+      margin: 5px;
+    }
+
+    .container.my-5 header h3 {
+      font-size: 20px;
+    }
+
+    .product-link {
+      text-align: center;
+    }
+
+    .main-image,
+    .hover-image {
+      width: 100%;
+      height: 150px; /* Adjust the height as needed */
+      object-fit: cover;
+    }
+
+    .card-title,
+    .card-text {
+      text-align: center;
+    }
+
+    .float-center {
+      text-align: center;
+    }
+
+    .input-group {
+      width: 100%;
+      margin-top: 10px;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .input-group .btn {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .form-outline {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    #form1 {
+      width: 100%;
+    }
+  }
+  
 </style>
+
 
 <body style="background-color: ghostwhite">
   <!--Main Navigation-->
   <header>
     <!-- Jumbotron -->
+    
     <div class="p-3 text-center " style="
     background: rgba(0, 194, 255, 0.35);">
       <div class="container">
         <div class="row gy-3">
           <!-- Left elements -->
           <div class="col-lg-2 col-sm-4 col-4">
-            <a href="#" class="float-start">
+            <a href="/" class="float-start">
               <h2 style="color: #000000; font-weight: bolder;">Kings</h2>
             </a>
           </div>
@@ -59,32 +151,34 @@
                   <p class="d-none d-md-block mb-0">Account</p>
                 </a>
                 <% } else { %>
-                  <a href="login" class="me-1  py-1 px-3 nav-link" style="color: #1E3050;"> <i
+                  <a href="/signin" class="me-1  py-1 px-3 nav-link" style="color: #1E3050;"> <i
                       class="fas fa-user-alt m-1 me-md-2"></i>
                     <p class="d-none d-md-block mb-0">Login in</p>
                   </a>
                   <% } %>
 
                     <% if(users) {%>
-                      <a href="/MyWishlist" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
+                      <a href="/Wish-list" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
                           class="fas fa-heart m-1 me-md-2 "></i>
-                        <p class="d-none d-md-block mb-0">Wishlist</p>
+
+                        <p class="d-none d-md-block mb-0">Wishlist <span id="total-wishList-items" class= "badge rounded-circle bg-danger position-absolute" >0</span></p>
                       </a>
                       <% }else{ %>
-                        <a href="/login" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
+                        <a href="/signin" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
                             class="fas fa-heart m-1 me-md-2 "></i>
                           <p class="d-none d-md-block mb-0">Wishlist</p>
                         </a>
                         <% } %>
                           <% if(users) {%>
-                            <a href="/MyCart" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
-                                class="fas fa-shopping-cart m-1 me-md-2 "></i>
-                              <p class="d-none d-md-block mb-0">My cart</p>
-                            </a>
+                            <a href="/cart" class=" py-1 px-3 nav-link" 
+                            style="color: #1E3050;" > <i class="fas fa-shopping-cart m-1 me-md-2 " ></i>
+                            
+                            <p class="d-none d-md-block mb-0">Cart <span id="total-cart-items" class= "badge rounded-circle bg-danger position-absolute" >0</span></p> 
+                          </a>
                             <% }else{ %>
-                              <a href="/login" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
+                              <a href="/signin" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
                                   class="fas fa-shopping-cart m-1 me-md-2 "></i>
-                                <p class="d-none d-md-block mb-0">My cart</p>
+                                <p class="d-none d-md-block mb-0">cart</p>
                               </a>
                               <% } %>
             </div>
@@ -95,11 +189,11 @@
           <div class="col-lg-5 col-md-12 col-12">
             <div class="input-group float-center" >
 
-              <form action="#" method="GET" class="input-group float-center">
+              <form action="/products" method="GET" class="input-group float-center">
                 <button type="submit" class="btn  shadow-0" style="border: 1px solid #000;background: #000;">
                   <i class="fas fa-search" style="color:#fff"></i>
                 </button>
-                <div class="form-outline">
+                <div class="form-outline" style="width:350px;height:35px;">
                   <input type="search" name="search" id="form1" class="form-control" style="border-radius: 0 5px 5px 0;
                   border: 1px solid #000;
                   background: #FFF;width: 350px;
@@ -145,12 +239,12 @@
               </a>
               <!-- Dropdown menu -->
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <% for(let i=0; i<categorys.length;i++) {%>
+                <% for(let i=0; i<categories.length;i++) {%>
                   <li>
                     <a class="dropdown-item "
                       style="color: white; background-color: #232F3E;font-family: 'Rubik', sans-serif"
-                      href="/products?category=<%= categorys[i]._id  %>">
-                      <%= categorys[i].name %>
+                      href="/products?category=<%= categories[i]._id  %>">
+                      <%= categories[i].name %>
                     </a>
                   </li>
                   <% } %>
@@ -165,13 +259,13 @@
               letter-spacing: .3px;">HOME</a>
             </li>
             <li class=" nav-item">
-              <a class="nav-link text-white" href="#" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
+              <a class="nav-link text-white" href="/products" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
               line-height: 18px;
               font-weight: 400;
               text-transform: uppercase;
               letter-spacing: .3px;">OUR STORE</a>
             </li>
-            <li class=" nav-item">
+            <!-- <li class=" nav-item">
               <a class="nav-link text-white" href="#" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
               line-height: 18px;
               font-weight: 400;
@@ -184,7 +278,7 @@
               font-weight: 400;
               text-transform: uppercase;
               letter-spacing: .3px;">CONTACT</a>
-            </li>
+            </li> -->
 
           </ul>
           <!-- Left links -->
@@ -235,7 +329,7 @@
     
                 <div class="discount-badge position-absolute top-0 start-0 mt-2 px-1 py-0"
                   style="background-color: #febd69; color: #131921; border-radius: 90px; margin-left: 8px; font-size: 0.75rem; font-weight: bolder;">
-                  <%= products[i].discound %> %OFF
+                  <%= products[i].discount %> %OFF
                 </div>
     
                 <img src="/images/<%= products[i].pImages[0] %>" class="card-img-top main-image" style="aspect-ratio: 2.5 / 3" />
@@ -272,21 +366,53 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     crossorigin="anonymous"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async function() {
+          try {
+              // Fetch total items from the server
+              const response = await fetch('/getTotalItemsInCart');
+              const data = await response.json();
+              const totalItems = data.totalQuantity;
+      
+              // Update the HTML element displaying total items in the navbar
+              const totalItemsElement = document.getElementById('total-cart-items');
+              if (totalItemsElement) {
+                  if (totalItems > 0) {
+                      totalItemsElement.textContent = totalItems;
+                      totalItemsElement.style.display = 'inline-block'; // Show the span tag
+                  } else {
+                      totalItemsElement.style.display = 'none'; // Hide the span tag if totalItems is 0
+                  }
+              }
+          } catch (error) {
+              console.error('Error fetching total items in cart:', error);
+          }
+      });
+      </script>
+      <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Fetch total items from the server
+                const response = await fetch('/getTotalItemsInWishList');
+                const data = await response.json();
+                const totalItems = data.totalQuantity;
+        
+                // Update the HTML element displaying total items in the navbar
+                const totalItemsElement = document.getElementById('total-wishList-items');
+                if (totalItemsElement) {
+                    if (totalItems > 0) {
+                        totalItemsElement.textContent = totalItems;
+                        totalItemsElement.style.display = 'inline-block'; // Show the span tag
+                    } else {
+                        totalItemsElement.style.display = 'none'; // Hide the span tag if totalItems is 0
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching total items in wishList:', error);
+            }
+        });
+        </script>
   
-
-  <style>
-    .burger {
-      margin-top: 10px;
-    }
-
-    @media (max-width: 995px) {
-      .navbar-nav {
-        flex-direction: column;
-        /* Switch back to a column layout on smaller screens */
-        background-color: #232F3E
-      }
-    }
-  </style>
   <%- include('include/footer') %>
 </body>
 

@@ -1,98 +1,173 @@
-<!-- include footer -->
+<!-- Include footer -->
 <%- include('include/adminBase.ejs') %>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
-<!-- /include footer -->
+<!-- /Include footer -->
 
-    <style>
-        .product-name {
-            max-width: 150px;
-            /* Adjust the max-width according to your design */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    </style>
-    <!-- CONTENT -->
+<style>
+    .product-name {
+        max-width: 150px;
+        /* Adjust the max-width according to your design */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    #order-details {
+        display: none; /* Initially hidden */
+        padding: 20px;
+        border: 1px solid #ddd;
+        margin-top: 20px;
+    }
+</style>
+<!-- CONTENT -->
 
-    <section id="content">
-        <!-- NAVBAR -->
+<section id="content">
+    <!-- NAVBAR -->
+    <!-- NAVBAR -->
 
-        <!-- NAVBAR -->
-
-        <!-- MAIN -->
-        <main>
-            <div class="table-data">
-                <div class="order">
-                    <div class="head">
-                        <h3>Recent Orders</h3>
-                        <i class='bx bx-search'></i>
-                        <i class='bx bx-filter'></i>
-                    </div>
-                    <table  class="display">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Order Id</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            
-                                <tr >
-                                    <td>
-                                        <img src="primg">
-                                        <p class="product-name">
-                                           
-                                        </p>
-                                    </td>
-                                    <td>
-                                        
-                                    </td>
-                                    <td>
-                                        
-                                    </td>
-                                    
-                                        <td><span class="status pending">pending</span></td>
-                                       
-                                            <td><span class="status process">shipped</span></td>
-                                            
-                                                <td><span class="status completed">Delivered</span></td>
-                                                
-                                                    <td><span class="status cancelled"
-                                                            style="background-color: rgb(2, 42, 122);">returned</span>
-                                                    </td>
-                                                   
-                                                        <td><span class="status cancelled"
-                                                                style="background-color: rgb(215, 1, 1);">Cancelled</span>
-                                                        </td>
-
-                                                       
-                                </tr>
-                                
-                        </tbody>
-                    </table>
+    <!-- MAIN -->
+    <main>
+        <div class="table-data">
+            <div class="order">
+                <div class="head">
+                    <h3>Recent Orders</h3>
+                    <i class='bx bx-search'></i>
+                    <i class='bx bx-filter'></i>
                 </div>
-            </div>
-        </main>
-        <!-- MAIN -->
-    </section>
-    <!-- CONTENT -->
-    <script>
-       
-    </script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
-    <script src="js/adminserver.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                <table class="display">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Order ID</th>
+                            <th>Status</th>
+                            <th>return</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                               
+                                <% order.products.forEach(product => { %>
+                                    <tr>
+                                        <td>
+                                            <img src="/images/<%= product.pImages %>" alt="<%= product.pName %>" width="50">
+                                            <p class="product-name">
+                                                <%= product.pName %>
+                                            </p>
+                                        </td>
+                                        <td><%= order._id %></td>
+                                        <td>
+                                            <% if (product.status === 'Pending') { %>
+                                                <span class="status pending">Pending</span>
+                                            <% } else if (product.status === 'Shipped') { %>
+                                                <span class="status process">Shipped</span>
+                                            <% } else if (product.status === 'Delivered') { %>
+                                                <span class="status completed">Delivered</span>
+                                            <% } else if (product.status === 'Cancelled') { %>
+                                                <span class="status cancelled" style="background-color: rgb(215, 1, 1);">Cancelled</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (product.return === 'Pending') { %>
+                                                <span class="status pending">Pending</span>
+                                            <% } else if (product.return === 'Returned') { %>
+                                                <span class="status returned" style="background-color: rgb(215, 1, 1);" >Returned</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <!-- Details button -->
+                                            <button class="btn btn-info mb-2 details-btn"  onclick="redirectToDetails('<%= product.productId._id %>','<%= order._id %>','<%= order.user.userId %>')">Details</button>
+                                                   <!-- Change Order button -->
+    <button class="btn btn-warning mb-2 change-order-btn" onclick="redirectToChangeOrder('<%= product.productId._id %>','<%= order._id %>','<%= order.user.userId %>')">Change Order</button>
+                                        </td>
+                                    </tr>
+                                    
+                                <% }) %>
+                            <% }) %>
+                        <% } %>
+                    </tbody>
+                </table>                     
+            </div> 
+        </div>
+            <!-- Pagination Controls -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <!-- Previous Page Button -->
+            <% if (page > 1) { %>
+                <li class="page-item">
+                    <a class="page-link" href="/admin-Orders?page=<%= page - 1 %>&limit=<%= limit %>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            <% } else { %>
+                <li class="page-item disabled">
+                    <span class="page-link" aria-hidden="true">&laquo;</span>
+                </li>
+            <% } %>
+  
+            <!-- Page Number Buttons -->
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= i === page ? 'active' : '' %>">
+                    <a style="color:blue;"  class="page-link" href="/admin-Orders?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                </li>
+            <% } %>
+  
+            <!-- Next Page Button -->
+            <% if (page < totalPages) { %>
+                <li class="page-item">
+                    <a class="page-link" href="/admin-Orders?page=<%= page + 1 %>&limit=<%= limit %>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            <% } else { %>
+                <li class="page-item disabled">
+                    <span class="page-link" aria-hidden="true">&raquo;</span>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+    </main>
+    <!-- MAIN -->
+</section>
+<!-- CONTENT -->
 
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
-    <script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+<script src="js/adminserver.js"></script>
+<script>
+   
+    // Initialize the DataTable
+    $(document).ready(function() {
+        $('.display').DataTable();
+    });
+
     
+ // Function to redirect to admin details page with product ID and order ID
+ function redirectToDetails(productId, orderId,userId) {
+            const url = `/admin-Order-Details?productId=${productId}&orderId=${orderId}&userId=${userId}`;
+            window.location.href = url;
+        }
 
-    </script>
-    </body>
+ // Function to redirect to admin Change Order page with product ID and order ID
+ function redirectToChangeOrder(productId, orderId,userId) {
+            const url = `/admin-Order-Change?productId=${productId}&orderId=${orderId}&userId=${userId}`;
+            window.location.href = url;
+        }
 
-    </html>
+</script>
+<script>
+    $(document).ready(function () {
+      $('#table_id').DataTable({
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        ordering: true,
+        searching: true,
+        responsive: true
+      });
+    });
+  </script>
+
+</body>
+</html>

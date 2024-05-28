@@ -9,9 +9,9 @@
     <script src="https://kit.fontawesome.com/23d1247997.js" crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <section id="content">
         <main>
-
             <a href='/add-Category'><button class="btn btn-dark">Add Categories</button></a>
             <a href="/unlisted-Categories"><button class="btn btn-dark">Unlisted Categories</button></a>
 
@@ -19,57 +19,69 @@
                 <div class="order">
                     <div class="head">
                         <h3>Categories</h3>
-                        <!-- <i class='bx bx-search'></i>
-                        <i class='bx bx-filter'></i> -->
                     </div>
-                    <table>
-
+                    <table id="categoryTable">
                         <thead>
                             <tr>
                                 <th>si. No</th>
                                 <th>category</th>
-
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <% for(let i=0;i<category.length;i++){ %>
-                            <tbody>
-                                <tr >
+                        <tbody>
+                            <% for(let i=0;i<category.length;i++){ %>
+                                <tr>
                                     <td>
                                         <p>
                                           <%= i + 1 %>
                                         </p>
                                     </td>
-
                                     <td>
-
                                         <p>
                                            <%= category[i].name  %>
                                         </p>
-
                                     </td>
-
-
-
                                     <td><a href="/unlist-Category?category=<%= category[i]._id  %>"
                                             class="btn btn-light border px-2 pt-2 icon-hover"
                                             style="margin-right: 3%;"><i
                                                 class="fas fa-trash fa-lg text-secondary px-1"></i></a></td>
-
-
                                 </tr>
-                                <% } %>
-                            </tbody>
-                          
+                            <% } %>
+                        </tbody>
                     </table>
                 </div>
+            </div>
         </main>
-        <script>
-            
-        </script>
     </section>
-
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#categoryTable').DataTable();
+        });
+    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const successMessage = "<%- success %>";
+      const errorMessage = "<%- error %>";
+  
+      if (successMessage && successMessage.trim() !== '') {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: successMessage,
+        });
+      }
+  
+      if (errorMessage && errorMessage.trim() !== '') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+        });
+      }
+    });
+  </script>
     </body>
-
-    </html>
+</html>

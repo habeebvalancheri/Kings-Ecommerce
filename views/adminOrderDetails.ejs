@@ -1,0 +1,174 @@
+<%- include('include/adminBase.ejs') %>
+
+<style>
+  /* Main container style */
+  .main-container {
+    max-width: 1100px;
+    margin: 50px auto; /* Centers the container on the page and adds margin from the top */
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .order-details-container {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+
+  /* Responsive container */
+  .order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* Responsive order info section */
+  .order-info-section {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Allow items to wrap */
+    gap: 15px;
+  }
+
+  /* Order info item styling */
+  .order-info-item {
+    flex: 1;
+    min-width: 200px; /* Minimum width for each item */
+  }
+
+  /* Product image styling */
+  .order-product-image {
+    max-width: 100px;
+    height: auto;
+  }
+
+  /* Button styling */
+  .close-button {
+    margin-top: 20px;
+  }
+
+  /* Media query for smaller screens */
+  @media (max-width: 768px) {
+    .order-info-section {
+      flex-direction: column; /* Stack items vertically on smaller screens */
+      align-items: flex-start;
+    }
+
+    .order-info-item {
+      width: 100%; /* Make each item full width on smaller screens */
+    }
+
+    /* Adjust product image size */
+    .order-product-image {
+      max-width: 80px;
+    }
+  }
+</style>
+
+<div class="row">
+    <div class="col-md-8 mb-4 mx-auto mb-4 mt-5">
+        <div class="card mb-4" style="background-color: #f5f5f7;">
+            <div class="card-header py-3">
+                
+                <!-- Main div for recent order details -->
+                <div id="order-details" class="order-details-container">
+                    <h3>Order Details</h3>
+                    
+                    <!-- Section for showing shipping address, payment option, and order date -->
+                    <div class="order-info">
+                        <div class="order-info-section">
+                            <div class="order-info-item">
+                                <p><strong>Shipping Details:</strong></p>
+                                <p><span id="shipping-details"><%= orderDetails.shippingAddress.toString().slice(1,-1) %></p>
+                            </div>
+                            <div class="order-info-item">
+                                <p><strong>Payment Method:</strong></p>
+                                <p><span id="payment-method"><%= orderDetails.paymentMethod %></p>
+                            </div>
+                            <div class="order-info-item"  >
+                                <p><strong>Ordered Date:</strong></p>
+                                <p><span id="ordered-date"style="color:blue"><%= orderDetails.orderDate %></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section for user information -->
+                    <div class="order-info">
+                        <div class="order-info-section">
+                            <div class="order-info-item">
+                                <p><strong>User Name:</strong></p>
+                                <p><span id="user-name"><%= user.name %></p>
+                            </div>
+                            <div class="order-info-item">
+                                <p><strong>Email:</strong></p>
+                                <p><span id="user-email"><%= user.email %></p>
+                            </div>
+                            <div class="order-info-item">
+                                <p><strong>Phone:</strong></p>
+                                <p><span id="user-phone"><%= user.phone %></p>
+                            </div>
+                        </div>
+                        
+                        <div class="order-info-section">
+                            <div class="order-info-item">
+                                <p><strong>Product Name:</strong></p>
+                                <p><span id="product-name"><%= product.pName %></p>
+                            </div>
+                            <div class="order-info-item">
+                                <p><strong>Product Price:</strong></p>
+                                <p><span id="product-price"><%= product.price %></p>
+                            </div>
+                            <div class="order-info-item">
+                                <p><strong>Discount:</strong></p>
+                                <p><span id="product-discount"><%= product.discount %>%</p>
+                            </div>
+                        </div>
+
+                        <div class="order-info-section">
+                            <div class="order-info-item">
+                                <p><strong>Total:</strong></p>
+                                <p><span id="order-total"><%= orderDetails.totalAmount.toFixed(2) %></p>
+                            </div>
+                            <div class="order-info-item">
+                                <p><strong>Image:</strong></p>
+                                <img id="product-image" src="/images/<%= product.pImages %>" alt="Product Image" width="100" class="order-product-image">
+                            </div>
+                        </div>
+
+                        <!-- New sections for status, cancellation reason, and return reason -->
+                        <div class="order-info-section">
+                            <div class="order-info-item" >
+                                <p><strong>Order Status:</strong></p>
+                                <p><span id="order-status" style="color:green"><%= product.status %></p>
+                            </div>
+                            <div class="order-info-item">
+                              <p><strong>Order Return Status:</strong></p>
+                              <p><span id="order-status" style="color:green"><%= product.return %></p>
+                          </div>
+                            <div class="order-info-item">
+                                <p><strong>Cancellation Reason:</strong></p>
+                                <p><span id="cancellation-reason" style="color:red"><%= product.cancelReason || 'N/A' %></p>
+                            </div>
+                            <div class="order-info-item">
+                                <p><strong>Return Reason:</strong></p>
+                                <p><span id="return-reason" style="color:red"><%= product.returnReason || 'N/A' %></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Button to close the details view -->
+                    <button onclick="closeOrderDetails()" class="btn btn-secondary close-button">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  function closeOrderDetails() {
+    window.location = '/admin-Orders';
+  }
+</script>

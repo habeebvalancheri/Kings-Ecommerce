@@ -2,183 +2,438 @@
 <%- include('include/header') %>
 <!-- /include header -->
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+<!-- MDB -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="stylesheet/accountDetails.css">
+<style>
+  /* Custom styles for SweetAlert dialogs */
+.swal-title {
+  color: #dc3545 !important; /* Red color for the title */
+}
 
+.swal-text {
+  color: #dc3545 !important; /* Red color for the text */
+}
 
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-  <!-- MDB -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="/stylesheet/accountDetails.css">
+.swal-footer {
+  text-align: center !important; /* Center-align the footer */
+}
 
+.swal-button {
+  background-color: #dc3545 !important; /* Red color for the buttons */
+  border: none !important; /* Remove button border */
+  box-shadow: none !important; /* Remove button shadow */
+  border-radius: 5px !important; /* Add border radius to buttons */
+  padding: 10px 20px !important; /* Add padding to buttons */
+}
 
-  <section style="background-color: #eee; height: 100vh;">
-    <div class="container py-5">
+.swal-button:hover {
+  background-color: #c82333 !important; /* Darker red color on hover */
+}
+
+</style>
+<style>
+  .errorP{
+      color: red;
+      font-size: small;
+
+  }
+</style>
+<section class="interactive-section">
+  <div class="container py-5">
+    <div class="row">
+      <!-- Logout Button (Right Side Top) -->
+      <div class="col text-end mb-4">
+        <form action="/logout">
+          <button type="submit" class="btn" style="background-color: #4f4f4f; color:whitesmoke" id="logoutButton">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Left Side Content -->
+    <div class="row">
+      <!-- Address Details -->
+      <div class="col-lg-4">
+        <!-- Add your logic to display address details -->
+
+        <!-- Example: Add Address Link -->
+        <!-- <div class="card mb-4">
+          <div class="card-body text-center">
+            <h5 class="my-3" style="color:black;">Address Options</h5>
+            <div class="d-flex justify-content-center mb-2"> -->
+              <!-- Add Address Link -->
+              <!-- <button id="addAddressLink" class="btn btn-link" style="text-decoration:none; background-color:  #4f4f4f; color: white;" onclick="redirectToAddress()">Add Address</button>
+            </div>
+          </div>
+        </div> -->
+
+        <!-- My Orders Link -->
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <h5 class="my-3">Your Orders</h5>
+            <div class="d-flex justify-content-center mb-2">
+              <!-- My Orders Link -->
+              <a href="/order">
+                <button class="btn btn-warning" style="font-weight: 500;">My Orders</button>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet Details -->
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <h5 class="my-3">Your Wallet</h5>
+            <% if(defaultAddress) {%>
+            <!-- Add your logic to display wallet details (Credit Card, Balance, etc.) -->
+            <div class="credit-card">₹
+              <%= wallet.wallet  %>
+            </div>
+            <% }else{ %>
+               <!-- Add your logic to display wallet details (Credit Card, Balance, etc.) -->
+            <div class="credit-card">
+              <!-- Your wallet content goes here -->
+            </div>
+              <% } %>
+          </div>
+        </div>
+      </div>
+
+   <!-- Right Side Content -->
+<div class="col-lg-8">
+  <!-- User Details -->
+  <div class="card mb-4" id="userDetailsSection">
+    <div class="card-body">
+      <!-- Full Name -->
       <div class="row">
-        <div class="col">
-          <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
-            <ol class="breadcrumb mb-0">
-              <form action="/logout">
-                <button type="submit" class="btn " style="background-color: #131921; color:whitesmoke"
-                  id="logoutButton">logout</button>
-              </form>
-            </ol>
+        <div class="col-sm-3">
+          <p class="mb-0">Full Name</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0" id="fullNameDisplay"><%= defaultAddress ? user.name : '' %></p>
+        </div>
+      </div>
+      <hr>
+
+      <!-- Email -->
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">Email</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0" id="emailDisplay"><%= defaultAddress ? user.email : '' %></p>
+        </div>
+      </div>
+      <hr>
+
+      <!-- Phone -->
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">Phone</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0" id="phoneDisplay"><%= defaultAddress ? user.phone : '' %></p>
+        </div>
+      </div>
+      <hr>
+      <p class="errorP <%= !validationErrors.userFullNameRequired?'d-none':''  %>" ><%=validationErrors.userFullNameRequired  %></p>
+      <p class="errorP <%= !validationErrors.fullNameRegex?'d-none':''  %>" ><%=validationErrors.fullNameRegex  %></p>
+      <p class="errorP <%= !validationErrors.userPhoneRequired?'d-none':''  %>" ><%=validationErrors.userPhoneRequired  %></p>
+      <p class="errorP <%= !validationErrors.phoneRegex?'d-none':''  %>" ><%=validationErrors.phoneRegex  %></p>
+      <p class="errorP <%= !validationErrors.errorCurrentPassword?'d-none':''  %>" ><%=validationErrors.errorCurrentPassword  %></p>
+      <p class="errorP <%= !validationErrors.currentPasswordRegex?'d-none':''  %>" ><%=validationErrors.currentPasswordRegex  %></p>
+      <p class="errorP <%= !validationErrors.notMatchingCurrentPassword?'d-none':''  %>" ><%=validationErrors.notMatchingCurrentPassword  %></p>
+      <p class="errorP <%= !validationErrors.errorNewPassword?'d-none':''  %>" ><%=validationErrors.errorNewPassword  %></p>
+      <p class="errorP <%= !validationErrors.newPasswordRegex?'d-none':''  %>" ><%=validationErrors.newPasswordRegex  %></p>
+      <p class="errorP <%= !validationErrors.errorConfirmPassword?'d-none':''  %>" ><%=validationErrors.errorConfirmPassword  %></p>
+      <p class="errorP <%= !validationErrors.confirmPasswordRegex?'d-none':''  %>" ><%=validationErrors.confirmPasswordRegex  %></p>
+      <p class="errorP <%= !validationErrors.notEqualPassword?'d-none':''  %>" ><%=validationErrors.notEqualPassword  %></p>
+      <p class="errorP <%= !validationErrors.alreadyUsedPassword?'d-none':''  %>" ><%=validationErrors.alreadyUsedPassword  %></p>
+     
+
+      <!-- Edit Profile -->
+      <div class="row align-items-center">
+        <div class="col-sm-3">
+          <p class="mb-0">Edit Profile</p>
+        </div>
+        <div class="col-sm-9 d-flex justify-content-end">
+          <button id="editProfileButton" class="btn btn-primary">Edit Profile</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+ 
+
+  <!-- Edit Profile Form -->
+  <div id="editProfileForm" class="card mb-4 d-none">
+    <div class="card-body">
+      <form action="/updateProfile" method="post" id="editForm">
+        
+        <div class="row">
+          <div class="col-sm-3">
+            <label for="fullName">Full Name</label>
+          </div>
+          <div class="col-sm-9">
+            <input type="text" id="fullName" name="fullName" class="form-control" value="<%= defaultAddress ? user.name : '' %>">
+          </div>
+        </div>
+        <!-- <div class="row mt-3">
+          <div class="col-sm-3">
+            <label for="email">Email</label>
+          </div>
+          <div class="col-sm-9"> -->
+            <!-- <input type="email" id="email" name="email" class="form-control" value=""> -->
+          <!-- </div>
+        </div> -->
+        <div class="row mt-3">
+          <div class="col-sm-3">
+            <label for="phone">Phone</label>
+          </div>
+          <div class="col-sm-9">
+            <input type="text" id="phone" name="phone" class="form-control" value="<%= defaultAddress ? user.phone : '' %>">
+          </div>
+        </div>
+       
+            <!-- Password Change Inputs (Initially hidden) -->
+            <div id="passwordChangeInputs" style="display: none;">
+              <div class="row mt-3">
+                <div class="col-sm-3">
+                  <label for="currentPassword">Current Password</label>
+                </div>
+                <div class="col-sm-9">
+                  <input type="password" id="currentPassword" name="currentPassword" class="form-control">
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-sm-3">
+                  <label for="newPassword">New Password</label>
+                </div>
+                <div class="col-sm-9">
+                  <input type="password" id="newPassword" name="newPassword" class="form-control">
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-sm-3">
+                  <label for="confirmPassword">Confirm Password</label>
+                </div>
+                <div class="col-sm-9">
+                  <input type="password" id="confirmPassword" name="confirmPassword" class="form-control">
+                </div>
+              </div>
+            </div>
+        <div class="row mt-4">
+          <div class="col-sm-9 offset-sm-3">
+              <!-- Button to toggle password change inputs -->
+          <button id="togglePasswordChange" class="btn btn-primary">Change Password</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="button" id="cancelEdit" class="btn btn-secondary ml-2">Cancel</button>
+          </div>
+          
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+           
+<!-- Display multiple addresses -->
+<div class="row align-items-center">
+  <div class="col-sm-3">
+    <h5 class="my-3">My Addresses</h5>
+  </div>
+  <div class="col-sm-9 d-flex justify-content-end">
+    <button id="addAddressLink" class="btn btn-link" style="text-decoration:none; background-color:  #4f4f4f; color: white;" onclick="redirectToAddress()">Add Address</button>
+  </div>
+
+  <% for (let i = 0; i < addressesOnPage.length; i++) { %>
+    <!-- Render addresses for the current page -->
+    <% const address = addressesOnPage[i]; %>
+    <div class="col-lg-6 mb-4 d-flex"> <!-- Adjust the column width as needed -->
+      <div class="card" style="flex: 1;">
+        <div class="card-body">
+          <ul class="list-unstyled">
+            <li><strong>Name:</strong> <%= address.name %></li>
+            <li><strong>Email:</strong> <%= user.email %></li>
+            <li><strong>Phone:</strong> <%= user.phone %></li>
+            <li><strong>Address:</strong> <%= address.address %></li>
+            <li><strong>City:</strong> <%= address.city %></li>
+            <li><strong>House No:</strong> <%= address.houseNo %></li>
+            <li><strong>State:</strong> <%= address.state %></li>
+            <li><strong>Country:</strong> <%= address.country %></li>
+            <li><strong>Zip Code:</strong> <%= address.zipCode %></li>
+            <li><strong>Mobile:</strong> <%= address.mobile %></li>
+          </ul>
+          <div class="mt-3 ">
+            <button class="btn btn-primary btn-sm" onclick="updateAddress('<%= address._id %>')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="removeAddress('<%= address._id %>')">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+  
+
+
+
+
+          <!-- Pagination Controls -->
+          <nav aria-label="Pagination">
+            <ul class="pagination justify-content-center">
+              <% if (currentPage > 1) { %>
+                <li class="page-item">
+                  <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              <% } %>
+              <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                </li>
+              <% } %>
+              <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                  <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              <% } %>
+            </ul>
           </nav>
         </div>
       </div>
-      
-        <div class="row">
-          <div class="col-lg-4">
-            <div class="card mb-4">
-              <div class="card-body text-center">
-                <h5 class="my-3">
-                  
-                </h5>
-                <p class="text-muted mb-1"></p>
-                
-                  <button class="btn "
-                    style="background-color: #FEBD69; color: #131921; font-weight: 500;">verified</button>
-                  
-                    <a href="/verifyUser?id=&email=">Verify OTP</a>
-                    
-                      <div class="d-flex justify-content-center mb-2">
-                        <input type="text" name="id" value="" style="display: none;">
-                        <input type="text" name="i" value="" style="display: none;">
-                        <h1></h1>
-                      </div>
-              </div>
-            </div>
-          </div>
-          
-            <div class="col-lg-4">
-              <div class="card mb-4">
-                <div class="card-body text-center">
-                  <h5 class="my-3">
-                    Your Orders
-                  </h5>
-                  <p class="text-muted mb-1"></p>
-                  <a href="/my-Orders"><button class="btn "
-                      style="background-color: #FEBD69; color: #131921; font-weight: 500;">My Orders</button></a>
-                  <div class="d-flex justify-content-center mb-2">
-                    <input type="text" name="id" value="" style="display: none;">
-                    <input type="text" name="i" value="" style="display: none;">
-                    <h1></h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-              <div class="col-lg-4">
-                <div class="card mb-4">
-                  <div class="card-body text-center">
-                    <h5 class="my-3">
-                      Your Wallet
-                    </h5>
-                    <!-- Credit Card -->
-                    <div class="credit-card">
-                      <div class="card-front">
-                        <div class="chip"></div>
-                        <div class="card-number"> </div>
-                        <div class="card-holder"> </div>
-                        <div class="card-expiry"> Balance :</div>
-                      </div>
-                      <div class="card-back">
-                        <div class="stripe"></div>
-                        <div class="signature"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-           
-            
-            
-           
-              <div class="col-lg-8">
-                <div class="card mb-4">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-sm-3">
-                        <p class="mb-0">Full Name</p>
-                      </div>
-                      <div class="col-sm-9">
-                        <p class="text-muted mb-0">
-                          
-                        </p>
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                        <p class="mb-0">Email</p>
-                      </div>
-                      <div class="col-sm-9">
-                        <p class="text-muted mb-0">
-                         
-                        </p>
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                        <p class="mb-0">Phone</p>
-                      </div>
-                      <div class="col-sm-9">
-                        <p class="text-muted mb-0">
-                          
-                        </p>
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                        <p class="mb-0">Mobile</p>
-                      </div>
-                      <div class="col-sm-9">
-                        <p class="text-muted mb-0">
-                        
-                        </p>
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                        <p class="mb-0">Address</p>
-                      </div>
-                     
-                        <div class="col-sm-9">
-                          <a href="/account/address">
-                            <p class="text-dark mb-0">
-                              View Address 
-                            </p>
-                          </a>
-                        </div>
-                        
-                          <div class="col-sm-9">
-                            <a href="/add-address">
-                              <p class="text-dark mb-0" style="text-decoration: underline;">
-                                Add Address
-                              </p>
-                            </a>
-                          </div>
-                         
-                    </div>
-                  </div>
-                </div>
-                </div>
-              </div>
-        </div>
-    
-        
-          <p>Blocked</p>
-          
-          </div>
-  </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blocked Section -->
+  <div class="text-center">
+    <!-- <p>Blocked</p> -->
+  </div>
+</section>
+<!-- SweetAlert library -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+  function redirectToAddress() {
+    window.location.href = '/address';
+  }
+</script>
+<script>
+  document.getElementById('editProfileButton').addEventListener('click', function() {
+    document.getElementById('userDetailsSection').classList.toggle('d-none');
+    document.getElementById('editProfileForm').classList.toggle('d-none');
+
+    // Populate edit form fields with existing details
+    document.getElementById('fullName').value = document.getElementById('fullNameDisplay').textContent.trim();
+    document.getElementById('email').value = document.getElementById('emailDisplay').textContent.trim();
+    document.getElementById('phone').value = document.getElementById('phoneDisplay').textContent.trim();
+  });
+
+  document.getElementById('cancelEdit').addEventListener('click', function() {
+    document.getElementById('userDetailsSection').classList.toggle('d-none');
+    document.getElementById('editProfileForm').classList.toggle('d-none');
+  });
+</script>
+<script>
+  document.getElementById('togglePasswordChange').addEventListener('click', function(event) {
+    event.preventDefault();
+    var passwordChangeInputs = document.getElementById('passwordChangeInputs');
+    var togglePasswordChangeButton = document.getElementById('togglePasswordChange');
+    // Toggle the display of password change inputs
+    if (passwordChangeInputs.style.display === 'none') {
+      passwordChangeInputs.style.display = 'block';
+      togglePasswordChangeButton.style.display = 'none';
+    } else {
+      passwordChangeInputs.style.display = 'none';
+      togglePasswordChangeButton.style.display = 'block';
+    }
+  });
+</script>
+<script>
+  // Function to display SweetAlerts for validation errors
+  function displayValidationErrors(errors) {
+  if (errors) {
+  if (errors.userFullNameRequired) {
+  swal("Error", errors.userFullNameRequired, "error");
+  }
+  if (errors.fullNameRegex) {
+  swal("Error", errors.fullNameRegex, "error");
+  }
+  if (errors.userPhoneRequired) {
+  swal("Error", errors.userPhoneRequired, "error");
+  }
+  if (errors.phoneRegex) {
+  swal("Error", errors.phoneRegex, "error");
+  }
+  if (errors.errorCurrentPassword) {
+  swal("Error", errors.errorCurrentPassword, "error");
+  }
+  if (errors.currentPasswordRegex) {
+  swal("Error", errors.currentPasswordRegex, "error");
+  }
+  if (errors.errorNewPassword) {
+  swal("Error", errors.errorNewPassword, "error");
+  }
+  if (errors.newPasswordRegex) {
+  swal("Error", errors.newPasswordRegex, "error");
+  }
+  if (errors.errorConfirmPassword) {
+  swal("Error", errors.errorConfirmPassword, "error");
+  }
+  if (errors.confirmPasswordRegex) {
+  swal("Error", errors.confirmPasswordRegex, "error");
+  }
+  if (errors.notMatchingCurrentPassword) {
+  swal("Error", errors.notMatchingCurrentPassword, "error");
+  }
+  if (errors.notEqualPassword) {
+  swal("Error", errors.notEqualPassword, "error");
+  }
+  if (errors.alreadyUsedPassword) {
+  swal("Error", errors.alreadyUsedPassword, "error");
+  }
+  }
+  }
   
- 
- 
-<script src="js/accountDetails.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- include footer -->
-  <%- include('include/footer') %>
-  <!-- /include footer -->
+  // Call the function to display validation errors after the document is loaded
+  document.addEventListener("DOMContentLoaded", function() {
+  displayValidationErrors(<%- JSON.stringify(validationErrors) %>);
+  });
+  </script>
+  <script>
+  // Function to update an address
+  function updateAddress(addressId) {
+  // Navigate to the edit-address route
+  window.location.href = `/edit-address?id=${addressId}`;
+  }
+  
+  // Remove address function
+  function removeAddress(addressId) {
+  fetch(`/remove-address?id=${addressId}`, { method: 'GET' })
+  .then(response => {
+  if (response.ok) {
+  location.reload(); // Reload the page upon successful removal
+  } else {
+  console.error('Failed to remove address');
+  }
+  })
+  .catch(error => {
+  console.error('Error removing address:', error);
+  });
+  }
+  </script>
+  
+<!-- SweetAlert library -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+
+<!-- include footer -->
+<%- include('include/footer') %>
+<!-- /include footer -->

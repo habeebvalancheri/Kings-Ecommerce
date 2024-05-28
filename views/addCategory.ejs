@@ -60,6 +60,12 @@
         button:hover {
             background-color: #45a049;
         }
+        
+    .errorP{
+        color: red;
+        font-size: small;
+
+    }
       
     </style>
 </head>
@@ -69,11 +75,38 @@
     <form action='/add-Category' method="post">
         <h2>Add Category</h2>
         <label for="categoryName">Category Name:</label>
-        <input type="text" id="categoryName" name="categoryName" placeholder="Enter category name" required>
+        <input type="text" id="categoryName" name="categoryName" placeholder="Enter category name">
+
+        <p class="errorP <%= !emptyName?'d-none':''  %>" ><%=emptyName  %></p>
+        <p class="errorP <%= !duplicate?'d-none':''  %>" ><%=duplicate  %></p>
+        <p class="errorP <%= !categoryPattern?'d-none':''  %>" ><%=categoryPattern  %></p>
 
         <button type="submit">Add Category</button>
     </form>
    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const successMessage = "<%- success %>";
+          const errorMessage = "<%- error %>";
+      
+          if (successMessage && successMessage.trim() !== '') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: successMessage,
+            });
+          }
+      
+          if (errorMessage && errorMessage.trim() !== '') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: errorMessage,
+            });
+          }
+        });
+      </script>
 </body>
 
 </html>

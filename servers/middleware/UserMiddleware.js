@@ -1,25 +1,18 @@
 
 
-exports.isUserLogged = (req,res,next)=>{
-  if(req.session.isLogged){
-    next()
+exports.redirectIfUserLoggedIn = (req,res,next)=>{
+  if(req.session.userLoggedIn){
+    res.redirect("/");
   }else{
-    res.redirect('/signin');
+    next()
   }
 };
 
-exports.isUserLoggedOut = (req,res,next)=>{
-  if(req.session.isLogged){
-    res.redirect('/home');
+exports.userLoggedOut = (req,res,next)=>{
+  if(req.session.userLoggedIn){
+    next()
   }else{
-    next();
+    res.redirect("/signin");
   }
-}
+};
 
-exports.userBlocked = (req,res,next)=>{
-  if(req.session.userBlocked){
-    res.redirect('/sigin');
-  }else{
-    next();
-  }
-}

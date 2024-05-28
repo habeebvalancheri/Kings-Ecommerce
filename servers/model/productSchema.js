@@ -24,7 +24,7 @@ const productSchema = new Schema({
   price: {
     type: Number,
   },
-  discound: {
+  discount: {
     type: Number,
   },
   active: {
@@ -35,8 +35,14 @@ const productSchema = new Schema({
     type: Number,
     default: 0,
   },
+  categoryStats: {
+    type: Boolean,
+    default: true,
+  }
 });
 
 const ProductDB = mongoose.model('Product', productSchema);
 
 module.exports = ProductDB;
+
+

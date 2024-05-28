@@ -8,6 +8,7 @@ const connectDB = require('./servers/database/connection');
 const userRouter = require('./servers/routes/userRouter');
 const adminRouter = require('./servers/routes/adminRouter');
 const morgan = require('morgan');
+const flash = require('express-flash');
 
 // Mongodb connection
 connectDB();
@@ -23,6 +24,8 @@ app.use(
     saveUninitialized: true,
   })
 );
+// for flash message
+app.use(flash());
 
 // Logger (Morgan)
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
@@ -53,7 +56,7 @@ app.use('/javascript', express.static(path.resolve(__dirname, "assets/javascript
 app.use('/images', express.static(path.resolve(__dirname, "assets/images")));
 
 // Server
-const PORT = 3000;
+const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
 });
