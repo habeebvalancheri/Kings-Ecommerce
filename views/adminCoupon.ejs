@@ -27,6 +27,7 @@
             <tr>
               <th>Coupon Code</th>
               <th>Discount</th>
+              <th>Max Amount</th>
               <th>Expires At</th>
               <th>Status</th>
               <th>Delete</th>
@@ -37,6 +38,7 @@
               <tr>
                 <td><%= item.couponCode %></td>
                 <td><%= item.discount %></td>
+                <td><%= "₹" + item.maxAmount %></td>
                 <td><%= item.expiresAt %></td>
                 <td>
                   <span class="status cancelled" style="background-color: rgb(52, 157, 0);">
@@ -94,7 +96,5 @@
         </ul>
     </nav>
 </section>
-
-
 </body>
 </html>

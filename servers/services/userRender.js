@@ -224,12 +224,13 @@ exports.wishlistPage = async (req,res)=>{
     const wishListItems = await wishListDB.findOne({ userId }).populate(
     'product.productId'
     );
-  
-console.log(wishListItems,"whisitems")
+
+    // Filter out inactive products
+    const activeWishListItems = wishListItems?.product.filter(item => item.productId.active);
     const category = await categoryDB.find({active:true});
     return res.render("wishlist",{
       category : category,
-      wishListItems:wishListItems,
+      wishListItems:activeWishListItems,
     });
   }catch(error){
     console.error(error);
@@ -238,23 +239,27 @@ console.log(wishListItems,"whisitems")
 };
 
 exports.cartPage = async (req,res)=>{
-  try{
-    const userId = req.session.userId
-    
-    const cartItems = await cartDB.findOne({ userId }).populate(
-    'product.productId'
-       // Assuming your Product model is named 'Product'
-);
-      console.log(cartItems,"ci")
-    const category = await categoryDB.find({active:true});
-    return res.render("cart",{
-      category : category,
-      cartItems : cartItems,
+  try {
+    const userId = req.session.userId;
+
+    // Find cart items and populate product details
+    const cartItems = await cartDB.findOne({ userId }).populate('product.productId');
+
+    // Filter out inactive products from cart items
+    const activeCartItems = cartItems?.product.filter(item => item.productId.active);
+
+    // Fetch active categories
+    const category = await categoryDB.find({ active: true });
+    console.log(activeCartItems,"cart")
+    return res.render("cart", {
+      category: category,
+      cartItems: activeCartItems, // Pass active cart items to the template
     });
-  }catch(error){
+  } catch (error) {
     console.error(error);
     return res.status(500).send("Server Error");
   }
+
 };
 
 exports.addressPage = async (req,res)=>{
@@ -395,6 +400,34 @@ req.session.mobileRegex = "";
 exports.checkoutPage = async(req,res)=>{
   try{
   
+    const userId = req.session.userId;
+    console.log(userId,"id")
+    const user = await userDB.findById(userId).populate('addresses')
+    const cart = await cartDB.find({ userId: userId }).populate('product.productId');
+console.log(cart)
+    let total = 0; 
+    let totalDiscount = 0; 
+    let totalPrice = 0;  
+    let subTotal = 0;  
+    let subDiscount = 0; 
+    let shippingCost = 40.00; 
+    let price = 0;
+    let discount = 0;
+
+    if (cart && cart.length > 0) {
+      cart.forEach(cartItem => {
+        cartItem.product.forEach(items =>{
+    price = items.productId.price;
+    discount = items.productId.discount || 0; // Check if discount is available
+    subTotal += price * items.quantity;
+    subDiscount += (price * discount / 100) * items.quantity;
+   
+   })
+  });
+  totalDiscount = (price * discount / 100);
+  total = subTotal - subDiscount + shippingCost;
+}
+    const category = await categoryDB.find({active:true});
    
   const  errorfullName = req.session.errorfullName;
   const  minFullName = req.session.minFullName;
@@ -416,12 +449,7 @@ exports.checkoutPage = async(req,res)=>{
   const couponPatterError = req.session.couponPatterError; 
   const  couponCodeIsNotMatch = req.session.couponCodeIsNotMatch;
  
-    const userId = req.session.userId;
-    console.log(userId,"id")
-    const user = await userDB.findById(userId).populate('addresses')
-    const cart = await cartDB.findOne({ userId: userId }).populate('product.productId');
-
-    const category = await categoryDB.find({active:true});
+  
       // clear session
 req.session.errorfullName = "";
 req.session.minFullName = "";
@@ -466,7 +494,14 @@ req.session.errorHouseNo  = '';
       RAZORPAY_ID_KEY,
       couponPatterError,
       couponCodeIsNotMatch,
-      couponDiscount:req.session.matchingCoupon ,
+      couponDiscount:req.session.matchingCoupon,
+      total,
+      totalDiscount,
+      subTotal,
+      subDiscount,
+      shippingCost,
+      price,
+      discount
     })
   }catch(error){
     console.error(error);

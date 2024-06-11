@@ -14,10 +14,10 @@
                 <div class="card border shadow-0">
                     <div class="m-4">
                         <h4 class="card-title mb-4">Your shopping cart</h4>
-                        <% if (cartItems && cartItems.product.length > 0) { %>
+                        <% if (cartItems && cartItems.length > 0 ) { %>
                         <% let totalPrice = 0; %> <!-- Initialize total price variable -->
                         <% let totalItems = 0; %> <!-- Initialize total items variable -->
-                        <% cartItems.product.forEach(item => { %>
+                        <% cartItems.forEach(item => { %>
                         <% let itemPrice = item.productId.price * item.quantity; %> <!-- Calculate item price -->
                         <% totalPrice += itemPrice; %> <!-- Add item price to total price -->
                         <% totalItems += item.quantity; %> <!-- Add item quantity to total items -->
@@ -115,9 +115,11 @@
                                 ₹ 0.00
                             </p>
                         </div>
-                       
+                       <% cartItems.forEach(items =>{ %>
+
+                    
                         <div class="mt-3">
-                            <form action="/check-out" method="post">
+                            <form action="/check-out?id=<%= items.productId._id %>" method="post">
                                 <input type="hidden" name="productIds" id="productIds" value="">
                               <input type="hidden" name="totalsum" value="" hidden>
                               <button class="btn btn-success w-100 shadow-0 mb-2" type="submit">Make Purchase
@@ -125,14 +127,15 @@
                           </form>
                                 <a href=" /products" class="btn btn-light w-100 border mt-2"> Back to shop </a>
                           </div>
-                         
+                     <% }) %>
+                    
                     </div>
                     
                 </div>
                 
             </div>
             
-           
+            
             <!-- summary -->
         </div>
     </div>

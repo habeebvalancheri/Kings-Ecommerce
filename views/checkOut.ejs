@@ -129,18 +129,24 @@
                                 </div>
                                 <p class="errorP <%= !stockError ? 'd-none' : '' %>"><%= stockError %></p>
                                 <!-- Continue Button -->
+                                <% let productIdsJson = 0; %>
+                                <% if (cart && cart.length > 0) { %>
+                                    <% cart.forEach(cartItem => { %>
                                 <% let productIds = []; %>
-                                <% cart.product.forEach((item) => { %>
+                                <% cartItem.product.forEach((item) => { %>
                                   <% productIds.push(item.productId._id); %>
+                                  <% productIdsJson = JSON.stringify(productIds); %>
                                 <% }); %>
-                                <% let productIdsJson = JSON.stringify(productIds); %>
-
+                                <%  }); %>
+                                <% } %>
+                                
                                 <div class="mt-4">
                                     <button type="submit" class="btn btn-dark float-end" data-cartproduct-id="<%= productIdsJson%>">Continue</button>
                                 </div>
-                             
+                                
                                 <button type="button" class="btn btn-dark" data-mdb-toggle="modal" data-mdb-target="#addressModal">Change Address</button>
                             </form>
+                           
                         </div>
                     </div>
                 </div>
@@ -151,12 +157,6 @@
                         <div class="p-4">
                             <h5 class="card-title mb-3">Product Details</h5>
                             <!-- Product Details Table -->
-                            <% let total = 0; %>
-                            <% let totalDiscount = 0; %>
-                            <% let totalPrice = 0; %>
-                            <% let subTotal = 0; %>
-                            <% let subDiscount = 0; %>
-                            <% let shippingCost = 40.00; %>
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
@@ -169,15 +169,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <% cart.product.forEach(function(item) { %>
-                                            <% 
-                                                let price = item.productId.price;
-                                                let discount = item.productId.discount || 0; // Check if discount is available
-                                                subTotal += price * item.quantity;
-                                                subDiscount += (price * discount / 100) * item.quantity;
-                                                totalDiscount = (price * discount / 100);
-                                                total = subTotal - subDiscount + shippingCost;
-                                            %>
+                                        <% if (cart && cart.length > 0) { %>
+                                            <% cart.forEach(cartItem => { %>
+                                        <% cartItem.product.forEach(function(item) { %>
                                         <tr>
                                             
                                             <td><%= item.productId.pName %></td>
@@ -187,6 +181,8 @@
                                             <td>₹ <%= price %></td>
                                         </tr>
                                         <% }) %>
+                                        <%   }); %>
+                                        <% } %>
                                         <tr>
                                             <td colspan="4" class="text-end">Subtotal:</td>
                                             <td>₹ <%= subTotal.toFixed(2) %></td>
@@ -598,7 +594,7 @@ localStorage.removeItem(productId);
     })
     .catch(error => {
         console.error("Error:", error);
-        alert('Failed to submit order');
+        alert('Failed to submit order:',error);
     });
 } else {
 
@@ -611,7 +607,7 @@ localStorage.removeItem(productId);
 })
 .catch(error => {
 console.error("Error:", error);
-alert('Failed to check wallet balance');
+alert('Failed to check wallet balance',error);
 });
 } else {
 
@@ -660,7 +656,7 @@ localStorage.removeItem(productId);
 });
                         }).catch(error => {
                             console.error("Error:", error);
-                            alert('Failed to confirm payment');
+                            alert('Failed to confirm payment',error);
                         });
                     },
                     // Other options...
@@ -683,18 +679,17 @@ localStorage.removeItem(productId);
                         }).then(response => {
                                         // Clear cart quantity data from local storage
 
-
+   // Clear cart quantity data from local storage
+   productId.forEach(function(productId) {
+        localStorage.removeItem(productId);
+    });
                             window.location.href = '/order'
-// Remove the quantity state from local storage
-productId.forEach(function(productId) {
-localStorage.removeItem(productId);
-});
                         
                         })
                         
                         .catch(error => {
                             console.error("Error:", error);
-                            alert('Failed to confirm payment');
+                            alert('Failed to confirm payment',error);
                         });
         }
 }

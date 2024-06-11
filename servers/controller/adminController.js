@@ -530,134 +530,127 @@ adminChangeReturn: async (req, res) => {
   }
 },
 exportOrder:async(req,res)=>{
-  try{
-
+  try {
     const { startDate, endDate } = req.query;
-       // Create a new workbook and worksheet
 
-       // Check if both start date and end date are defined
-       if (!startDate && !endDate) {
-           return res.redirect('/admin-Dashboard')
-       }
+    // Validate dates
+    if (!startDate || !endDate) {
+      return res.status(400).send('Start date and end date are required.');
+    }
 
+    const workbook = new excelJs.Workbook();
+    const worksheet = workbook.addWorksheet('Sales Reports');
 
-       const workbook = new excelJs.Workbook();
-       const worksheet = workbook.addWorksheet('Sales Reports');
-   
-       // Define worksheet columns based on order schema
-       worksheet.columns = [
-        { header: 'S NO.', key: 'S NO.',width: 5 },
-        { header: 'Product Name', key: 'Product Name',width: 60 },
-        { header: 'Price', key: 'Price',width: 10 },
-        { header: 'Discount', key: 'Discount',width: 10 },
-        { header: 'Quantity', key: 'Quantity',width: 10 },
-        { header: 'Status', key: 'Status',width: 15 },
-        { header: 'Returns', key: 'Returns',width: 15 },
-        { header: 'Total Amount', key: 'Total Amount',width: 15 },
-        { header: 'Order Date', key: 'Order Date',width: 25 },
-        { header: 'Payment Method', key: 'Payment Method',width: 20 },
-        { header: 'Sales Count', key: 'Sales Count', width: 15 },
-        { header: 'Total Order Amount', key: 'Total Order Amount', width: 20 },
-        { header: 'Total Discount', key: 'Total Discount', width: 15 },
-      ];
-   
-       // Fetch orders from database
-       const orders = await orderDB.find({
-         orderDate: { $gte: startDate, $lte: endDate }
-       });
+    // Define worksheet columns based on order schema
+    worksheet.columns = [
+      { header: 'S NO.', key: 'S NO.', width: 10 },
+      { header: 'OrderId', key: 'OrderId', width: 40 },
+      { header: 'Billing Email', key: 'Billing Email', width: 30 },
+      { header: 'Payment Method', key: 'Payment Method', width: 20 },
+      { header: 'Order Date', key: 'Order Date', width: 15 },
+      { header: 'Product Name', key: 'Product Name', width: 60 },
+      { header: 'Product Price', key: 'Product Price', width: 15 },
+      { header: 'Product Quantity', key: 'Product Quantity', width: 15 },
+      
+      { header: 'Sub Total ', key: 'Sub Total', width: 20 },
+      { header: 'Total Discount', key: 'Total Discount', width: 15 },
+      { header: 'Total ', key: 'Total ', width: 15 },
+    ];
 
-          // Calculate overall sales count, order amount, and discount
+    // Fetch orders from database within the date range
+    const orders = await orderDB.find({
+      orderDate: { $gte: new Date(startDate), $lte: new Date(endDate) }
+    });
+
     let salesCount = 0;
     let totalOrderAmount = 0;
     let totalDiscount = 0;
-   
-       // Add data to the worksheet, including S.No.
-       let counter = 1;
-       orders.forEach((order) => {
-         for (let i = 0; i < order.products.length; i++) {
-          // Add product details
-          const product = order.products[i];
-          worksheet.addRow({
-            'S NO.':  counter++,
-            'Product Name': order.products[i].pName,
-            'Price': "₹" + order.products[i].price,
-            'Discount': order.products[i].discount + '%',
-            'Quantity': order.products[i].quantity +'qt',
-            'Status': order.products[i].status,
-            'Returns': order.products[i].return,
-            'Total Amount':"₹" + order.totalAmount,
-            'Order Date': order.orderDate, // Set order date for each product
-            'Payment Method': order.paymentMethod, // Set payment method for each product
-            'Sales Count': salesCount,
-                'Total Order Amount': "₹" + totalOrderAmount,
-                'Total Discount': "₹" + totalDiscount,
-          });
-                  // Update summary values
-                  salesCount += product.quantity;
-                  totalOrderAmount += product.price * product.quantity;
-                  totalDiscount += (product.price * product.quantity * product.discount) / 100;
-        }
-           
-       });
-   
-       // Format header row (feel free to customize formatting)
-       worksheet.getRow(1).eachCell((cell) => {
-        cell.alignment = { horizontal: 'left' };
-         cell.font = { bold: true };
-       });
-   
-       // Set response headers
-       res.setHeader(
-         'Content-Type',
-         'application/vnd.openxmlformats-officedocument.spreadsheatml.sheet'
-       );
-       res.setHeader(
-         'Content-Disposition',
-         `attachment; filename=orders.xlsx`
-       );
-   
-       // Write the workbook to the response stream
-       await workbook.xlsx.write(res);
-   
-       // Set status after sending response
-       res.status(200).end();
-  }catch(error){
+
+    let counter = 1;
+    orders.forEach((order) => {
+      order.products.forEach((product) => {
+        worksheet.addRow({
+          'S NO.': counter++,
+          'OrderId': `order Id ${order._id}`,
+          'Billing Email': order.user.email,
+          'Payment Method': order.paymentMethod,
+          'Order Date': order.orderDate.toISOString().split('T')[0],
+          'Product Name': product.pName,
+          'Product Price': `₹${product.price}`,
+          'Product Quantity': `${product.quantity} qt`,
+        });
+
+        salesCount += product.quantity;
+        totalOrderAmount += product.price * product.quantity;
+        totalDiscount += (product.price * product.quantity * product.discount) / 100;
+      });
+    });
+
+    // Add summary row
+    worksheet.addRow({});
+    worksheet.addRow({
+      'S NO.': 'Summary',
+      'Sub Total': `₹${totalOrderAmount}`,
+      'Total Discount': `₹${totalDiscount}`,
+      'Total ': `₹${totalOrderAmount - totalDiscount}`,
+    });
+
+    // Format header row
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.alignment = { horizontal: 'left' };
+      cell.font = { bold: true };
+    });
+
+    // Set response headers and send the file
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=orders.xlsx');
+    await workbook.xlsx.write(res);
+    res.status(200).end();
+  } catch (error) {
     console.error(error);
-    res.status(500).send("Server Error");
+    res.status(500).send('Server Error');
   }
 },
 
-getSalesData : async (req, res) => {
-    try {
-       // Fetch sales data from the database
-       const salesData = await orderDB.aggregate([
-        {
-            $unwind: '$products' // Deconstructs the products array
-        },
-        {
-            $group: {
-                _id: '$products.productId', // Group by productId
-                totalQuantity: { $sum: '$products.quantity' } // Sum the quantities of each product
-            }
-        },
-        {
-            $project: {
-                _id: 0, // Exclude the _id field from the result
-                productId: '$_id',
-                totalQuantity: 1
-            }
-        },
-        {
-          $sort:{totalQuantity:1}
-        }
-    ]);
-    res.json({ success: true, data: salesData });
+getSalesData: async (req, res) => {
+  try {
+      // Fetch order dates and convert them to the correct format
+      const orderdata = await orderDB.find({}, { orderDate: 1 });
+      const ordersDate = orderdata.map(order => {
+          return order.orderDate.toISOString().split('T')[0];
+      });
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-    }
+      // Fetch sales data from the database
+      const salesData = await orderDB.aggregate([
+        {
+          $unwind: '$products' // Deconstructs the products array
+        },
+        {
+          $group: {
+            _id: '$orderDate', // Group by orderDate
+            totalQuantity: { $sum: '$products.quantity' } // Sum the quantities of each product
+          }
+        },
+        {
+          $project: {
+            _id: 0, // Exclude the _id field from the result
+            orderDate: '$_id',
+            totalQuantity: 1
+          }
+        },
+        {
+          $sort: { orderDate: 1 }
+        }
+      ]);
+      
+console.log(salesData)
+    return res.json({ success: true, data: salesData, ordersDate });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+  }
 },
+
 
 addCoupon:async(req,res)=>{
   try{
@@ -666,12 +659,21 @@ addCoupon:async(req,res)=>{
     req.session.couponCodeRegex = "";
     req.session.discountError = "";
     req.session.discountRegex = "";
+    req.session.maxAmountError = "";
+    req.session.maxAmountRegex = "";
+    req.session.categoryCouponExists = "";
     req.session.validFromError = "";
     req.session.validToError = "";
+    req.session.couponExists = "";
+    req.session.validFrom = "";
+    req.session.validTo = "";
 
     const {validFrom,validTo} = req.body;
     const couponCode = req.body.couponCode.trim();
     const discount = req.body.discount.trim();
+    const maxAmount = req.body.maxAmount.trim();
+    const today = new Date().toISOString().split('T')[0];
+    const category = req.body.category;
 
     if(!couponCode){
       req.session.couponCodeError = "Coupon code field is required";
@@ -687,44 +689,73 @@ addCoupon:async(req,res)=>{
     }
 
     let discountRegex = /^[0-9]+$/;
-    if(!discountRegex.test(discount)){
-      req.session.discountRegex = "Discount should be a number";
+    if(!discountRegex.test(discount) || discount <= 10 &&  discount >= 80){
+      req.session.discountRegex = "Discount should be a numeric value greater than 10 and less than 80.";
+    }
+    if(!maxAmount){
+      req.session.maxAmountError = "Maximum Amount field is required";
+    }
+
+    let maxAmountRegex = /^[0-9]+$/;
+    if(!maxAmountRegex.test(maxAmount) ||  maxAmount < 10000){
+      req.session.maxAmountRegex = "Max Amount should be a numeric value greater than or equal to 10000 ";
     }
 
     if(!validFrom){
       req.session.validFromError = "Valida from field is required";
-    }
+    }else if (validFrom < today || validFrom > today) {
+      req.session.validFrom = "Valid from date should not be in the past or future.";
+  }
 
     if(!validTo){
       req.session.validToError = "Valid to field is required";
-    }
+    } else if (validTo < validFrom) {
+      req.session.validTo = "Valid to date should not be before the valid from date.";
+  }
 
     if( req.session.couponCodeError ||
       req.session.couponCodeRegex  ||
       req.session.discountError ||
       req.session.discountRegex ||
+      req.session.maxAmountError ||
+      req.session.maxAmountRegex ||
       req.session.validFromError||
-      req.session.validToError
+      req.session.validToError ||
+      req.session.validFrom ||
+      req.session.validTo
       ){
         console.log(" Session Errors")
      return res.redirect('/addCoupon')
     }
-
-    const newCoupon = new couponDB({
-      couponCode:couponCode,
-      discount:discount,
-      createdAt:validFrom,
-      expiresAt:validTo,
-      active:true,
-    })
+    const categoriId = await categoryDB.findOne({name:category,active:true});
+    const coupons = await couponDB.findOne({category:categoriId._id,active:true,expired:false})
+    const existingCoupon = await couponDB.findOne({ couponCode: couponCode});
+    if(existingCoupon){
+      req.session.couponExists = "Coupon Already exists or InActive"
+      return res.redirect('/addCoupon');
+    }
+     if(coupons){
+      req.session.categoryCouponExists = 'The coupon is already active on this category'
+      return res.redirect('/addCoupon');
+    }
     
-    await newCoupon.save();
-    console.log(newCoupon,"coupn Saved");
-
-  return res.redirect('/admin-Coupon');
+      const newCoupon = new couponDB({
+        couponCode:couponCode,
+        discount:discount,
+        maxAmount : maxAmount,
+        category:categoriId._id,
+        createdAt:validFrom,
+        expiresAt:validTo,
+        active:true,
+      })
+      
+      await newCoupon.save();
+      console.log(newCoupon,"coupn Saved");
+  
+    return res.redirect('/admin-Coupon');
   }catch(error){
     console.error(error);
-    res.status(500).send("Server Error");
+  return  res.status(500).send("Server Error");
   }
 },
 deleteCoupon:async(req,res)=>{
@@ -752,18 +783,22 @@ addOffer :async(req,res)=>{
     req.session.discountRegex = "";
     req.session.validFromError = "";
     req.session.validToError = "";
+    req.session.offerExists = "";
+    req.session.validFrom2 = "";
+    req.session.validTo2 = "";
 
     // request data from body
     const {validFrom,validTo} = req.body;
     const categoryCode = req.body.category;
     const discount = req.body.discount;
-    console.log(validFrom,validTo,categoryCode,discount);
+    const today = new Date().toISOString().split('T')[0];
+
     // Form validation
     if(!categoryCode){
       req.session.categoryCodeError = "Category field is required";
     }
 
-    let categoryCodeRegex = /^[a-zA-Z]+$/
+    let categoryCodeRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
     if(!categoryCodeRegex.test(categoryCode)){
       req.session.categotyCodeRegex = "Category code should be Alphabetic";
     }
@@ -773,17 +808,23 @@ addOffer :async(req,res)=>{
     }
 
     let discountRegex = /^[0-9]+$/;
-    if(!discountRegex.test(discount)){
-      req.session.discountRegex = "Discount should be a number";
+    if(!discountRegex.test(discount) || discount <= 10 ||  discount >= 80){
+      req.session.discountRegex = "Discount should be a numeric value greater than 10 and less than 80.";
     }
 
     if(!validFrom){
-      req.session.validFromError = "Valida from field is required";
-    }
+      req.session.validFromError = "Valid from field is required";
+    }else if (validFrom > today) {
+      req.session.validFrom2 = "Valid from date should not be in the future.";
+  }
 
     if(!validTo){
       req.session.validToError = "Valid to field is required";
-    }
+    }else if (validTo > today) {
+      req.session.validTo2 = "Valid to date should not be in the future.";
+  } else if (validTo < validFrom) {
+      req.session.validTo2 = "Valid to date should not be before the valid from date.";
+  }
 
     // validation error
     if(
@@ -792,22 +833,27 @@ addOffer :async(req,res)=>{
       req.session.discountError ||
       req.session.discountRegex ||
       req.session.validFromError||
-      req.session.validToError
+      req.session.validToError ||
+      req.session.validFrom2  ||
+      req.session.validTo2 
       ){
         console.log(" Session Errors")
      return res.redirect('/addOffers')
     }
-    
+    const offer = await offerDB.find({name:categoryCode});
+    if(offer){
+      req.session.offerExists = "The offer is already Active";
+      return res.redirect('/addOffers');
+    }
     // find category
     const category = await categoryDB.findOne({name:categoryCode,active:true});
-    console.log('hii')
+ 
     // Find category
     if (!category) {
       req.session.categoryCodeNotMatch = "Category code does not exist or is inactive";
       return res.redirect('/addOffers');
     }
 
-console.log("hiii")
     // create new offer
     const newOffer = new offerDB({
       name : categoryCode,
@@ -816,16 +862,28 @@ console.log("hiii")
       expiresAt : validTo,
       active:true,
     });
-console.log("hiiii")
+
     // save offer
     await newOffer.save();
 // Set success message in session
-
         return res.redirect('/admin-Offers');    
 
   }catch(error){
-    console.log(error);
     res.status(500).send("Sever Error");
   }
+},
+
+deleteOffer: async(req,res)=>{
+try{
+ const id = req.query.id;
+console.log(id)
+ await offerDB.findOneAndUpdate({_id:id,active:true},{active:false,expired:true});
+
+ return res.redirect('/admin-offers');
+
+}catch(error){
+  console.error(error);
+  return res.status(500).send("Server Error");
 }
+},
 };

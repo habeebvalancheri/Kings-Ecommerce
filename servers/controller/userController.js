@@ -458,7 +458,7 @@ module.exports = {
 
         const categorys = await categoryDB.find();
         console.log(req.session.categoryy,"categoryy")
-        res.render("ourStore", {
+       return res.render("ourStore", {
             products: products,
             category: categorys,
             page: page,
@@ -894,8 +894,9 @@ updateUserProfile : async (req,res)=>{
 checkOut : async(req,res)=>{
   try{
 
-    const userId = req.session.userId
-
+    const userId = req.session.userId;
+    req.session.productIdInCheckout = req.query.id;
+   
     const cart = await cartDB.findOne({userId}).populate('product.productId');
 
     let total = 0;
@@ -978,7 +979,12 @@ walletPayment: async (req, res) => {
 couponCodeApply: async (req, res) => {
   try {
     const couponCode = req.body.coupon.trim();
+    const productId = req.session.productIdInCheckout;
     let total = req.body.total;
+
+    const products = await productDB.find({
+_id:productId
+    });
 
     // Validate coupon code format
     const couponRegex = /^[a-zA-Z0-9]+$/;
@@ -986,25 +992,42 @@ couponCodeApply: async (req, res) => {
       return res.status(400).json({ error: "The coupon code should contain only alphanumeric characters." });
     }
 
+    let categoryId = 0;
+    if (products && products.length > 0) {
+      categoryId = products[0].category.toString();
+    } 
+   
     // Check if the entered coupon code matches the one stored in the database
-    const coupons = await couponDB.findOne({ active: true, expired: false });
-    if ( couponCode !== coupons.couponCode) {
+    const coupons = await couponDB.findOne({couponCode:couponCode, active: true, expired: false });
+    const couponId =  coupons._id.toString() 
+    if ( !coupons ) {
       return res.status(400).json({ error: "The entered coupon code is not valid." });
     }
+
+    if(categoryId !== coupons.category){
+      return res.status(500).json({ error: "The product Category is not matching so this coupon doesn't apply" });
+    }
+
+  // Check if the coupon has already been applied
+  const appliedCoupon = await orderDB.findOne({ 'coupon.couponApplied': couponId });
+  if (appliedCoupon) {
+    return res.status(400).json({ error: "The coupon has already been applied." });
+  }
 
     // Calculate discount and update total
     const discount = coupons.discount;
     const discountAmount = (total * discount) / 100;
-    console.log(total)
-    console.log(discountAmount,"DA")
     total -= discountAmount;
-    console.log(total)
+
+    if(total < coupons.maxAmount ){
+      return res.status(500).json({ error: "The coupon doesn't apply the total amount is less than Maximum Coupon Amount" });
+    }
 
     // Send response with discount and updated total
     return res.status(200).json({ discount: discount, updatedTotal: total });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Server error" });
+    return res.status(400).json({ error: "Server error" });
   }
 },
 
@@ -1029,8 +1052,9 @@ req.session.errorHouseNo  = '';
  req.session.emailRegex = '';
 
 
-const { formData} = req.body;
-
+// const { formData} = req.body;
+const user = req.session.userId;
+console.log(user);
 
 // Remove white space 
 const fullName = req.body.formData.name;
@@ -1164,12 +1188,12 @@ if(req.session.errorfullName ||
 
   const cartProducts = await cartDB.findOne({userId:req.session.userId}).populate('product.productId')
   req.session.cartProducts = cartProducts;
-  const productDBId = await productDB.find({})
+  // const productDBId = await productDB.find({})
 
 
   console.log(couponCode,"ccd")
   let couponDiscount = 0; // Initialize coupon discount to 0
-  let couponName = ""; // Initialize coupon name to an empty string
+  let couponId = ""; // Initialize coupon name to an empty string
   
   // Check if a coupon code is provided
   if (couponCode) {
@@ -1180,14 +1204,12 @@ if(req.session.errorfullName ||
       }
       // Assign coupon details
       couponDiscount = coupon.discount;
-      couponName = coupon.couponCode;
+      couponId = coupon._id;
   }
-  console.log(couponDiscount,couponName,"CD & CN");
 
-
-const products = cartProducts.product.map(item => {
-  return item.productId; // We're assuming 'productId' is properly populated
-});
+// const products = cartProducts.product.map(item => {
+//   return item.productId; // We're assuming 'productId' is properly populated
+// });
 
     // Check stock availability and create orders
     for (const product of cartProducts.product) {
@@ -1242,8 +1264,9 @@ const newOrder = new orderDB({
   orderDate: Date.now(),
     // Include coupon details if a coupon was applied
     coupon: {
-      code: couponName,
+      code: couponId,
       discount: couponDiscount,
+      couponApplied:[couponId],
   }
 });
 

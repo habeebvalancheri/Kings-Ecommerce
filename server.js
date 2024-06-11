@@ -56,7 +56,7 @@ app.use('/javascript', express.static(path.resolve(__dirname, "assets/javascript
 app.use('/images', express.static(path.resolve(__dirname, "assets/images")));
 
 // Server
-const PORT = 8000;
+const PORT = 7000;
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
 });

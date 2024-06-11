@@ -30,7 +30,7 @@ const orderSchema = new mongoose.Schema({
       required:true,
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required:true,
     },
     description: {
@@ -70,7 +70,7 @@ const orderSchema = new mongoose.Schema({
     },
     totalPrice :{
       type : Number,
-    }
+    },
   }],
   totalAmount : {
     type : Number,
@@ -119,6 +119,9 @@ paymentStatus : {
   discount:{
     type: Number,
   },
+  couponApplied: [{
+    type: String,
+  }],
 },
 })
 

@@ -34,6 +34,7 @@ router.get('/admin-offers', adminMiddleware.adminLoggedOut,adminService.adminOff
 router.get('/addOffers', adminMiddleware.adminLoggedOut,adminService.addOfferPage);
 router.post('/add-Offers',adminController.addOffer);
 router.get('/deleteOffers', adminMiddleware.adminLoggedOut,adminService.deleteOfferPage);
+router.get('/delete-Offers',adminController.deleteOffer);
 
 
 // Admin User Management

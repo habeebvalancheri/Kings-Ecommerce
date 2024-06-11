@@ -11,10 +11,11 @@
           <div class="card border shadow-0">
             <div class="m-4">
               <h4 class="card-title mb-4">My Wishlist</h4>
-              <% if (wishListItems && wishListItems.product.length > 0) { %>
+              <% if (wishListItems && wishListItems.length > 0 ) { %>
+
                 <% let totalItems = 0; %>
                 <% let totalPrice = 0; %>
-                <% wishListItems.product.forEach(item => { %>
+                <% wishListItems.forEach(item => { %>
                   <% let itemPrice = item.productId.price * item.quantity; %>
                   <% if(item.productId.stock > 0) {%>
                     <% totalItems += item.quantity; %>

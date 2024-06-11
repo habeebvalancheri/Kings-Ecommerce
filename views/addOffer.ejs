@@ -38,7 +38,7 @@
                             <p class="errorP <%= !categoryCodeError ? 'd-none' : '' %>"><%= categoryCodeError %></p>
                             <p class="errorP <%= !categoryRegex ? 'd-none' : '' %>"><%= categoryRegex %></p>
                             <p class="errorP <%= !categoryMatch ? 'd-none' : '' %>"><%= categoryMatch %></p>
-                           
+                            <p class="errorP <%= !offerExists ? 'd-none' : '' %>"><%= offerExists %></p>
                         </div>
                         <div class="form-group">
                             <label for="discount">Discount (%)</label>
@@ -52,12 +52,14 @@
                             <input type="date" class="form-control" id="valid-from" name="validFrom">
                             <small id="valid-from-error" class="text-danger"></small>
                             <p class="errorP <%= !validationFrom ? 'd-none' : '' %>"><%= validationFrom %></p>
+                            <p class="errorP <%= !validFrom ? 'd-none' : '' %>"><%= validFrom %></p>
                         </div>
                         <div class="form-group">
                             <label for="valid-to">Valid To</label>
                             <input type="date" class="form-control" id="valid-to" name="validTo">
                             <small id="valid-to-error" class="text-danger"></small>
                             <p class="errorP <%= !validationTo ? 'd-none' : '' %>"><%= validationTo %></p>
+                            <p class="errorP <%= !validTo ? 'd-none' : '' %>"><%= validTo %></p>
                         </div>
                         <h1></h1>
                         <button type="submit" class="btn" style="background-color: #131921; color: white;">Add Offer</button>
@@ -71,105 +73,104 @@
 <!-- CONTENT -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-  
-   
- 
-    
-      document.getElementById('coupon-form').addEventListener('submit', async function (event) {
-          // Perform validation checks
-          if (!(await validateForm())) {
-              // Prevent form submission if validation fails
-              event.preventDefault();
-          }
-      });
+ document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('coupon-form').addEventListener('submit', async function (event) {
+        // Perform validation checks
+        if (!(await validateForm())) {
+            // Prevent form submission if validation fails
+            event.preventDefault();
+        }
+    });
 
-      // Validate form inputs
-      async function validateForm() {
-          const categoryCode = document.getElementById('category-code').value.trim();
-          const discount = document.getElementById('discount').value.trim();
-          const validFrom = document.getElementById('valid-from').value;
-          const validTo = document.getElementById('valid-to').value;
+    // Validate form inputs
+    async function validateForm() {
+        const categoryCode = document.getElementById('category-code').value.trim();
+        const discount = document.getElementById('discount').value.trim();
+        const validFrom = document.getElementById('valid-from').value;
+        const validTo = document.getElementById('valid-to').value;
+        const today = new Date().toISOString().split('T')[0];
 
-          let valid = true;
+        let valid = true;
+        let errors = [];
 
-          if(!categoryCode){
-            showAlert("Category name is required")
+        if (!categoryCode) {
+            errors.push("Category name is required");
             valid = false;
-          }
+        }
 
-          // Validate category code (Alphabetic)
-          const categoryCodeRegex = /^[a-zA-Z]+$/;
-          if (!categoryCodeRegex.test(categoryCode)) {
-              showAlert("Category code should be Alphabetic");
-              valid = false;
-          }
+        // Validate category code (Alphabetic)
+        const categoryCodeRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
+        if (!categoryCodeRegex.test(categoryCode)) {
+            errors.push("Category code should be Alphabetic");
+            valid = false;
+        }
 
-          // Validate discount (Numeric)
-          const discountRegex = /^[0-9]+$/;
-          if (!discountRegex.test(discount)) {
-              showAlert("Discount should be a numeric value");
-              valid = false;
-          }
+        // Validate discount (Numeric)
+        const discountRegex = /^[0-9]+$/;
+        if (!discountRegex.test(discount)) {
+            errors.push("Discount should be a numeric value");
+            valid = false;
+        }
 
-          // Validate valid from date
-          if (!validFrom) {
-              showAlert("Valid from date is required");
-              valid = false;
-          }
+        // Validate valid from date
+        if (!validFrom) {
+            errors.push("Valid from date is required");
+            valid = false;
+        }else if (validFrom > today) {
+            errors.push("Valid from date should not be in the future");
+            valid = false;
+        }
 
-          // Validate valid to date
-          if (!validTo) {
-              showAlert("Valid to date is required");
-              valid = false;
-          }
+        // Validate valid to date
+        if (!validTo) {
+            errors.push("Valid to date is required");
+            valid = false;
+        } else if (validTo > today) {
+            errors.push("Valid to date should not be in the future");
+            valid = false;
+        } else if (validTo < validFrom) {
+            errors.push("Valid to date should not be before the valid from date");
+            valid = false;
+        }
 
-          // Check category code against the database
-          
-              const categoryValid = await checkCategoryCode(categoryCode);
-              if (categoryCode !== categoryValid) {
-                  showAlert("Category code does not exist or is inactive");
-                  valid = false;
-              }
-          
-
-          return valid;
-      }
-
-      // Function to check category code with the server
-      async function checkCategoryCode(categoryCode) {
-          try {
-              const response = await fetch('/add-Offers', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({ categoryCode })
-              });
-             
-          } catch (error) {
-              console.error('Error checking category code:', error);
-              showAlert('Error checking category code. Please try again.');
-              return false;
-          }
-      }
+        if (errors.length > 0) {
+            showAlert(errors);
+            return valid;
+        }
 
 
-      // Function to show SweetAlert2 alert
-      function showAlert(message) {
-          Swal.fire({
-              icon: 'error',
-              title: 'Validation Error',
-              text: message,
-          });
-      }
+        return valid;
+    }
 
-     
-  });
-  
+    // Function to check category code with the server
+    async function checkCategoryCode(categoryCode) {
+        try {
+            const response = await fetch('/check-category-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ categoryCode })
+            });
+
+            const data = await response.json();
+            return data.valid;
+        } catch (error) {
+            console.error('Error checking category code:', error);
+            showAlert(['Error checking category code. Please try again.']);
+            return false;
+        }
+    }
+
+    // Function to show SweetAlert2 alert
+    function showAlert(messages) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            html: messages.join('<br>'),
+        });
+    }
+});
 </script>
-
-
     </body>
-
     </html>

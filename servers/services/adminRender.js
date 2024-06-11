@@ -24,7 +24,6 @@ return res.status(500).send("Server Error");
 
 };
 
-//  Admin Dashboard Page Render
 exports.adminDashboardPage = async (req, res) => {
   try {
     // Fetch the count of users from the database
@@ -34,7 +33,6 @@ exports.adminDashboardPage = async (req, res) => {
     const orders = await orderDB.find({}); // Retrieve all orders
     let totalSalesCount = 0;
 
-    // Iterate through each order and sum up the quantities
     orders.forEach(order => {
       order.products.forEach(product => {
         totalSalesCount += product.quantity;
@@ -42,12 +40,14 @@ exports.adminDashboardPage = async (req, res) => {
     });
 
     // Render the adminDashboard page with the userCount
-    return res.render("adminDashboard", { userCount,orderCount ,totalSalesCount });
+    return res.render("adminDashboard", { userCount, orderCount, totalSalesCount });
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server Error");
   }
 };
+
+
 
 //  Admin Product Page Render
 exports.adminProductsPage = async (req, res) => {
@@ -221,7 +221,9 @@ exports.adminOrdersPage = async (req, res) => {
     .populate('products.productId')
     .skip(offset)
     .limit(limit)
-    .sort({ orderDate: -1 })
+    
+    // Sort the orders array by orderDate in descending order
+orders.sort((a, b) => a.orderDate - b.orderDate );
 
     const totalOrders = await orderDB.countDocuments()
 
@@ -401,52 +403,68 @@ exports.unlistedCategoryPage = async (req, res) => {
   }
 },
 //  Admin Coupons Page Render
+// Admin Coupons Page Render
 exports.adminCouponsPage = async (req, res) => {
-  try{
+  try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 10;
+    const limit = parseInt(req.query.limit) || 10;
 
     const offset = (page - 1) * limit;
 
-    const coupons = await couponDB.find({active:true,expired:false})
-    .skip(offset)
-    .limit(limit);
-    
-    const totalOrders = await orderDB.countDocuments({
-    })
+    // Fetch active and non-expired coupons
+    const coupons = await couponDB.find({ active: true, expired: false })
+      .skip(offset)
+      .limit(limit);
 
-    const totalPages = Math.ceil(totalOrders /limit);
-    
-    
-  return  res.render("adminCoupon",{
+    // Count the total number of active and non-expired coupons
+    const totalCoupons = await couponDB.countDocuments({ active: true, expired: false });
+
+    const totalPages = Math.ceil(totalCoupons / limit);
+
+    return res.render("adminCoupon", {
       coupons,
-      totalPages:totalPages,
-      page:page,
-      limit:limit,
+      totalPages: totalPages,
+      page: page,
+      limit: limit,
     });
-  }catch(error){
+  } catch (error) {
     console.error(error);
-  return res.status(500).send("Server error")
+    return res.status(500).send("Server error");
   }
 };
+
 
 //  Add Coupons Page Render
 exports.addCouponPage = async (req, res) => {
   try{
+
+    const categories = await categoryDB.find({active:true})
     const couponCodeError = req.session.couponCodeError;
     const couponCodeRegex = req.session.couponCodeRegex;
     const discountError = req.session.discountError;
     const discountRegex = req.session.discountRegex;
+    const maxAmountError = req.session.maxAmountError;
+    const maxAmountRegex = req.session.maxAmountRegex;
+    const categoryError = req.session.categoryCouponExists;
     const validFromError = req.session.validFromError;
     const validToError = req.session.validToError;
-
+    const couponExists = req.session.couponExists;
+    const validFrom = req.session.validFrom;
+     const validTo =  req.session.validTo;
+    
 
     req.session.couponCodeError = '';
     req.session.couponCodeRegex = "";
     req.session.discountError = "";
     req.session.discountRegex = "";
+    req.session.maxAmountError = "";
+    req.session.maxAmountRegex = "";
+    req.session.categoryCouponExists = "";
     req.session.validFromError = "";
     req.session.validToError = "";
+    req.session.couponExists = "";
+    req.session.validFrom = "";
+    req.session.validTo="";
 
 
    return res.render("addCoupon",{
@@ -454,8 +472,15 @@ exports.addCouponPage = async (req, res) => {
       couponCodeRegex,
       discountError,
       discountRegex,
+      maxAmountError,
+      maxAmountRegex,
+      categoryError,
       validFromError,
-      validToError
+      validToError,
+      couponExists,
+      validFrom,
+      validTo,
+      categories
     });
   }catch(error){
     console.error(error);
@@ -463,41 +488,59 @@ exports.addCouponPage = async (req, res) => {
   }
 };
 
-exports.deleteCouponPage = async (req,res)=>{
-  try{
-
+// Admin Deleted Coupons Page Render
+exports.deleteCouponPage = async (req, res) => {
+  try {
     const page = parseInt(req.query.page) || 1;
-    const limit =  10;
+    const limit = parseInt(req.query.limit) || 10;
 
     const offset = (page - 1) * limit;
 
-    const unlistedCoupons = await couponDB.find({active:false,expired:true})
-    .skip(offset)
-    .limit(limit);
+    // Fetch inactive and expired coupons
+    const unlistedCoupons = await couponDB.find({ active: false, expired: true })
+      .skip(offset)
+      .limit(limit);
 
-    const totalOrders = await orderDB.countDocuments()
+    // Count the total number of inactive and expired coupons
+    const totalCoupons = await couponDB.countDocuments({ active: false, expired: true });
 
-    const totalPages = Math.ceil(totalOrders /limit);
+    const totalPages = Math.ceil(totalCoupons / limit);
 
-    return res.render("deleteCoupon",{
+    return res.render("deleteCoupon", {
       unlistedCoupons,
-      totalPages:totalPages,
-      page:page,
-      limit:limit,
-    })
-  }catch(error){
+      totalPages: totalPages,
+      page: page,
+      limit: limit,
+    });
+  } catch (error) {
     console.error(error);
-   return res.status(500).send("Server Error");
+    return res.status(500).send("Server Error");
   }
-}
+};
+
 
 //  Admin offer Page Render
 exports.adminOfferPage = async (req, res) => {
   try{
 
-    const offer = await offerDB.find({active:true});
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10; // Set default limit if not provided
+
+    const skip = (page - 1) * limit;
+
+     // Fetch the total number of offers
+     const totalOffers = await offerDB.countDocuments({ active: true, expired: false });
+
+
+    const offers = await offerDB.find({active:true,expired:false});
+
+    const totalPages = Math.ceil(totalOffers / limit);
+
    return res.render("adminOffer",{
-    offer
+    offers,
+    currentPage: page,
+    totalPages,
+    limit
    });
   }catch(error){
     console.error(error);
@@ -517,7 +560,9 @@ exports.addOfferPage = async (req, res) => {
      const validationFrom = req.session.validFromError
      const validationTo = req.session.validToError
      const categoryMatch = req.session.categoryCodeNotMatch;
-   
+     const offerExists = req.session.offerExists;
+     const validFrom =  req.session.validFrom2;
+    const validTo = req.session.validTo2;
      // Clear the message after fetching it
      req.session.categoryCodeError = "";
      req.session.categotyCodeRegex = "";
@@ -526,6 +571,10 @@ exports.addOfferPage = async (req, res) => {
      req.session.validFromError = "";
      req.session.validToError = "";
      req.session.categoryCodeNotMatch  = "";
+     req.session.offerExists = "";
+     req.session.validFrom2 = "";
+     req.session.validTo2 = "";
+    
     
    return res.render("addOffer",{
     categoryCodeError,
@@ -535,6 +584,9 @@ exports.addOfferPage = async (req, res) => {
     validationFrom,
     validationTo,
     categoryMatch,
+    offerExists,
+    validFrom,
+    validTo
    });
 
   }catch(error){
@@ -544,16 +596,32 @@ exports.addOfferPage = async (req, res) => {
  
 };
 
-
-//  delete offer Page Render
 exports.deleteOfferPage = async (req, res) => {
-  try{
-   return res.render("deleteOffer");
-  }catch(error){
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10; // Set default limit if not provided
+    const skip = (page - 1) * limit;
+
+    // Fetch the total number of offers
+    const totalOffers = await offerDB.countDocuments({ active: false, expired: true });
+
+    // Fetch the offers with pagination
+    const offers = await offerDB.find({ active: false, expired: true })
+    .skip(skip)
+    .limit(limit);
+
+    const totalPages = Math.ceil(totalOffers / limit);
+
+    return res.render("deleteOffer", {
+      offers,
+      currentPage: page,
+      totalPages,
+      limit
+    });
+  } catch (error) {
     console.error(error);
-   return res.status(500).send("Server error");
+    return res.status(500).send("Server error");
   }
- 
 };
 
 
