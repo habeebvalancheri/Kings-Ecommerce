@@ -1,9 +1,9 @@
 // Get all OTP input fields
-const otpInputs = document.querySelectorAll('.otp-input');
+const otpInputs = document.querySelectorAll(".otp-input");
 
 // Add event listener to each OTP input
 otpInputs.forEach((input, index) => {
-  input.addEventListener('input', (event) => {
+  input.addEventListener("input", (event) => {
     const value = event.target.value;
 
     // Move to the next input if the current input is filled
@@ -13,10 +13,10 @@ otpInputs.forEach((input, index) => {
   });
 
   // Add event listener to backspace
-  input.addEventListener('keydown', (event) => {
+  input.addEventListener("keydown", (event) => {
     if (event.key == "Backspace" && index > 0) {
       // Clear each input
-      otpInputs[index].value = '';
+      otpInputs[index].value = "";
       otpInputs[index - 1].focus();
     }
   });
@@ -26,8 +26,8 @@ otpInputs.forEach((input, index) => {
 let countDown = 60;
 
 function startResendTimer() {
-  const countDownElement = document.getElementById('countdown');
-  const resendButton = document.getElementById('resend');
+  const countDownElement = document.getElementById("countdown");
+  const resendButton = document.getElementById("resend");
 
   resendButton.style.display = "none";
 
@@ -42,14 +42,14 @@ function startResendTimer() {
     }
   }, 1000);
 
-  resendButton.addEventListener('click',()=>{
+  resendButton.addEventListener("click", () => {
     clearInterval(timeInterval);
     countDown = 60;
     startResendTimer();
-  })
+  });
 }
 
 // Call the function when the page loads to start the timer
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   startResendTimer();
 });

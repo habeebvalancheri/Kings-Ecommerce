@@ -1,18 +1,15 @@
-
-
-exports.redirectIfUserLoggedIn = (req,res,next)=>{
-  if(req.session.userLoggedIn){
+exports.redirectIfUserLoggedIn = (req, res, next) => {
+  if (req.session.userLoggedIn) {
     res.redirect("/");
-  }else{
-    next()
+  } else {
+    next();
   }
 };
 
-exports.userLoggedOut = (req,res,next)=>{
-  if(req.session.userLoggedIn){
-    next()
-  }else{
+exports.userLoggedOut = (req, res, next) => {
+  if (req.session.userLoggedIn) {
+    next();
+  } else {
     res.redirect("/signin");
   }
 };
-

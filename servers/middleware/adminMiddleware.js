@@ -1,11 +1,9 @@
-
-
 // Middleware to redirect if admin is already logged in
-exports.redirectIfAdminLoggedIn = (req,res,next)=>{
-  if(req.session.adminLoggedIn){
+exports.redirectIfAdminLoggedIn = (req, res, next) => {
+  if (req.session.adminLoggedIn) {
     return res.redirect("/admin-Dashboard");
-  }else{
-   next()
+  } else {
+    next();
   }
 };
 
@@ -17,4 +15,3 @@ exports.adminLoggedOut = (req, res, next) => {
     return res.redirect("/adminLogin");
   }
 };
-
