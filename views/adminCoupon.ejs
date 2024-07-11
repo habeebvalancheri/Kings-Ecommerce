@@ -21,7 +21,7 @@
             </button>
           </a>
         </div>
-
+        <% if(coupons.length > 0){ %>
         <table>
           <thead>
             <tr>
@@ -54,11 +54,17 @@
             <% }) %>
           </tbody>
         </table>
+        <% }else{ %>
+          <div>
+            <p>There are no Coupons Add One</p>
+          </div>
+          <% } %>
       </div>
     </div>
       
   </main>
      <!-- Pagination Controls -->
+     <% if(totalPages > 0) {%>
      <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             <!-- Previous Page Button -->
@@ -95,6 +101,7 @@
             <% } %>
         </ul>
     </nav>
+    <% } %>
 </section>
 </body>
 </html>

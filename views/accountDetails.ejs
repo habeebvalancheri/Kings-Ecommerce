@@ -73,31 +73,26 @@
         <!-- My Orders Link -->
         <div class="card mb-4">
           <div class="card-body text-center">
-            <h5 class="my-3">Your Orders</h5>
+            <h5 class="my-3">My Orders</h5>
             <div class="d-flex justify-content-center mb-2">
               <!-- My Orders Link -->
               <a href="/order">
-                <button class="btn btn-warning" style="font-weight: 500;">My Orders</button>
+                <button class="btn btn-warning" style="font-weight: 500;">Orders</button>
               </a>
             </div>
           </div>
         </div>
 
-        <!-- Wallet Details -->
+         <!-- My Wallet Link -->
         <div class="card mb-4">
           <div class="card-body text-center">
-            <h5 class="my-3">Your Wallet</h5>
-            <% if(defaultAddress) {%>
-            <!-- Add your logic to display wallet details (Credit Card, Balance, etc.) -->
-            <div class="credit-card">₹
-              <%= wallet.wallet  %>
+            <h5 class="my-3">My Wallet</h5>
+            <div class="d-flex justify-content-center mb-2">
+              <!-- My Wallet Link -->
+              <a href="/wallet">
+                <button class="btn btn-warning" style="font-weight: 500;">Wallet</button>
+              </a>
             </div>
-            <% }else{ %>
-               <!-- Add your logic to display wallet details (Credit Card, Balance, etc.) -->
-            <div class="credit-card">
-              <!-- Your wallet content goes here -->
-            </div>
-              <% } %>
           </div>
         </div>
       </div>
@@ -247,81 +242,24 @@
     <h5 class="my-3">My Addresses</h5>
   </div>
   <div class="col-sm-9 d-flex justify-content-end">
-    <button id="addAddressLink" class="btn btn-link" style="text-decoration:none; background-color:  #4f4f4f; color: white;" onclick="redirectToAddress()">Add Address</button>
-  </div>
-
-  <% for (let i = 0; i < addressesOnPage.length; i++) { %>
-    <!-- Render addresses for the current page -->
-    <% const address = addressesOnPage[i]; %>
-    <div class="col-lg-6 mb-4 d-flex"> <!-- Adjust the column width as needed -->
-      <div class="card" style="flex: 1;">
-        <div class="card-body">
-          <ul class="list-unstyled">
-            <li><strong>Name:</strong> <%= address.name %></li>
-            <li><strong>Email:</strong> <%= user.email %></li>
-            <li><strong>Phone:</strong> <%= user.phone %></li>
-            <li><strong>Address:</strong> <%= address.address %></li>
-            <li><strong>City:</strong> <%= address.city %></li>
-            <li><strong>House No:</strong> <%= address.houseNo %></li>
-            <li><strong>State:</strong> <%= address.state %></li>
-            <li><strong>Country:</strong> <%= address.country %></li>
-            <li><strong>Zip Code:</strong> <%= address.zipCode %></li>
-            <li><strong>Mobile:</strong> <%= address.mobile %></li>
-          </ul>
-          <div class="mt-3 ">
-            <button class="btn btn-primary btn-sm" onclick="updateAddress('<%= address._id %>')">Edit</button>
-            <button class="btn btn-danger btn-sm" onclick="removeAddress('<%= address._id %>')">Remove</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  <% } %>
-  
-
-
-
-
-          <!-- Pagination Controls -->
-          <nav aria-label="Pagination">
-            <ul class="pagination justify-content-center">
-              <% if (currentPage > 1) { %>
-                <li class="page-item">
-                  <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                  </a>
-                </li>
-              <% } %>
-              <% for (let i = 1; i <= totalPages; i++) { %>
-                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                  <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                </li>
-              <% } %>
-              <% if (currentPage < totalPages) { %>
-                <li class="page-item">
-                  <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                  </a>
-                </li>
-              <% } %>
-            </ul>
-          </nav>
+    <button id="addAddressLink" class="btn btn-link" style="text-decoration:none; background-color:  #4f4f4f; color: white; margin-right: 10px;" onclick="redirectToAddress()">Add Address</button>
+    <a href="/address">
+      <button class="btn btn-warning" style="font-weight: 500;">Manage Address</button>
+    </a>
+</div>
         </div>
       </div>
       </div>
     </div>
   </div>
 
-  <!-- Blocked Section -->
-  <div class="text-center">
-    <!-- <p>Blocked</p> -->
-  </div>
 </section>
 <!-- SweetAlert library -->
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>
   function redirectToAddress() {
-    window.location.href = '/address';
+    window.location.href = '/addAddress';
   }
 </script>
 <script>
@@ -406,29 +344,6 @@
   displayValidationErrors(<%- JSON.stringify(validationErrors) %>);
   });
   </script>
-  <script>
-  // Function to update an address
-  function updateAddress(addressId) {
-  // Navigate to the edit-address route
-  window.location.href = `/edit-address?id=${addressId}`;
-  }
-  
-  // Remove address function
-  function removeAddress(addressId) {
-  fetch(`/remove-address?id=${addressId}`, { method: 'GET' })
-  .then(response => {
-  if (response.ok) {
-  location.reload(); // Reload the page upon successful removal
-  } else {
-  console.error('Failed to remove address');
-  }
-  })
-  .catch(error => {
-  console.error('Error removing address:', error);
-  });
-  }
-  </script>
-  
 <!-- SweetAlert library -->
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 

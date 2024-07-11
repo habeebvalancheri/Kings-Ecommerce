@@ -14,9 +14,10 @@
                 <div class="card border shadow-0">
                     <div class="m-4">
                         <h4 class="card-title mb-4">Your shopping cart</h4>
-                        <% if (cartItems && cartItems.length > 0 ) { %>
                         <% let totalPrice = 0; %> <!-- Initialize total price variable -->
                         <% let totalItems = 0; %> <!-- Initialize total items variable -->
+                        <% if (cartItems && cartItems.length > 0 ) { %>
+                        
                         <% cartItems.forEach(item => { %>
                         <% let itemPrice = item.productId.price * item.quantity; %> <!-- Calculate item price -->
                         <% totalPrice += itemPrice; %> <!-- Add item price to total price -->
@@ -115,27 +116,21 @@
                                 ₹ 0.00
                             </p>
                         </div>
-                       <% cartItems.forEach(items =>{ %>
+                       
 
                     
                         <div class="mt-3">
-                            <form action="/check-out?id=<%= items.productId._id %>" method="post">
-                                <input type="hidden" name="productIds" id="productIds" value="">
-                              <input type="hidden" name="totalsum" value="" hidden>
+                            <form action="/check-out?id=<%= cartItems.map(item => item.productId._id).join(',') %>" method="post">
+                                <input type="hidden" name="productIds" id="productIds" value="<%= cartItems.map(items => items.productId._id).join(',') %>">
+                              <input type="hidden" name="totalsum" value="<%= totalPrice %>" hidden>
                               <button class="btn btn-success w-100 shadow-0 mb-2" type="submit">Make Purchase
                               </button>
                           </form>
-                                <a href=" /products" class="btn btn-light w-100 border mt-2"> Back to shop </a>
+                                <a href="/products" class="btn btn-light w-100 border mt-2"> Back to shop </a>
                           </div>
-                     <% }) %>
-                    
                     </div>
-                    
                 </div>
-                
             </div>
-            
-            
             <!-- summary -->
         </div>
     </div>
@@ -399,6 +394,7 @@ async function handleDecreaseClick(event) {
 
 
          </script>
+         
          
 
 <!-- include footer -->

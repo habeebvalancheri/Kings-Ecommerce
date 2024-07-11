@@ -1,24 +1,26 @@
-<!-- include header -->
-<%- include('include/adminHead') %>
-  <!-- /include header -->
+<!DOCTYPE html>
+<html lang="en">
 
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-  <!-- MDB -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="dist/themes/toasteur-default.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
-
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Product</title>
+  <link rel="icon" type="image/x-icon" href="/images/fav-icon.png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
   <style>
-    .errorP{
-        color: red;
-        font-size: small;
-
+    .errorP {
+      color: red;
+      font-size: small;
     }
-</style>
+  </style>
+</head>
+<body style="background-color:#f5f5f7;">
+  <!-- Include header -->
+  <%- include('include/adminHead') %>
+  <!-- /include header -->
   
   <div class="row">
     <div class="col-md-8 mb-4 mx-auto mb-4  mt-5">
@@ -53,8 +55,6 @@
                     <p class="errorP <%= !descriptionRegexerror?'d-none':''  %>" ><%=descriptionRegexerror  %></p>
                   </div>
 
-                
-
                   <div class="col-sm-4 mb-3">
                     <p class="mb-0">product price</p>
                     <div class="form-outline">
@@ -64,8 +64,6 @@
                     <p class="mb-0" id="PriceWarning" style="display: none; color: red;">price should be positive value</p>
                     <p class="errorP <%= !priceRegexerror?'d-none':''  %>" ><%=priceRegexerror  %></p>
                   </div>
-
-                  
 
 
                   <div class="col-sm-4 mb-3">
@@ -94,6 +92,7 @@
                     <p class="mb-0">category</p>
                     <div class="form-outline">
                       <select name="category" id="productCategory" class="form-control">
+                        <option value="">Select Category</option>
                        <% for(let i=0;i<data.length;i++){  %>
                           <option >
                           <%= data[i].name  %>
@@ -111,7 +110,7 @@
                     <p class="mb-0">Product Image</p>
                     <div class="form-outline">
 
-                      <input  type="file" id="productImage" name="image" multiple accept="image/*" class="form-control-file" id="productImage"
+                      <input  type="file" id="productImage" name="image" multiple accept="image/*" class="form-control-file" 
                         accept="image/*">
                         <div id="imagePreview" class="mt-2" style="display: flex; gap: 10px;"></div>
 
@@ -133,171 +132,171 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+  <script>
   
-
-<!-- ... (remaining HTML code) ... -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const productImage = document.getElementById('productImage');
-    const imagePreview = document.getElementById('imagePreview');
-
-    productImage.addEventListener('change', function() {
-        const files = Array.from(productImage.files);
-
-        // Clear the image preview container
-        imagePreview.innerHTML = '';
-
-        // Iterate through the selected files
-        files.forEach((file, index) => {
-            // Create a FileReader instance
-            const reader = new FileReader();
-
-            // Create an image element
-            const img = document.createElement('img');
-            img.style.width = '100px';
-            img.style.height = '100px';
-            img.style.objectFit = 'cover';
-            img.className = 'img-thumbnail';
-            img.alt = `Image Preview ${index + 1}`;
-
-            // Create a container div for the image and the remove button
-            const imageContainer = document.createElement('div');
-            imageContainer.style.display = 'inline-block';
-            imageContainer.style.margin = '5px';
-
-            // Create the remove button
-            const removeButton = document.createElement('button');
-            removeButton.textContent = 'Remove';
-            removeButton.className = 'btn btn-danger btn-sm';
-            removeButton.style.display = 'block';
-            removeButton.addEventListener('click', function() {
-                // Remove the container div from the preview container
-                imagePreview.removeChild(imageContainer);
-                
-                // Create a new DataTransfer object
-                const dataTransfer = new DataTransfer();
-                
-                // Loop through the files and add back only those not being removed
-                files.forEach((f, idx) => {
-                    if (idx !== index) {
-                        dataTransfer.items.add(f);
-                    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const productImage = document.getElementById('productImage');
+        const imagePreview = document.getElementById('imagePreview');
+    
+        productImage.addEventListener('change', function() {
+            const files = Array.from(productImage.files);
+    
+            // Clear the image preview container
+            imagePreview.innerHTML = '';
+    
+            // Iterate through the selected files
+            files.forEach((file, index) => {
+                // Create a FileReader instance
+                const reader = new FileReader();
+    
+                // Create an image element
+                const img = document.createElement('img');
+                img.style.width = '100px';
+                img.style.height = '100px';
+                img.style.objectFit = 'cover';
+                img.className = 'img-thumbnail';
+                img.alt = `Image Preview ${index + 1}`;
+    
+                // Create a container div for the image and the remove button
+                const imageContainer = document.createElement('div');
+                imageContainer.style.display = 'inline-block';
+                imageContainer.style.margin = '5px';
+    
+                // Create the remove button
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.className = 'btn btn-danger btn-sm';
+                removeButton.style.display = 'block';
+                removeButton.addEventListener('click', function() {
+                    // Remove the container div from the preview container
+                    imagePreview.removeChild(imageContainer);
+                    
+                    // Create a new DataTransfer object
+                    const dataTransfer = new DataTransfer();
+                    
+                    // Loop through the files and add back only those not being removed
+                    files.forEach((f, idx) => {
+                        if (idx !== index) {
+                            dataTransfer.items.add(f);
+                        }
+                    });
+                    
+                    // Update the file input's file list
+                    productImage.files = dataTransfer.files;
                 });
+    
+                // Read the file as a data URL and set it as the image source
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+    
+                // Append the image and remove button to the container div
+                imageContainer.appendChild(img);
+                imageContainer.appendChild(removeButton);
                 
-                // Update the file input's file list
-                productImage.files = dataTransfer.files;
+                // Append the container div to the preview container
+                imagePreview.appendChild(imageContainer);
             });
-
-            // Read the file as a data URL and set it as the image source
-            reader.onload = function(e) {
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-
-            // Append the image and remove button to the container div
-            imageContainer.appendChild(img);
-            imageContainer.appendChild(removeButton);
-            
-            // Append the container div to the preview container
-            imagePreview.appendChild(imageContainer);
         });
     });
-});
+    
+    
+    </script>
+    <script>
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('addProductForm');
+    
+        // Handle form submission
+        form.addEventListener('submit', function (event) {
+            // Perform validation checks
+            if (!validateForm()) {
+                // Prevent form submission if validation fails
+                event.preventDefault();
+            }
+        });
+    
+        function validateForm() {
+    const productName = document.getElementById('productName').value.trim();
+    const productDescription = document.getElementById('productDescription').value.trim();
+    const productPrice = parseFloat(document.getElementById('productPrice').value.trim());
+    const productStock = parseInt(document.getElementById('productStock').value.trim());
+    const productDiscount = parseFloat(document.getElementById('productDiscount').value.trim());
+    const productCategory = document.getElementById('productCategory').value.trim();
+    const productImages = document.getElementById('productImage').files;
 
+    let valid = true;
 
-</script>
-<script>
+    // Validate product name (3-70 alphabetic characters)
+    const productNameRegex = /^[a-zA-Z\s]{3,70}$/;
+    if (!productNameRegex.test(productName)) {
+        showAlert('Product name should be between 3 and 70 alphabetic characters.');
+        valid = false;
+    }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('addProductForm');
+    // Validate product description (3-200 characters)
+    if (productDescription.length < 3 || productDescription.length > 200) {
+        showAlert('Description should be between 3 and 200 characters.');
+        valid = false;
+    }
 
-    // Handle form submission
-    form.addEventListener('submit', function (event) {
-        // Perform validation checks
-        if (!validateForm()) {
-            // Prevent form submission if validation fails
-            event.preventDefault();
-        }
-    });
+    // Validate product price (positive number)
+    if (isNaN(productPrice) || productPrice <= 0) {
+        showAlert('Price should be a positive number.');
+        valid = false;
+    }
 
-    // Validate form inputs
-    function validateForm() {
-        
-      const productName = document.getElementById('productName').value.trim();
+    // Validate product stock (positive integer)
+    if (isNaN(productStock) || productStock <= 0) {
+        showAlert('Stock should be a positive integer.');
+        valid = false;
+    }
 
-        const productDescription = document.getElementById('productDescription').value.trim();
+    // Validate product discount (between 10 and 90 percent)
+    if (isNaN(productDiscount) || productDiscount < 10 || productDiscount > 90) {
+        showAlert('Discount should be between 10% and 90%.');
+        valid = false;
+    }
 
-        const productPrice = parseFloat(document.getElementById('productPrice').value.trim());
-
-        const productStock = parseInt(document.getElementById('productStock').value.trim());
-
-        const productDiscount = parseFloat(document.getElementById('productDiscount').value.trim());
-
-        const productCategory = document.getElementById('productCategory').value.trim();
-
-        const productImages = document.getElementById('productImage').files;
-
-        let valid = true;
-
-        // Validate product name (3-70 alphabetic characters)
-        const productNameRegex = /^[a-zA-Z\s]{3,70}$/;
-        if (!productNameRegex.test(productName)) {
-            showAlert('Product name should be between 3 and 70 alphabetic characters.');
-            valid = false;
-        }
-
-        // Validate product description (3-200 alphanumeric characters and punctuation)
-        if (productDescription > 3 || 2000 < productDescription) {
-              showAlert('Description should be between 3 and 200 characters and may include letters, numbers, spaces, commas, periods, exclamation marks, and question marks.');
-              valid = false;
-          }
-
-        // Validate product price (positive number)
-        if (isNaN(productPrice) || productPrice <= 0) {
-            showAlert('Price should be a positive number.');
-            valid = false;
-        }
-
-        // Validate product stock (positive integer)
-        if (isNaN(productStock) || productStock <= 0) {
-            showAlert('Stock should be a positive integer.');
-            valid = false;
-        }
-
-        // Validate product discount (between 10 and 90 percent)
-        if (isNaN(productDiscount) || productDiscount < 10 || productDiscount > 90) {
-            showAlert('Discount should be between 10% and 90%.');
-            valid = false;
-        }
-
-        // Validate product category (should not be empty)
+    // Validate product category (should not be empty)
     if (productCategory === "") {
         showAlert('Please select a category.');
         valid = false;
     }
 
-        // Validate product image (at least one image should be selected)
-        if (productImages.length < 4) {
-            showAlert('Please upload four product images.');
-            valid = false;
+    // Validate product image (at least one image should be selected)
+    if (productImages.length < 1) {
+        showAlert('Please upload at least one product image.');
+        valid = false;
+    }
+
+    return valid;
+}
+
+        // Function to show SweetAlert2 alert
+        function showAlert(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: message,
+            });
         }
-
-        return valid;
-    }
-
-    // Function to show SweetAlert2 alert
-    function showAlert(message) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: message,
-        });
-    }
-});
-
-
-</script> 
-
-
-
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+    });
+    
+    
+    </script> 
+     <script>function _showPlaceholder() {
+      const element = document.getElementById('someElementId');
+      if (element) {
+          // Access element properties safely
+          element.classList.add('someClass');
+      } else {
+          console.error('Element not found or null.');
+      }
+  }</script>
+</body>
+</html>

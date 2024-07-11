@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const addressSchema = require('../model/addressSchema');
 
 const detailsSchema = new mongoose.Schema({
   name: {
@@ -22,18 +21,18 @@ const detailsSchema = new mongoose.Schema({
   },
   block: {
     type: Boolean,
-    default:false,
+    default: false,
   },
-  addresses: [{type : mongoose.Schema.Types.ObjectId, ref : 'addressdb'}], // changed to reference another collection
+  addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: "addressdb" }], // changed to reference another collection
   wallet: {
     type: Number,
     default: 0.0,
   },
-  verified:{
-    type:Boolean,
-    default:false,
-  } 
+  verified: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const userDB = mongoose.model('userdb', detailsSchema);
+const userDB = mongoose.model("userdb", detailsSchema);
 module.exports = userDB;

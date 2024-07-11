@@ -79,6 +79,8 @@
                   <p class="mb-0">category</p>
                   <div class="form-outline">
                     <select name="category" id="productCategory" class="form-control">
+                      <option value="">
+                      <%= categoryName %></option>
                       <% for(let i=0;i<data.length;i++) { %>
                       <option value="<%= data[i].name  %>" <%=products.name===data[i].name ? 'selected' : '' %> >
                         <%= data[i].name %>

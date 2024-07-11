@@ -11,7 +11,7 @@ const categorySchema = new mongoose.Schema({
     default: true,
   },
   // You can add more fields as needed for your specific use case
-});
+}, { timestamps: true });  // Add this line to enable timestamps
 
 const Category = mongoose.model('Category', categorySchema);
 

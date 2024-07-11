@@ -59,6 +59,7 @@
     </div>
 
     <!-- Pagination Controls -->
+    <% if(totalPages > 0) {%>
     <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center">
         <% if (currentPage > 1) { %>
@@ -92,8 +93,22 @@
         <% } %>
       </ul>
     </nav>
+    <% } %>
   </main>
 </section>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+//  document.addEventListener('DOMContentLoaded', function () {
+   
+// const successMessage = "<%= successMessage %>";
+//     if (successMessage) {
+//       Swal.fire({
+//         icon: 'success',
+//         title: 'Success',
+//         text: successMessage,
+//       });
+//     }
+//   })
+</script>
 </body>
 </html>

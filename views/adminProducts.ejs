@@ -4,9 +4,8 @@
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
 <!-- MDB -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 
 <style>
   .name {
@@ -45,10 +44,6 @@
 </style>
 
 <body>
-
-
-
-
 <!-- CONTENT -->
 <section id="content">
   <!-- NAVBAR -->    
@@ -57,148 +52,124 @@
 
   <!-- MAIN -->
   <main style="background-color: #eee;">
-
     <form action="/add-Products">
       <button class="btn btn-primary" type="submit">Add Product</button>
     </form>
     <h1></h1>
-    
     <!-- Add margin to create a gap -->
     <form action="/unlisted-Products" style="margin-bottom: 20px;">
       <button class="btn btn-warning" type="submit">Unlisted Product</button>
     </form>
-
-      <div class="row">
-        <div class="row">
-          <table class="table align-middle mb-0 bg-white" id="table_id">
-            <thead class="bg-light">
-              <tr>
-                <th style="padding-left: 4%">Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <% for(let i=0 ;i<products.length;i++){ %>
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <img src="/images/<%= products[i].pImages[0] %>" alt=""
-                        style="width: 45px; height: 45px" class="rounded-circle" />
-                      <div class="ms-3">
-                        <p class="fw-bold mb-1 name">
-                          <%= products[i].pName  %>
-                          
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p class="fw-normal mb-1">
-                      <%= products[i].category.name %>
-                    </p>
-                  </td>
-                  <td style="color: rgb(224, 10, 10);">
-                    <%= products[i].price  %>
-                  </td>
-                  <td>
-                    <%= products[i].stock  %>
-                  </td>
-                  <td>
-                    <a style="margin-right: 3%;" href="/update-Product?id=<%= products[i]._id  %>"
-                      class="btn btn-light border px-1 pt-2 icon-hover">
-                      <i class="fas fa-pencil fa-lg text-secondary px-1"></i>
-                    </a>
-                    <a href="/unlist-Product?id=<%= products[i]._id %>"
-                      class="btn btn-light border px-1 pt-2 icon-hover">
-                      <i class="fas fa-trash fa-lg text-secondary px-1"></i>
-                    </a>
-                  </td>
-                </tr>
-              <% } %>
-            </tbody>
-          </table>
-        </div>
-      </div>
   
-      
-  </main>
-     <!-- Pagination Controls -->
-     <nav aria-label="Page navigation">
+    <div class="row">
+      <% if(products.length > 0){ %>
+      <div class="row">
+        <table class="table align-middle mb-0 bg-white" id="table_id">
+          <thead class="bg-light">
+            <tr>
+              <th style="padding-left: 4%">Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(let i = 0; i < products.length; i++) { %>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="/images/<%= products[i].pImages[0] %>" alt=""
+                      style="width: 45px; height: 45px" class="rounded-circle" />
+                    <div class="ms-3">
+                      <p class="fw-bold mb-1 name"><%= products[i].pName %></p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class="fw-normal mb-1"><%= products[i].category.name %></p>
+                </td>
+                <td style="color: rgb(224, 10, 10);">
+                  <%= products[i].price %>
+                </td>
+                <td><%= products[i].stock %></td>
+                <td>
+                  <a style="margin-right: 3%;" href="/update-Product?id=<%= products[i]._id %>"
+                    class="btn btn-light border px-1 pt-2 icon-hover">
+                    <i class="fas fa-pencil fa-lg text-secondary px-1"></i>
+                  </a>
+                  <a href="/unlist-Product?id=<%= products[i]._id %>"
+                    class="btn btn-light border px-1 pt-2 icon-hover">
+                    <i class="fas fa-trash fa-lg text-secondary px-1"></i>
+                  </a>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+      <% } else{%>
+        <p>There are no Products Add One</p>
+              <% } %>
+    </div>
+
+    <% if(totalPages > 0) {%>
+    <!-- Pagination Controls -->
+    <nav aria-label="Page navigation">
       <ul class="pagination justify-content-center">
-          <!-- Previous Page Button -->
-          <% if (page > 1) { %>
-              <li class="page-item">
-                  <a class="page-link" href="/admin-Products?page=<%= page - 1 %>&limit=<%= limit %>" aria-label="Previous">
-                      <span aria-hidden="true">&laquo;</span>
-                  </a>
-              </li>
-          <% } else { %>
-              <li class="page-item disabled">
-                  <span class="page-link" aria-hidden="true">&laquo;</span>
-              </li>
-          <% } %>
+        <!-- Previous Page Button -->
+        <% if (page > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="/admin-Products?page=<%= page - 1 %>&limit=<%= limit %>" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        <% } else { %>
+          <li class="page-item disabled">
+            <span class="page-link" aria-hidden="true">&laquo;</span>
+          </li>
+        <% } %>
 
-          <!-- Page Number Buttons -->
-          <% for (let i = 1; i <= totalPages; i++) { %>
-              <li class="page-item <%= i === page ? 'active' : '' %>">
-                  <a class="page-link" href="/admin-Products?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
-              </li>
-          <% } %>
+        <!-- Page Number Buttons -->
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= i === page ? 'active' : '' %>">
+            <a class="page-link" href="/admin-Products?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+          </li>
+        <% } %>
 
-          <!-- Next Page Button -->
-          <% if (page < totalPages) { %>
-              <li class="page-item">
-                  <a class="page-link" href="/admin-Products?page=<%= page + 1 %>&limit=<%= limit %>" aria-label="Next">
-                      <span aria-hidden="true">&raquo;</span>
-                  </a>
-              </li>
-          <% } else { %>
-              <li class="page-item disabled">
-                  <span class="page-link" aria-hidden="true">&raquo;</span>
-              </li>
-          <% } %>
+        <!-- Next Page Button -->
+        <% if (page < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="/admin-Products?page=<%= page + 1 %>&limit=<%= limit %>" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        <% } else { %>
+          <li class="page-item disabled">
+            <span class="page-link" aria-hidden="true">&raquo;</span>
+          </li>
+        <% } %>
       </ul>
-  </nav>
-  <!-- MAIN -->
+      <% } %>
+    </nav>
+  </main>
 </section>
 <!-- CONTENT -->
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-      integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
- 
-      <script>
-        $(document).ready(function () {
-          $('#table_id').DataTable({
-            paging: true,
-            pageLength: 10,
-            lengthMenu: [10, 25, 50, 100],
-            ordering: true,
-            searching: true,
-            responsive: true
-          });
-        });
-      </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const successMessage = "<%- success %>";
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-      if (successMessage && successMessage.trim() !== '') {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: successMessage,
-        });
-      }
-    });
-  </script>
-  
-  
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const successMessage = "<%- success %>";
+    if (successMessage && successMessage.trim() !== '') {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: successMessage,
+      });
+    }
+  });
+</script>
 </body>
-
 </html>

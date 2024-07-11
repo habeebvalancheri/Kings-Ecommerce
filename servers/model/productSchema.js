@@ -39,7 +39,7 @@ const productSchema = new Schema({
     type: Boolean,
     default: true,
   }
-});
+}, { timestamps: true });  // Add this line to enable timestamps
 
 const ProductDB = mongoose.model('Product', productSchema);
 

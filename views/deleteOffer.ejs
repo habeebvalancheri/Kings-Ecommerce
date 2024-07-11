@@ -29,37 +29,45 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% for (let i = 0; i < offers.length; i++) { %>
+                        <% let count = (currentPage - 1) * limit %>
+                        <% offers.forEach((item) => { %>
+                            <% count++ %>
+                    
                         <tr>
-                            <td><%= (currentPage - 1) * limit + i + 1 %></td>
-                            <td><%= offers[i].name %></td>
-                            <td><%= offers[i].discount %>%</td>
-                            <td><%= offers[i].createdAt.toDateString() %></td>
-                            <td><%= offers[i].expiresAt.toDateString() %></td>
+                            <td><%= count %></td>
+                            <td><%= item.name %></td>
+                            <td><%= item.discount %>%</td>
+                            <td><%= item.createdAt.toDateString() %></td>
+                            <td><%= item.expiresAt.toDateString() %></td>
                             <td>
                                 <span class="status cancelled" style="background-color: rgb(209, 0, 0);">
                                     InActive
                                 </span>
                             </td>
                         </tr>
-                        <% } %>
+                        <% }) %>
                     </tbody>
                 </table>
                 <% } else { %>
                 <p>No offers available</p>
                 <% } %>
             </div>
-
+        </div>
+    </main>
             <!-- Pagination -->
             <% if (totalPages > 1) { %>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
                     <% if (currentPage > 1) { %>
                     <li class="page-item">
                         <a class="page-link" href="?page=<%= currentPage - 1 %>&limit=<%= limit %>" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
+                    <% } else { %>
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-hidden="true">&laquo;</span>
+                        </li>
                     <% } %>
                     <% for (let i = 1; i <= totalPages; i++) { %>
                     <li class="page-item <%= i === currentPage ? 'active' : '' %>">
@@ -72,12 +80,15 @@
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
+                    <% } else { %>
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-hidden="true">&raquo;</span>
+                        </li>
                     <% } %>
                 </ul>
             </nav>
             <% } %>
-        </div>
-    </main>
+      
 </section>
 </body>
 </html>

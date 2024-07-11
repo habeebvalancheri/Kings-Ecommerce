@@ -110,8 +110,8 @@
 
       // Validate discount (Numeric and within range)
       const discountValue = parseInt(discount);
-      if (isNaN(discountValue) || discountValue <= 10 || discountValue >= 80) {
-        showAlert("Discount should be a numeric value greater than 10 and less than 80.");
+      if (isNaN(discountValue)) {
+        showAlert("Discount should be a numeric value.");
         valid = false;
       }
 
