@@ -91,6 +91,8 @@ router.post("/submit-Order", userController.submitOrder);
 router.post("/cancelOrder", userController.cancelOrder);
 router.post("/returnOrder", userController.returnOrder);
 
+router.get('/download-invoice',userController.invoiceDownload);
+
 //  User Logout Route
 router.get("/logout", middlewares.userLoggedOut, userService.userLogout);
 

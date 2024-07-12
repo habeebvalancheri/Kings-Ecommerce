@@ -31,6 +31,9 @@
                                     <button class="btn btn-info mb-2 order-details-btn" data-order-id="<%= order._id %>">
                                         Order Details
                                     </button>
+                                    <button class="btn btn-primary mb-2 ml-2 download-invoice-btn" data-order-id="<%= order._id %>">
+                                        <i class="fas fa-file-invoice"></i> Invoice
+                                    </button>
                                 </div>
                                 <!-- /Order Details Button -->
 
@@ -398,4 +401,9 @@ document.querySelectorAll('.confirm-return-btn').forEach(button => {
     });
 });
 
+ // Handle the invoice download button click
+ $('.download-invoice-btn').click(function () {
+        var orderId = $(this).data('order-id');
+        window.location.href =  `/download-invoice?orderId=${orderId}`;// Adjust the URL to match your route
+    });
 </script>

@@ -18,6 +18,7 @@ const orderDB = require("../model/orderSchema");
 const { redirectIfUserLoggedIn } = require("../middleware/UserMiddleware");
 const mongoose = require("mongoose");
 const express = require("express");
+const PDFDocument = require("pdfkit");
 const RazorPay = require("razorpay");
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 dotenv.config();
@@ -1513,6 +1514,64 @@ module.exports = {
       await order.save();
 
       return res.json({ success: true, message: "Product is returing" });
+    } catch (error) {
+      return res.status(500).send("Server Error");
+    }
+  },
+
+  invoiceDownload: async (req, res) => {
+    try {
+      // query orderId
+      const orderId = req.query.orderId;
+
+      // find orders
+      const orders = await orderDB.find({ _id: orderId });
+
+      if (!orders) {
+        return res.status(404).send("Order not Found");
+      }
+
+      // Create a new PDF document
+      const doc = new PDFDocument();
+
+      // Set the response headers
+      res.setHeader(
+        "Content-disposition",
+        `attachment; filename=invoice-${orderId}.pdf`
+      );
+      res.setHeader("Content-type", "application/pdf");
+
+      // Pipe the PDF document to the response
+      doc.pipe(res);
+
+      // Add content to the PDF document
+      doc.fontSize(20).text("Invoice", { align: "center" });
+
+      doc.moveDown();
+
+      orders.forEach((orders) => {
+        doc.fontSize(14).text(`Order ID: ${orders._id}`);
+        doc.text(`Order Date: ${orders.orderDate}`);
+        doc.text(`Customer Name: ${orders.user.name}`);
+        doc.text(`Customer Email: ${orders.user.email}`);
+
+        doc.moveDown();
+        doc.fontSize(16).text("Product:");
+
+        orders.products.forEach((product) => {
+          doc.fontSize(12).text(`Product Name:${product.pName}`);
+          doc.text(`Product Price: ₹${product.price.toFixed(2)}`);
+          doc.text(`Product Quantity: ${product.quantity}`);
+        });
+
+        doc.moveDown();
+        doc
+          .fontSize(14)
+          .text(`Total Amount: ₹${orders.totalAmount.toFixed(2)}`, { align: "right" });
+      });
+
+      // Finalize the PDF and end the stream
+      doc.end();
     } catch (error) {
       return res.status(500).send("Server Error");
     }
