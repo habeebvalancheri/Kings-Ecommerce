@@ -914,8 +914,8 @@ module.exports = {
         req.session.discountError = "Discount field is required";
       }
 
-      if (!discountRegex.test(discount)) {
-        req.session.discountRegex = "Discount should be a numeric";
+      if (!discountRegex.test(discount) || discount < 0 || discount > 100) {
+        req.session.discountRegex = "Discount should be a numeric value, greater than 0 and less than 100";
       }
 
       if (!maxAmount) {
@@ -1040,8 +1040,8 @@ module.exports = {
       }
 
       let discountRegex = /^[0-9]+$/;
-      if (!discountRegex.test(discount)) {
-        req.session.discountRegex = "Discount should be a numeric";
+      if (!discountRegex.test(discount) || discount < 0 || discount > 100) {
+        req.session.discountRegex = "Discount should be a numeric value, greater than 0 and less than 100";
       }
 
       if (!validFrom) {

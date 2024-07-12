@@ -115,8 +115,8 @@
 
       // Validate discount (Numeric)
       const discountRegex = /^[0-9]+$/;
-      if (!discountRegex.test(discount)) {
-        errors.push("Discount should be a numeric value");
+      if (!discountRegex.test(discount) || discount < 0 || discount > 100) {
+        errors.push("Discount should be a numeric value, greater than 0 and less than 100");
         valid = false;
       }
 
