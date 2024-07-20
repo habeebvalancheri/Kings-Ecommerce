@@ -19,6 +19,10 @@
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
     <style>
       /* Basic styling */
       body {
@@ -259,6 +263,7 @@
                   <p class="errorP <%= !stockError ? 'd-none' : '' %>">
                     <%= stockError %>
                   </p>
+                  <p class="errorP <%= !COD ? 'd-none' : '' %>"><%= COD %></p>
                   <!-- Continue Button -->
                   <% let productIdsJson = 0; %> <% if (cart && cart.length > 0)
                   { %> <% cart.forEach(cartItem => { %> <% let productIds = [];
@@ -314,9 +319,12 @@
                         <td><%= item.productId.pName %></td>
                         <td><%= item.quantity %>qt</td>
                         <td><%= item.productId.discount %>%</td>
-                    
-                        <td>₹ <%= totalDiscount[index * cartItem.product.length + subIndex].toFixed(2) %></td>
-                 
+
+                        <td>
+                          ₹ <%= totalDiscount[index * cartItem.product.length +
+                          subIndex].toFixed(2) %>
+                        </td>
+
                         <td>₹ <%= item.productId.price %></td>
                       </tr>
                       <% }) %> <% }); %> <% } %>
@@ -494,7 +502,7 @@
     <%- include('include/footer') %>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -607,6 +615,33 @@
           $("#couponTotalPrice").text("");
           // Hide the Remove Coupon button
           $(this).hide();
+
+          fetch("/removeCoupon", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                console.log("Coupon removed and session variable cleared.");
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Failed to remove coupon!",
+                });
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "An error occurred while removing the coupon!",
+              });
+            });
         });
       });
 
@@ -771,6 +806,13 @@
               title: "Form validation failed",
               text: errorMessage,
             });
+          } else if (total > 1000 && paymentMethod === "COD") {
+            Swal.fire({
+              icon: "warning",
+              title: "Order Restriction",
+              text: "Cash on Delivery (COD) is not allowed for orders above ₹1000. Please choose another payment method.",
+            });
+            return; // Stop form submission
           } else {
             paymentMethod = $('input[name="payment"]:checked').val();
             console.log("Form Data:", formData);
@@ -801,13 +843,13 @@
                     })
                       .then((response) => {
                         window.location.href = "/order";
+
                         // Remove the quantity state from local storage
                         productId.forEach(function (productId) {
                           localStorage.removeItem(productId);
                         });
                       })
                       .catch((error) => {
-                        console.error("Error:", error);
                         alert("Failed to submit order:", error);
                       });
                   } else {
@@ -819,7 +861,6 @@
                   }
                 })
                 .catch((error) => {
-                  console.error("Error:", error);
                   alert("Failed to check wallet balance", error);
                 });
             } else {
@@ -845,8 +886,6 @@
                     }
                   })
                   .then((data) => {
-                    console.log(data.success);
-                    console.log(data.success.amount);
                     // Replace YOUR_KEY_ID with your actual Razorpay Key ID
                     var options = {
                       key: "<%= RAZORPAY_ID_KEY%>",
@@ -878,6 +917,7 @@
                         })
                           .then((response) => {
                             window.location.href = "/order";
+
                             // Remove the quantity state from local storage
                             productId.forEach(function (productId) {
                               localStorage.removeItem(productId);
@@ -918,6 +958,7 @@
                     productId.forEach(function (productId) {
                       localStorage.removeItem(productId);
                     });
+
                     window.location.href = "/order";
                   })
 

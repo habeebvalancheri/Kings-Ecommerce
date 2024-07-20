@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 Internal Server Error</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #000;
+        }
+
+        .container {
+            position: relative;
+            color: #fff;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://source.unsplash.com/random/1920x1080') no-repeat center center/cover;
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .content {
+            z-index: 1;
+        }
+
+        .content h1 {
+            font-size: 4em;
+            margin-bottom: 0.5em;
+        }
+
+        .content p {
+            font-size: 1.5em;
+            margin-bottom: 1em;
+        }
+
+        .home-button {
+            padding: 0.5em 1em;
+            font-size: 1em;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .home-button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .content h1 {
+                font-size: 3em;
+            }
+
+            .content p {
+                font-size: 1.2em;
+            }
+
+            .home-button {
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content h1 {
+                font-size: 2.5em;
+            }
+
+            .content p {
+                font-size: 1em;
+            }
+
+            .home-button {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="background-image"></div>
+        <div class="content">
+            <h1>404</h1>
+            <p>Sorry, the page you are looking for might have been removed or is temporarily unavailable.</p>
+            <a href="/" class="home-button">Go Home</a>
+        </div>
+    </div>
+</body>
+</html>

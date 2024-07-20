@@ -34,7 +34,7 @@
                         <div class="form-group">
                             <label for="category-code">Category Name</label>
                             <select class="form-control" id="category" name="category">
-                                <option value="" disabled selected>Select Category</option>
+                                <option value="<%=   categoryCode %>" disabled selected>Select Category</option>
                                 <% categories.forEach(category => { %>
                                   <option value="<%= category.name %>"><%= category.name %></option>
                                 <% }); %>
@@ -46,14 +46,14 @@
                         </div>
                         <div class="form-group">
                             <label for="discount">Discount (%)</label>
-                            <input type="number" class="form-control" id="discount" placeholder="Enter Discount Percentage" name="discount">
+                            <input type="number" class="form-control" id="discount" placeholder="Enter Discount Percentage" name="discount" value="<%= discount %>">
                             <small id="discount-error" class="text-danger"></small>
                             <p class="errorP <%= !discountError ? 'd-none' : '' %>"><%= discountError %></p>
                             <p class="errorP <%= !discountRegex ? 'd-none' : '' %>"><%= discountRegex %></p>
                         </div>
                         <div class="form-group">
                             <label for="valid-from">Valid From</label>
-                            <input type="date" class="form-control" id="valid-from" name="validFrom">
+                            <input type="date" class="form-control" id="valid-from" name="validFrom" value="<%= validFromValue %>">
                             <small id="valid-from-error" class="text-danger"></small>
                             <p class="errorP <%= !validationFrom ? 'd-none' : '' %>"><%= validationFrom %></p>
                             <p class="errorP <%= !validFrom ? 'd-none' : '' %>"><%= validFrom %></p>
@@ -61,7 +61,7 @@
                         <div class="form-group">
                             <label for="valid-to">Valid To</label>
                             <input type="date" class="form-control" id="valid-to" name="validTo">
-                            <small id="valid-to-error" class="text-danger"></small>
+                            <small id="valid-to-error" class="text-danger" value="<%=  validToValue %>"></small>
                             <p class="errorP <%= !validationTo ? 'd-none' : '' %>"><%= validationTo %></p>
                             <p class="errorP <%= !validTo ? 'd-none' : '' %>"><%= validTo %></p>
                         </div>
@@ -76,7 +76,7 @@
 </section>
 <!-- CONTENT -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
+<!-- <script>
    document.addEventListener('DOMContentLoaded', function () {
    
     const errorMessage = "<%= errorMessage %>";
@@ -156,6 +156,6 @@
     }
   });
 
-</script>
+</script> -->
     </body>
     </html>

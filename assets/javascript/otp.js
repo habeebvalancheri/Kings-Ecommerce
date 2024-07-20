@@ -1,6 +1,8 @@
 // Get all OTP input fields
 const otpInputs = document.querySelectorAll(".otp-input");
 
+let timerEnded = false;
+
 // Add event listener to each OTP input
 otpInputs.forEach((input, index) => {
   input.addEventListener("input", (event) => {
@@ -31,20 +33,36 @@ function startResendTimer() {
 
   resendButton.style.display = "none";
 
+
+  // Get the stored countdown time from local storage
+  let storedTime = localStorage.getItem("countDown");
+  if (storedTime) {
+    countDown = parseInt(storedTime);
+  } else {
+    countDown = 60;
+  }
+
   const timeInterval = setInterval(() => {
     countDownElement.textContent = countDown;
     countDown--;
+
+    // Store the remaining time in local storage
+    localStorage.setItem("countDown", countDown);
 
     if (countDown < 0) {
       clearInterval(timeInterval);
       countDownElement.textContent = " ";
       resendButton.style.display = "block";
+      localStorage.removeItem("countDown"); // Clear local storage when timer finishes
+      timerEnded = true;
     }
   }, 1000);
 
   resendButton.addEventListener("click", () => {
     clearInterval(timeInterval);
+    localStorage.removeItem("countDown");
     countDown = 60;
+    timerEnded = false;
     startResendTimer();
   });
 }
@@ -52,4 +70,12 @@ function startResendTimer() {
 // Call the function when the page loads to start the timer
 document.addEventListener("DOMContentLoaded", () => {
   startResendTimer();
+});
+
+// Prevent form submission if the timer has ended
+document.querySelector("form").addEventListener("submit", (event) => {
+  if (timerEnded) {
+    event.preventDefault();
+    alert("The OTP has expired. Please request a new one.");
+  }
 });

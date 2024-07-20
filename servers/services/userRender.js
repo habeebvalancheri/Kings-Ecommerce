@@ -31,7 +31,7 @@ exports.signupPage = async (req, res) => {
       terms: req.session.terms,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -46,7 +46,7 @@ exports.otpLoginPage = async (req, res) => {
       invalidCode: req.session.InvalidCode,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -62,7 +62,7 @@ exports.signinPage = async (req, res) => {
       accountBlocked: req.session.accountBlocked,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -74,7 +74,7 @@ exports.forgotPasswordPage = async (req, res) => {
       errorPattern3: req.session.errorPattern3,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -87,7 +87,7 @@ exports.changePasswordPage = async (req, res) => {
       email: req.session.email,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 exports.homePage = async (req, res) => {
@@ -116,7 +116,7 @@ exports.homePage = async (req, res) => {
       userEmail: req.session.email, // Assuming you want to pass the email to the view
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -134,7 +134,7 @@ exports.productDetailsPage = async (req, res) => {
       category,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -187,7 +187,7 @@ exports.accountDetailsPage = async (req, res) => {
       validationErrors: validationErrors,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -209,7 +209,7 @@ exports.wishlistPage = async (req, res) => {
       wishListItems: activeWishListItems,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -235,7 +235,7 @@ exports.cartPage = async (req, res) => {
       cartItems: activeCartItems, // Pass active cart items to the template
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -265,7 +265,7 @@ exports.addressPage = async (req, res) => {
       currentPage: page,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -328,7 +328,7 @@ exports.addAddressPage = async (req, res) => {
       errorAddressExists: req.session.errorAddressExists,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -395,12 +395,15 @@ exports.addressEdit = async (req, res) => {
       address: address,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
 exports.checkoutPage = async (req, res) => {
   try {
+
+    req.session.shippinCostAdded = '';
+
     const userId = req.session.userId;
 
     const user = await userDB.findById(userId).populate("addresses");
@@ -454,6 +457,7 @@ exports.checkoutPage = async (req, res) => {
     const stockError = req.session.stockError;
     const couponPatterError = req.session.couponPatterError;
     const couponCodeIsNotMatch = req.session.couponCodeIsNotMatch;
+    const COD = req.session.COD;
 
     // clear session
     req.session.errorfullName = "";
@@ -475,6 +479,7 @@ exports.checkoutPage = async (req, res) => {
     req.session.couponCodeError = "";
     req.session.couponPatterError = "";
     req.session.couponCodeIsNotMatch = "";
+    req.session.COD = "";
 
     return res.render("checkOut", {
       category: category,
@@ -497,6 +502,7 @@ exports.checkoutPage = async (req, res) => {
       errorEmail,
       emailRegex,
       stockError,
+      COD,
       RAZORPAY_ID_KEY,
       couponPatterError,
       couponCodeIsNotMatch,
@@ -510,7 +516,7 @@ exports.checkoutPage = async (req, res) => {
       discount,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -547,7 +553,7 @@ exports.orderPage = async (req, res) => {
       totalPages: totalPages,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -580,7 +586,7 @@ exports.walletPage = async (req, res) => {
       wallet: wallet || { transactions: [], totalPages: 0, currentPage: 1 },
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
 
@@ -599,9 +605,24 @@ exports.orderDetails = async (req, res) => {
       orderDetails: orderDetails,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };
+
+//  notFound Error render
+exports.notFoundError =  (req, res) => {
+  return res.render("404");
+};
+
+// In userService or wherever you handle client-side errors
+exports.ServerError = (req, res, context) => {
+  return res.render("500", {
+    context: context,
+    buttonText: 'Go Home',
+    buttonLink: '/'
+  });
+};
+
 
 exports.userLogout = async (req, res) => {
   try {
@@ -613,6 +634,6 @@ exports.userLogout = async (req, res) => {
       return res.redirect("/signin"); // Redirect to the sign in page
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect('/ClientServer-Error');
   }
 };

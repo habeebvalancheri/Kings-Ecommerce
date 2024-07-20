@@ -87,11 +87,25 @@ router.get("/wallet", middlewares.userLoggedOut, userService.walletPage);
 router.post("/onlinePayment", userController.onlinePayment);
 router.post("/walletPayment", userController.walletPayment);
 router.post("/couponCode", userController.couponCodeApply);
+router.post("/removeCoupon", (req, res) => {
+  req.session.shippinCostAdded = false;
+  res.json({ success: true });
+});
 router.post("/submit-Order", userController.submitOrder);
 router.post("/cancelOrder", userController.cancelOrder);
 router.post("/returnOrder", userController.returnOrder);
 
-router.get('/download-invoice',userController.invoiceDownload);
+router.get("/download-invoice", userController.invoiceDownload);
+
+// Error Pages
+router.get(
+  "/NotFound-Error",
+  middlewares.userLoggedOut,
+  userService.notFoundError
+);
+router.get("/ClientServer-Error", middlewares.userLoggedOut, (req, res) => {
+  userService.ServerError(req, res, "client");
+});
 
 //  User Logout Route
 router.get("/logout", middlewares.userLoggedOut, userService.userLogout);

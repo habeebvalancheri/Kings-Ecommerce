@@ -56,7 +56,7 @@ const sendOtpVerificationEmail = async (req, res, { email }) => {
     const hashedOTP = await bcrypt.hash(otp, saltRound);
 
     // Create new OtpVerification document
-    const newOtpVerification = await new userOtpVerification({
+    const newOtpVerification = new userOtpVerification({
       userId: req.session.id,
       otp: hashedOTP,
       createdAt: Date.now(),
@@ -69,7 +69,7 @@ const sendOtpVerificationEmail = async (req, res, { email }) => {
     // Send email
     await transport.sendMail(mailOptions);
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/ClientServer-Error");
   }
 };
 
@@ -213,7 +213,7 @@ module.exports = {
       await sendOtpVerificationEmail(req, res, { email: user.email });
       return res.redirect("/otpLogin");
     } catch (err) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -291,7 +291,7 @@ module.exports = {
       req.session.email = user.email;
       return res.redirect("/");
     } catch (error) {
-      return res.status(500).json({ error: "Server Error" });
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -356,10 +356,7 @@ module.exports = {
         }
       }
     } catch (error) {
-      return res.json({
-        status: "Failed",
-        message: error.message,
-      });
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -376,10 +373,7 @@ module.exports = {
         await sendOtpVerificationEmail(req, res, { email: email });
       }
     } catch (error) {
-      return res.json({
-        status: 500,
-        message: error.message,
-      });
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -451,7 +445,7 @@ module.exports = {
 
       const noPages = Math.ceil(total / itemsPerPage);
 
-      const categorys = await categoryDB.find();
+      const categorys = await categoryDB.find({ active: true });
 
       return res.render("ourStore", {
         products: products,
@@ -467,7 +461,7 @@ module.exports = {
         },
       });
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -498,7 +492,7 @@ module.exports = {
         return res.redirect("/forgot-password");
       }
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -544,7 +538,7 @@ module.exports = {
         return res.redirect("/signin");
       }
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -568,6 +562,16 @@ module.exports = {
           (item) => item.productId.toString() === productId.toString()
         );
 
+        const isProductCart = userCart.product.find(
+          (item) => item.productId.toString() === productId.toString()
+        );
+
+        if (isProductCart) {
+          return res.json({
+            success: false,
+            message: "Product already added to the cart",
+          });
+        }
         if (productIndex !== -1) {
           // Product is already in the cart, increase its quantity
           userCart.product[productIndex].quantity += quantity;
@@ -596,7 +600,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.status(500).json({ error: "Server Error" });
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -645,7 +649,7 @@ module.exports = {
       }
       // Save the user's wishlist
     } catch (error) {
-      return res.status(500).json({ error: "Server Error" });
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -677,7 +681,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.status(500).json({ error: "Server Error" });
+      return res.redirect("/ClientServer-Error");
     }
   },
   // Controller
@@ -699,7 +703,7 @@ module.exports = {
 
       return res.status(200).json({ totalQuantity });
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -721,7 +725,7 @@ module.exports = {
 
       return res.status(200).json({ totalQuantity });
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -766,7 +770,7 @@ module.exports = {
         message: "Product removed from cart successfully",
       });
     } catch (error) {
-      return res.status(500).json({ success: false, message: "Server error" });
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -799,7 +803,7 @@ module.exports = {
         message: "Product removed from wishlist successfully",
       });
     } catch (error) {
-      return res.status(500).json({ success: false, message: "Server error" });
+      return res.redirect("/ClientServer-Error");
     }
   },
   updateUserProfile: async (req, res) => {
@@ -902,7 +906,7 @@ module.exports = {
         return res.redirect("/account-details");
       }
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
   checkOut: async (req, res) => {
@@ -932,7 +936,7 @@ module.exports = {
 
       return res.redirect("/checkout");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -971,7 +975,7 @@ module.exports = {
 
       return res.status(200).json({ success: order }); // Send success response with order details
     } catch (error) {
-      return res.status(500).json({ error: error.message }); // Send error response with error message
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -999,7 +1003,7 @@ module.exports = {
       await wallet.save();
       return res.status(200).json({ success: wallet });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.redirect("/ClientServer-Error");
     }
   },
   couponCodeApply: async (req, res) => {
@@ -1067,7 +1071,10 @@ module.exports = {
                 (product.price * cartItem.quantity * product.discount) / 100;
               let productTotalAmount =
                 product.price * cartItem.quantity - productDiscountAmount;
-              productTotalAmount += shippingCost;
+              if (!req.session.shippinCostAdded) {
+                productTotalAmount += shippingCost;
+                req.session.shippinCostAdded = true;
+              }
 
               if (productTotalAmount < coupons.maxAmount) {
                 return res.json({
@@ -1109,7 +1116,7 @@ module.exports = {
         updatedTotal: updatedTotal.toFixed(2),
       });
     } catch (error) {
-      return res.status(500).json({ error: "Server error" });
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -1145,6 +1152,12 @@ module.exports = {
       const paymentMethod = req.body.formData.payment;
       const total = req.body.total;
       const couponCode = req.body.couponCode;
+
+      if (total > 1000 && paymentMethod === "COD") {
+        req.session.COD =
+          "Orders greater than 1000 do not apply for COD payment method";
+        return res.redirect("/checkout");
+      }
 
       // check if name have 3 to 20 characters
       // Regular expression to allow only characters
@@ -1301,6 +1314,8 @@ module.exports = {
         }
       }
 
+      // Validation for total amount greater than 1000 and COD payment method
+
       let paymentStatus = "";
       if (paymentMethod === "COD") {
         paymentStatus = "Pending";
@@ -1360,6 +1375,18 @@ module.exports = {
       const savedOrder = await newOrder.save();
       req.session.orderId = savedOrder._id;
 
+      if (couponCode) {
+        await couponDB.findOneAndUpdate(
+          {
+            couponCode: couponCode,
+            active: true,
+            expired: false,
+          },
+          { $inc: { couponCount: -1 } },
+          { new: true }
+        );
+      }
+
       // Decrease stock for the products in the order
       for (const product of cartProducts.product) {
         const productInDB = await productDB.findById(product.productId._id);
@@ -1377,7 +1404,7 @@ module.exports = {
 
       return res.redirect("/order");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -1441,18 +1468,28 @@ module.exports = {
         );
 
         if (order.couponAppliedProducts < 1) {
-          if (allProductsCancelled) {
+          if (allProductsCancelled && order.shippingCharge.length <= 0) {
             overallTotalPrice += shippingCost;
+            order.shippingCharge.push(40);
           }
         }
+
         if (couponAppliedToProduct) {
-          overallTotalPrice += shippingCost;
+          if (order.shippingCharge.length <= 0) {
+            overallTotalPrice += shippingCost;
+            order.shippingCharge.push(40);
+          }
           const couponDiscount =
             (overallTotalPrice * order.coupon.discount) / 100;
           overallTotalPrice -= couponDiscount;
         }
 
+        // Round the overall total price to avoid floating-point precision issues
+        overallTotalPrice = Math.round(overallTotalPrice * 100) / 100;
+
         let ttlsum = order.totalAmount - overallTotalPrice;
+        ttlsum = Math.round(ttlsum * 100) / 100; // Round the total sum as well
+
         order.totalAmount = ttlsum;
 
         let wallet = await walletDB.findOne({});
@@ -1462,6 +1499,8 @@ module.exports = {
         }
 
         wallet.walletBalance += overallTotalPrice;
+        wallet.walletBalance = Math.round(wallet.walletBalance * 100) / 100; // Round the wallet balance
+
         wallet.transactions.push({
           amount: overallTotalPrice,
           credit: true,
@@ -1479,7 +1518,7 @@ module.exports = {
         message: "Product successfully cancelled",
       });
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -1515,7 +1554,7 @@ module.exports = {
 
       return res.json({ success: true, message: "Product is returing" });
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -1567,13 +1606,15 @@ module.exports = {
         doc.moveDown();
         doc
           .fontSize(14)
-          .text(`Total Amount: ₹${orders.totalAmount.toFixed(2)}`, { align: "right" });
+          .text(`Total Amount: ₹${orders.totalAmount.toFixed(2)}`, {
+            align: "right",
+          });
       });
 
       // Finalize the PDF and end the stream
       doc.end();
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/ClientServer-Error");
     }
   },
 };

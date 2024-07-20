@@ -75,7 +75,7 @@
     <form action='/add-Category' method="post">
         <h2>Add Category</h2>
         <label for="categoryName">Category Name:</label>
-        <input type="text" id="categoryName" name="categoryName" placeholder="Enter category name">
+        <input type="text" id="categoryName" name="categoryName" placeholder="Enter category name" value="<%= categoryName %>">
 
         <p class="errorP <%= !emptyName?'d-none':''  %>" ><%=emptyName  %></p>
         <p class="errorP <%= !duplicate?'d-none':''  %>" ><%=duplicate  %></p>

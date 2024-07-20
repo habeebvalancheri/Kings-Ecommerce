@@ -97,7 +97,7 @@ input[type=number] {
               <p class="errorP <%= !codeExpired?'d-none':''  %>" ><%=codeExpired  %></p>
               <p class="errorP <%= !invalidCode?'d-none':''  %>" ><%=invalidCode  %></p>
 
-              <div class="otp-timer mb-3" id="otp-timer" style="text-align:left;">Resend OTP in: <span id="countdown">30</span></div>
+              <div class="otp-timer mb-3" id="otp-timer" style="text-align:left;">Resend OTP in: <span id="countdown">60</span></div>
                
               <input type="text" name="userId" value="<%=id%>" style="display: none;">
               <input type="text" name="email" value="<%=email%>" style="display: none;">

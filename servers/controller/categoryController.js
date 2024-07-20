@@ -6,6 +6,7 @@ module.exports = {
     try {
       req.session.emptyName = "";
       req.session.duplicate = "";
+      req.session.categoryPattern = "";
 
       let { categoryName } = req.body;
       // Trim leading and trailing spaces
@@ -14,6 +15,7 @@ module.exports = {
       // Validate category name
       if (!categoryName) {
         req.session.emptyName = "Enter a Category Name";
+        req.session.categoryName = categoryName; 
         return res.redirect(
           "/add-Category?error=Category Not Added Check The Field"
         );
@@ -22,6 +24,7 @@ module.exports = {
       if (!/^[a-zA-Z][a-zA-Z\s]*[a-zA-Z]$/.test(categoryName.trim())) {
         req.session.categoryPattern =
           "Category name must contain only letters and spaces, with no spaces at the beginning or end.";
+          req.session.categoryName = categoryName; 
         return res.redirect(
           "/add-Category?error=Category Not Added Check The Field"
         );
@@ -31,6 +34,7 @@ module.exports = {
 
       if (existingCategory) {
         req.session.duplicate = "Category with this name already exists";
+        req.session.categoryName = categoryName; 
         return res.redirect(
           "/add-Category?error=Category Not Added Category Not Added Check The Field"
         );
@@ -46,7 +50,7 @@ module.exports = {
         "/admin-Category?success=Category Added successfully"
       );
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect('/AdminServer-Error');
     }
   },
 
@@ -64,7 +68,7 @@ module.exports = {
         "/admin-Category?success=Category unlisted successfully"
       );
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect('/AdminServer-Error');
     }
   },
 
@@ -82,7 +86,7 @@ module.exports = {
         "/unlisted-Categories?success=Category restored successfully"
       );
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect('/AdminServer-Error');
     }
   },
 };

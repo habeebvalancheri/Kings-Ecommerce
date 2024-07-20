@@ -201,6 +201,14 @@
                 // Append the container div to the preview container
                 imagePreview.appendChild(imageContainer);
             });
+            if (productImage.files.length > 4) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Limit Exceeded',
+                text: 'Only the first four images will be uploaded.',
+            });
+            productImage.value = ''; // Reset the file input
+        }
         });
     });
     

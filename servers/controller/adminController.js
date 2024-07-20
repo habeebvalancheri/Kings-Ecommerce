@@ -62,10 +62,7 @@ module.exports = {
         return res.redirect("/admin-Dashboard");
       }
     } catch (error) {
-      return res.status(500).json({
-        status: "FAILED",
-        message: error.message,
-      });
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -86,7 +83,7 @@ module.exports = {
         return res.status(404).send("User not found");
       }
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -105,7 +102,7 @@ module.exports = {
         return res.status(404).send("User not found");
       }
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -138,6 +135,14 @@ module.exports = {
       stock = stock.trim();
       discount = discount.trim();
       category = category.trim();
+
+      // Save the form data in the session
+      req.session.pName = pName;
+      req.session.description = description;
+      req.session.price = price;
+      req.session.stock = stock;
+      req.session.discount = discount;
+      req.session.category = category;
 
       // Validate incoming data using regex patterns
       const pNameRegex = /^[a-zA-Z\s]{3,70}$/;
@@ -194,7 +199,7 @@ module.exports = {
         for (const file of req.files) {
           if (!allowedMimeTypes.includes(file.mimetype)) {
             req.session.imageError =
-              "Invalid image type. Please upload JPEG, PNG, or GIF files only.";
+              "Invalid image type. Please upload JPEG, PNG, GIF , or WEBP files only.";
             break;
           }
         }
@@ -239,7 +244,7 @@ module.exports = {
           const filepath = path.join(process.cwd(), "assets/images", filename);
 
           // Save the cropped image
-          await fs.promises.writeFile(filepath, buffer);
+          await fs.writeFile(filepath, buffer);
 
           // Return the filename
           return filename;
@@ -261,12 +266,19 @@ module.exports = {
       // Save the new product to the database
       await newProduct.save();
 
+      req.session.pName = "";
+      req.session.description = "";
+      req.session.price = "";
+      req.session.stock = "";
+      req.session.discount = "";
+      req.session.category = "";
+
       // Redirect to the admin products page with a success message
       return res.redirect(
         "/admin-Products?success=Product added successfully."
       );
     } catch (error) {
-      return res.status(500).send("Server error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -291,6 +303,16 @@ module.exports = {
       stock = stock.trim();
       discount = discount.trim();
       category = category.trim();
+
+      // Store form data in session
+      req.session.formData = {
+        pName,
+        description,
+        price,
+        stock,
+        discount,
+        category,
+      };
 
       // Validate incoming data using regex patterns
       const pNameRegex = /^[a-zA-Z\s]{3,70}$/;
@@ -383,7 +405,7 @@ module.exports = {
 
       return res.redirect("/admin-Products");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -399,14 +421,14 @@ module.exports = {
 
       const image = req.files.map((file) => file.filename);
 
-      const updatedImage = await productDB.updateOne(
+      await productDB.updateOne(
         { _id: id },
         { $push: { pImages: { $each: image } } }
       );
 
       return res.redirect(`/update-Product?id=${id}`);
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -433,7 +455,7 @@ module.exports = {
           .json({ success: false, message: "Image not found or not removed" });
       }
     } catch (error) {
-      return res.status(500).json({ error: "Server Error" });
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -452,7 +474,7 @@ module.exports = {
         "/admin-Products?success=Product unlisted successfully"
       );
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -470,7 +492,7 @@ module.exports = {
         "/unlisted-products?success=Product restored successfully"
       );
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -550,7 +572,7 @@ module.exports = {
         message: `Product status successfully updated to ${status}`,
       });
     } catch (error) {
-      return res.status(500).json({ success: false, message: "Server Error" });
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -616,8 +638,9 @@ module.exports = {
           (item) => item.return === "Returned"
         );
 
-        if (allProductsReturned) {
+        if (allProductsReturned && order.shippingCharge.length <= 0) {
           overallTotalPrice += shippingCost;
+          order.shippingCharge.push(40);
         }
 
         // Check if the product had a coupon applied
@@ -626,12 +649,21 @@ module.exports = {
         );
 
         if (couponAppliedToProduct) {
+          if (order.shippingCharge.length <= 0) {
+            overallTotalPrice += shippingCost;
+            order.shippingCharge.push(40);
+          }
           const couponDiscount =
             (overallTotalPrice * order.coupon.discount) / 100;
           overallTotalPrice -= couponDiscount;
         }
 
+        // Round the overall total price to avoid floating-point precision issues
+        overallTotalPrice = Math.round(overallTotalPrice * 100) / 100;
+
         let ttlsum = order.totalAmount - overallTotalPrice;
+        ttlsum = Math.round(ttlsum * 100) / 100; // Round the total sum as well
+
         order.totalAmount = ttlsum;
 
         let wallet = await walletDB.findOne({ userId: user._id });
@@ -641,6 +673,8 @@ module.exports = {
         }
 
         wallet.walletBalance += overallTotalPrice;
+        wallet.walletBalance = Math.round(wallet.walletBalance * 100) / 100; // Round the wallet balance
+
         wallet.transactions.push({
           amount: overallTotalPrice,
           credit: true,
@@ -658,7 +692,7 @@ module.exports = {
         message: `Product return successfully updated to ${newReturn}`,
       });
     } catch (error) {
-      return res.status(500).json({ success: false, message: "Server Error" });
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -757,7 +791,7 @@ module.exports = {
       await workbook.xlsx.write(res);
       return res.status(200).end();
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -837,7 +871,7 @@ module.exports = {
       res.setHeader("Content-Disposition", "inline; filename=sales_report.pdf");
       res.send(pdfBuffer);
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -874,7 +908,7 @@ module.exports = {
 
       return res.json({ success: true, data: salesData, ordersDate });
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -896,50 +930,75 @@ module.exports = {
       const { validFrom, validTo } = req.body;
       const couponCode = req.body.couponCode.trim();
       const discount = req.body.discount.trim();
+      const couponCount = req.body.couponCount.trim();
       const maxAmount = req.body.maxAmount.trim();
       const today = new Date().toISOString().split("T")[0];
       const category = req.body.category;
 
       if (!couponCode) {
         req.session.couponCodeError = "Coupon code field is required";
+        req.session.couponCode = couponCode;
       }
 
       let couponCodeRegex = /^[a-zA-Z0-9]+$/;
       if (!couponCodeRegex.test(couponCode)) {
         req.session.couponCodeRegex =
           "Coupon code should be Alphabetic and Numeric";
+        req.session.couponCode = couponCode;
       }
 
       if (!discount) {
         req.session.discountError = "Discount field is required";
+        req.session.discount = discount;
       }
 
+      const discountRegex = /[0-9]$/;
       if (!discountRegex.test(discount) || discount < 0 || discount > 100) {
-        req.session.discountRegex = "Discount should be a numeric value, greater than 0 and less than 100";
+        req.session.discountRegex =
+          "Discount should be a numeric value, greater than 0 and less than 100";
+        req.session.discount = discount;
+      }
+
+      if (!couponCount) {
+        req.session.couponCountError = "Coupon Count field is required";
+        req.session.couponCount = couponCount;
+      }
+
+      let couponCountRegex = /^[0-9]+$/;
+      if (!couponCountRegex.test(couponCount) || couponCount < 1) {
+        req.session.couponCountRegex =
+          "Coupon Count should be a numeric value greater 0 ";
+        req.session.couponCount = couponCount;
       }
 
       if (!maxAmount) {
         req.session.maxAmountError = "Maximum Amount field is required";
+        req.session.maxAmount = maxAmount;
       }
 
       let maxAmountRegex = /^[0-9]+$/;
       if (!maxAmountRegex.test(maxAmount) || maxAmount < 10000) {
         req.session.maxAmountRegex =
           "Max Amount should be a numeric value greater than or equal to 10000 ";
+        req.session.maxAmount = maxAmount;
       }
 
       if (!validFrom) {
         req.session.validFromError = "Valida from field is required";
+        req.session.validFromValue = validFrom;
       } else if (validFrom < today || validFrom > today) {
         req.session.validFrom =
           "Valid from date should not be in the past or future.";
+        req.session.validFromValue = validFrom;
       }
 
       if (!validTo) {
         req.session.validToError = "Valid to field is required";
+        req.session.validToValue = validTo;
       } else if (validTo < validFrom) {
         req.session.validTo =
           "Valid to date should not be before the valid from date.";
+        req.session.validToValue = validTo;
       }
 
       if (
@@ -956,29 +1015,56 @@ module.exports = {
       ) {
         return res.redirect("/addCoupon");
       }
+
       const categoriId = await categoryDB.findOne({
         name: category,
         active: true,
       });
+
+      if (!categoriId) {
+        req.session.categoryError = "Category field is required";
+        req.session.couponCode = couponCode;
+        req.session.discount = discount;
+        req.session.couponCount = couponCount;
+        req.session.maxAmount = maxAmount;
+        req.session.validFromValue = validFrom;
+        req.session.validToValue = validTo;
+        return res.redirect("/addCoupon");
+      }
+
       const coupons = await couponDB.findOne({
         category: categoriId._id,
         active: true,
         expired: false,
       });
+
       const existingCoupon = await couponDB.findOne({ couponCode: couponCode });
       if (existingCoupon) {
         req.session.couponExists = "Coupon Already exists or InActive";
+        req.session.couponCode = couponCode;
+        req.session.discount = discount;
+        req.session.couponCount = couponCount;
+        req.session.maxAmount = maxAmount;
+        req.session.validFromValue = validFrom;
+        req.session.validToValue = validTo;
         return res.redirect("/addCoupon");
       }
       if (coupons) {
         req.session.categoryCouponExists =
           "The coupon is already active on this category";
+        req.session.couponCode = couponCode;
+        req.session.discount = discount;
+        req.session.couponCount = couponCount;
+        req.session.maxAmount = maxAmount;
+        req.session.validFromValue = validFrom;
+        req.session.validToValue = validTo;
         return res.redirect("/addCoupon");
       }
 
       const newCoupon = new couponDB({
         couponCode: couponCode,
         discount: discount,
+        couponCount: couponCount,
         maxAmount: maxAmount,
         category: categoriId._id,
         createdAt: validFrom,
@@ -988,9 +1074,16 @@ module.exports = {
 
       await newCoupon.save();
 
+      req.session.couponCode = "";
+      req.session.discount = "";
+      req.session.couponCount = "";
+      req.session.maxAmount = "";
+      req.session.validFromValue = "";
+      req.session.validToValue = "";
+
       return res.redirect("/admin-Coupon");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -1008,7 +1101,7 @@ module.exports = {
 
       return res.redirect("/admin-Coupon");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -1033,29 +1126,37 @@ module.exports = {
       // Form validation
       if (!categoryCode) {
         req.session.categoryCodeError = "Category field is required";
+        req.session.categoryCode = categoryCode;
       }
 
       if (!discount) {
         req.session.discountError = "Discount field is required";
+        req.session.discount = discount;
       }
 
       let discountRegex = /^[0-9]+$/;
       if (!discountRegex.test(discount) || discount < 0 || discount > 100) {
-        req.session.discountRegex = "Discount should be a numeric value, greater than 0 and less than 100";
+        req.session.discountRegex =
+          "Discount should be a numeric value, greater than 0 and less than 100";
+        req.session.discount = discount;
       }
 
       if (!validFrom) {
         req.session.validFromError = "Valida from field is required";
+        req.session.validFromValue = validFrom;
       } else if (validFrom < today || validFrom > today) {
         req.session.validFrom2 =
           "Valid from date should not be in the past or future.";
+        req.session.validFromValue = validFrom;
       }
 
       if (!validTo) {
         req.session.validToError = "Valid to field is required";
+        req.session.validToValue = validTo;
       } else if (validTo < validFrom) {
         req.session.validTo2 =
           "Valid to date should not be before the valid from date.";
+        req.session.validToValue = validTo;
       }
       // validation error
       if (
@@ -1069,6 +1170,10 @@ module.exports = {
       ) {
         req.session.errorMessage =
           "Validation failed. Please check the fields.";
+        req.session.categoryCode = categoryCode;
+        req.session.discount = discount;
+        req.session.validFromValue = validFrom;
+        req.session.validToValue = validTo;
         return res.redirect("/addOffers");
       }
 
@@ -1080,6 +1185,10 @@ module.exports = {
       if (existingOffer) {
         req.session.offerExists = "The offer is already Active";
         req.session.errorMessage = "Offer already exists.";
+        req.session.categoryCode = categoryCode;
+        req.session.discount = discount;
+        req.session.validFromValue = validFrom;
+        req.session.validToValue = validTo;
         return res.redirect("/addOffers");
       }
 
@@ -1094,6 +1203,10 @@ module.exports = {
           "Category code does not exist or is inactive";
         req.session.errorMessage =
           "Category code does not exist or is inactive.";
+        req.session.categoryCode = categoryCode;
+        req.session.discount = discount;
+        req.session.validFromValue = validFrom;
+        req.session.validToValue = validTo;
         return res.redirect("/addOffers");
       }
 
@@ -1133,9 +1246,158 @@ module.exports = {
       // Set success message in session
       req.session.successMessage =
         "Offer successfully added and discounts updated.";
+
+      req.session.categoryCode = "";
+      req.session.discount = "";
+      req.session.validFromValue = "";
+      req.session.validToValue = "";
+
       return res.redirect("/admin-Offers");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
+    }
+  },
+
+  updateOffer: async (req, res) => {
+    try {
+      const id = req.query.id;
+
+      // request data from body
+      const { validFrom, validTo } = req.body;
+      const categoryCode = req.body.category;
+      const discount = req.body.discount;
+      const today = new Date().toISOString().split("T")[0];
+
+      // Form validation
+      if (!categoryCode) {
+        req.session.categoryCodeError = "Category field is required";
+        req.session.categoryCode = categoryCode;
+      }
+
+      if (!discount) {
+        req.session.discountError = "Discount field is required";
+        req.session.discount = discount;
+      }
+
+      let discountRegex = /^[0-9]+$/;
+      if (!discountRegex.test(discount) || discount < 0 || discount > 100) {
+        req.session.discountRegex =
+          "Discount should be a numeric value, greater than 0 and less than 100";
+        req.session.discount = discount;
+      }
+
+      if (!validFrom) {
+        req.session.validFromError = "Valida from field is required";
+        req.session.validFromValue = validFrom;
+      } else if (validFrom < today || validFrom > today) {
+        req.session.validFrom2 =
+          "Valid from date should not be in the past or future.";
+        req.session.validFromValue = validFrom;
+      }
+
+      if (!validTo) {
+        req.session.validToError = "Valid to field is required";
+        req.session.validToValue = validTo;
+      } else if (validTo < validFrom) {
+        req.session.validTo2 =
+          "Valid to date should not be before the valid from date.";
+        req.session.validToValue = validTo;
+      }
+      // validation error
+      if (
+        req.session.categoryCodeError ||
+        req.session.discountError ||
+        req.session.discountRegex ||
+        req.session.validFromError ||
+        req.session.validToError ||
+        req.session.validFrom2 ||
+        req.session.validTo2
+      ) {
+        req.session.errorMessage =
+          "Validation failed. Please check the fields.";
+        req.session.categoryCode = categoryCode;
+        req.session.discount = discount;
+        req.session.validFromValue = validFrom;
+        req.session.validToValue = validTo;
+        return res.redirect("/addOffers");
+      }
+
+      // Find category
+      const category = await categoryDB.findOne({
+        name: categoryCode,
+        active: true,
+      });
+
+      if (!category) {
+        req.session.categoryCodeNotMatch =
+          "Category code does not exist or is inactive";
+        req.session.errorMessage =
+          "Category code does not exist or is inactive.";
+        req.session.categoryCode = categoryCode;
+        req.session.discount = discount;
+        req.session.validFromValue = validFrom;
+        req.session.validToValue = validTo;
+        return res.redirect("/addOffers");
+      }
+
+      const categoryOffer = await offerDB.findOne({ _id: id });
+
+      let validDiscount = true;
+      let updatedProducts = [];
+      // Find all active products in the category
+      const offerProducts = await productDB.find({
+        category: category,
+        active: true,
+      });
+
+      offerProducts.forEach((products) => {
+        let combinedDiscount = products.discount - categoryOffer.discount;
+        if (combinedDiscount <= 60) {
+          products.discount = combinedDiscount;
+          updatedProducts.push(products);
+        } else {
+          validDiscount = false;
+        }
+      });
+      // Save updated products
+      await Promise.all(updatedProducts.map((product) => product.save()));
+      // Set success message in session
+      req.session.successMessage =
+        "Offer successfully added and discounts updated.";
+
+      await offerDB.findOneAndUpdate(
+        {
+          _id: id,
+          active: true,
+        },
+        {
+          name: categoryCode,
+          discount: discount,
+          createdAt: validFrom,
+          expiresAt: validTo,
+          active: true,
+        }
+      );
+
+      validDiscount = true;
+      updatedProducts = [];
+
+      offerProducts.forEach((products) => {
+        let combinedDiscount = products.discount + parseInt(discount);
+
+        if (combinedDiscount <= 60) {
+          products.discount = combinedDiscount;
+          updatedProducts.push(products);
+        } else {
+          validDiscount = false;
+        }
+      });
+      // Save updated products
+      await Promise.all(updatedProducts.map((product) => product.save()));
+
+      return res.redirect("/admin-Offers");
+    } catch (error) {
+      return res.redirect("/AdminServer-Error");
     }
   },
 
@@ -1174,7 +1436,7 @@ module.exports = {
       await Promise.all(updatedProducts.map((product) => product.save()));
       return res.redirect("/admin-offers");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   },
 };

@@ -215,7 +215,7 @@ module.exports = {
 
       return res.redirect("/account-details");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect('/ClientServer-Error');
     }
   },
 
@@ -391,7 +391,7 @@ module.exports = {
       // Redirect or send response as needed
       return res.redirect("/account-details");
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect('/ClientServer-Error');
     }
   },
 
@@ -408,7 +408,7 @@ module.exports = {
         return res.status(404).send("Address not found");
       }
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect('/ClientServer-Error');
     }
   },
 };

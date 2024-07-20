@@ -26,15 +26,16 @@
           <form action="/add-Coupon" method="post" id="coupon-form">
             <div class="form-group">
               <label for="coupon-code">Coupon Code</label>
-              <input type="text" class="form-control" id="coupon-code" placeholder="Enter Coupon Code" name="couponCode">
+              <input type="text" class="form-control" id="coupon-code" placeholder="Enter Coupon Code" name="couponCode" value="<%= couponCode %>">
               <small id="coupon-code-error" class="text-danger"></small>
               <p class="errorP <%= !couponCodeError ? 'd-none' : '' %>"><%= couponCodeError %></p>
               <p class="errorP <%= !couponCodeRegex ? 'd-none' : '' %>"><%= couponCodeRegex %></p>
               <p class="errorP <%= !couponExists ? 'd-none' : '' %>"><%= couponExists %></p>
+              <p class="errorP <%= !categoryNotFound ? 'd-none' : '' %>"><%= categoryNotFound %></p>
             </div>
             <div class="form-group">
               <label for="discount">Discount (%)</label>
-              <input type="number" class="form-control" id="discount" placeholder="Enter Discount Percentage" name="discount">
+              <input type="number" class="form-control" id="discount" placeholder="Enter Discount Percentage" name="discount" value="<%= discount %>">
               <small id="discount-error" class="text-danger"></small>
               <p class="errorP <%= !discountError ? 'd-none' : '' %>"><%= discountError %></p>
               <p class="errorP <%= !discountRegex ? 'd-none' : '' %>"><%= discountRegex %></p>
@@ -51,22 +52,29 @@
               <p class="errorP <%= !categoryError ? 'd-none' : '' %>"><%= categoryError %></p>
             </div>
             <div class="form-group">
+              <label for="max-amount">coupon count</label>
+              <input type="number" class="form-control" id="coupon-count" placeholder="Enter How Many coupon Wanted" name="couponCount" value="<%= couponCount %>">
+              <small id="max-amount-error" class="text-danger"></small>
+              <p class="errorP <%= !couponCountError ? 'd-none' : '' %>"><%= couponCountError %></p>
+              <p class="errorP <%= !couponCountRegex ? 'd-none' : '' %>"><%= couponCountRegex %></p>
+            </div>
+            <div class="form-group">
               <label for="max-amount">Max Amount</label>
-              <input type="number" class="form-control" id="max-amount" placeholder="Enter Max Amount" name="maxAmount">
+              <input type="number" class="form-control" id="max-amount" placeholder="Enter Max Amount" name="maxAmount" value="<%= maxAmount %>">
               <small id="max-amount-error" class="text-danger"></small>
               <p class="errorP <%= !maxAmountError ? 'd-none' : '' %>"><%= maxAmountError %></p>
               <p class="errorP <%= !maxAmountRegex ? 'd-none' : '' %>"><%= maxAmountRegex %></p>
             </div>
             <div class="form-group">
               <label for="valid-from">Valid From</label>
-              <input type="date" class="form-control" id="valid-from" name="validFrom">
+              <input type="date" class="form-control" id="valid-from" name="validFrom" value="<%= validFromValue %>">
               <small id="valid-from-error" class="text-danger"></small>
               <p class="errorP <%= !validFromError ? 'd-none' : '' %>"><%= validFromError %></p>
               <p class="errorP <%= !validFrom ? 'd-none' : '' %>"><%= validFrom %></p>
             </div>
             <div class="form-group">
               <label for="valid-to">Valid To</label>
-              <input type="date" class="form-control" id="valid-to" name="validTo">
+              <input type="date" class="form-control" id="valid-to" name="validTo" value="<%= validToValue %>">
               <small id="valid-to-error" class="text-danger"></small>
               <p class="errorP <%= !validToError ? 'd-none' : '' %>"><%= validToError %></p>
               <p class="errorP <%= !validTo ? 'd-none' : '' %>"><%= validTo %></p>
@@ -94,6 +102,7 @@
     function validateForm() {
       const couponCode = document.getElementById('coupon-code').value.trim();
       const discount = document.getElementById('discount').value.trim();
+      const couponCount = document.getElementById('coupon-count').value.trim();
       const maxAmount = document.getElementById('max-amount').value.trim();
       const validFrom = document.getElementById('valid-from').value;
       const validTo = document.getElementById('valid-to').value;
@@ -112,6 +121,13 @@
       const discountValue = parseInt(discount);
       if (isNaN(discountValue) || discountValue < 0 || discountValue > 100) {
         showAlert("Discount should be a numeric value, greater than 0 and less than 100");
+        valid = false;
+      }
+
+       // Validate max amount (Numeric and within range)
+       const couponCountValue = parseInt(couponCount);
+      if (isNaN(couponCountValue) || couponCountValue < 1) {
+        showAlert("Coupon Count should be greater than 0");
         valid = false;
       }
 

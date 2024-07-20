@@ -133,8 +133,12 @@ const orderSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    shippingCharge:[{
+      type:Number,
+    }]
   },
-  { timestamp: true }
+  { timestamp: true },
+ 
 );
 
 const order = mongoose.model("Order", orderSchema);

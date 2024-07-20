@@ -83,7 +83,39 @@
         <!-- Div for Sales Chart -->
         <div class="sales-chart">
           <canvas id="salesChart" height="100"></canvas>
-        </div>
+
+          <div class="row">
+            <!-- Left Column: Top 10 Products -->
+            <div class="col-md-6">
+              <div class="top-products bg-white p-3 rounded">
+                <h4>Top 10 Best Selling Products</h4>
+                <ul class="list-group">
+                  <% for (let i = 0; i < topSellingProducts.length; i++) { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <%= topSellingProducts[i].productDetails.pName %>
+                      <span class="badge bg-primary rounded-pill"><%= topSellingProducts[i].totalSold %> Sales</span>
+                    </li>
+                  <% } %>
+                </ul>
+              </div>
+            </div>
+    
+            <!-- Right Column: Top 10 Categories -->
+            <div class="col-md-6">
+              <div class="top-category-products bg-white p-3 rounded">
+                <h4>Top 10 Best Selling Categories</h4>
+                <ul class="list-group">
+                  <% for (let i = 0; i < topSellingCategories.length; i++) { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <%= topSellingCategories[i].categoryDetails.name %>
+                      <span class="badge bg-primary rounded-pill"><%= topSellingCategories[i].totalSold %> Sales</span>
+                    </li>
+                  <% } %>
+                </ul>
+              </div>
+            </div>
+          </div>
+    
       </main>
 
       <!-- Bootstrap modal for date range selection -->

@@ -19,7 +19,7 @@ exports.adminLoginPage = (req, res) => {
       emailNotValid: req.session.emailNotValid,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -38,14 +38,58 @@ exports.adminDashboardPage = async (req, res) => {
       });
     });
 
+    const topSellingCategories = await orderDB.aggregate([
+      { $unwind: "$products" },
+      {
+        $group: {
+          _id: "$products.category",
+          totalSold: { $sum: "$products.quantity" },
+        },
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "_id",
+          as: "categoryDetails",
+        },
+      },
+      { $unwind: "$categoryDetails" },
+    ]);
+
+    const topSellingProducts = await orderDB.aggregate([
+      { $unwind: "$products" },
+      {
+        $group: {
+          _id: "$products.productId",
+          totalSold: { $sum: "$products.quantity" },
+        },
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" },
+    ]);
+
     // Render the adminDashboard page with the userCount
     return res.render("adminDashboard", {
+      topSellingCategories: topSellingCategories,
+      topSellingProducts: topSellingProducts,
       userCount,
       orderCount,
       totalSalesCount,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -81,7 +125,7 @@ exports.adminProductsPage = async (req, res) => {
       limit: limit,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -89,6 +133,17 @@ exports.adminProductsPage = async (req, res) => {
 exports.addProductsPage = async (req, res) => {
   try {
     const data = await categoryDB.find({ active: true });
+
+    // Retrieve the form values from session
+    const formData = {
+      pName: req.session.pName || "",
+      description: req.session.description || "",
+      price: req.session.price || "",
+      stock: req.session.stock || "",
+      discount: req.session.discount || "",
+      category: req.session.category || "",
+    };
+
     const pNameRegexerror = req.session.pNameRegexerror;
     const descriptionRegexerror = req.session.descriptionRegexerror;
     const priceRegexerror = req.session.priceRegexerror;
@@ -97,17 +152,25 @@ exports.addProductsPage = async (req, res) => {
     const categoryError = req.session.categoryError;
     const imageError = req.session.imageError;
 
-    // Clear session errors after rendering
-    req.session.pNameRegexerror = "";
-    req.session.descriptionRegexerror = "";
-    req.session.priceRegexerror = "";
-    req.session.stockRegexerror = "";
-    req.session.discountRegexerror = "";
-    req.session.categoryError = "";
-    req.session.imageError = "";
-
+    if (!req.query.error) {
+      // Clear session errors after rendering
+      req.session.pName = "";
+      req.session.description = "";
+      req.session.price = "";
+      req.session.stock = "";
+      req.session.discount = "";
+      req.session.category = "";
+      req.session.pNameRegexerror = "";
+      req.session.descriptionRegexerror = "";
+      req.session.priceRegexerror = "";
+      req.session.stockRegexerror = "";
+      req.session.discountRegexerror = "";
+      req.session.categoryError = "";
+      req.session.imageError = "";
+    }
     return res.render("addProducts", {
       data: data,
+      formData,
       pNameRegexerror,
       descriptionRegexerror,
       priceRegexerror,
@@ -117,7 +180,7 @@ exports.addProductsPage = async (req, res) => {
       imageError,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -148,6 +211,9 @@ exports.updateProductsPage = async (req, res) => {
     const categoryError2 = req.session.categoryError2;
     const generalError = req.session.generalError;
 
+    // Read the session form data
+    const formData = req.session.formData || {};
+
     // Clear session error messages
     req.session.pNameRegexerror2 = "";
     req.session.descriptionRegexerror2 = "";
@@ -173,9 +239,10 @@ exports.updateProductsPage = async (req, res) => {
       categoryError2,
       generalError,
       categoryName,
+      formData,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -207,7 +274,7 @@ exports.unlistedProductPage = async (req, res) => {
       totalPages,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -238,7 +305,7 @@ exports.adminOrdersPage = async (req, res) => {
       limit: limit,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -264,7 +331,7 @@ exports.adminOrderDetailsPage = async (req, res) => {
       product: product[0],
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -298,7 +365,7 @@ exports.adminUsersPage = async (req, res) => {
       totalPages: totalPages,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -335,7 +402,7 @@ exports.adminCategorysPage = async (req, res) => {
       limit: size,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -344,22 +411,27 @@ exports.addCategoryPage = async (req, res) => {
   try {
     const emptyName = req.session.emptyName;
     const duplicate = req.session.duplicate;
+    const categoryPattern = req.session.categoryPattern;
+    const categoryName = req.session.categoryName || "";
     // Get success and error messages from query parameters
     const successMessage = req.query.success;
     const errorMessage = req.query.error;
 
     req.session.emptyName = "";
     req.session.duplicate = "";
+    req.session.categoryPattern = "";
+    req.session.categoryName = "";
 
     return res.render("addCategory", {
       emptyName,
       duplicate,
-      categoryPattern: req.session.categoryPattern,
+      categoryPattern,
+      categoryName,
       success: successMessage,
       error: errorMessage,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -395,7 +467,7 @@ exports.addCategoryPage = async (req, res) => {
       limit: size,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 }),
   // Admin Coupons Page Render
@@ -428,7 +500,7 @@ exports.addCategoryPage = async (req, res) => {
         limit: limit,
       });
     } catch (error) {
-      return res.status(500).send("Server Error");
+      return res.redirect("/AdminServer-Error");
     }
   });
 
@@ -436,10 +508,21 @@ exports.addCategoryPage = async (req, res) => {
 exports.addCouponPage = async (req, res) => {
   try {
     const categories = await categoryDB.find({ active: true });
+
+    const couponCode = req.session.couponCode;
+    const discount = req.session.discount;
+    const couponCount = req.session.couponCount;
+    const maxAmount = req.session.maxAmount;
+    const validFromValue = req.session.validFromValue;
+    const validToValue = req.session.validToValue;
+
     const couponCodeError = req.session.couponCodeError;
     const couponCodeRegex = req.session.couponCodeRegex;
     const discountError = req.session.discountError;
     const discountRegex = req.session.discountRegex;
+    const categoryNotFound = req.session.categoryError;
+    const couponCountError = req.session.couponCountError;
+    const couponCountRegex = req.session.couponCountRegex;
     const maxAmountError = req.session.maxAmountError;
     const maxAmountRegex = req.session.maxAmountRegex;
     const categoryError = req.session.categoryCouponExists;
@@ -453,6 +536,9 @@ exports.addCouponPage = async (req, res) => {
     req.session.couponCodeRegex = "";
     req.session.discountError = "";
     req.session.discountRegex = "";
+    req.session.categoryError = "";
+    req.session.couponCountError = "";
+    req.session.couponCountRegex = "";
     req.session.maxAmountError = "";
     req.session.maxAmountRegex = "";
     req.session.categoryCouponExists = "";
@@ -467,6 +553,9 @@ exports.addCouponPage = async (req, res) => {
       couponCodeRegex,
       discountError,
       discountRegex,
+      categoryNotFound,
+      couponCountError,
+      couponCountRegex,
       maxAmountError,
       maxAmountRegex,
       categoryError,
@@ -476,9 +565,15 @@ exports.addCouponPage = async (req, res) => {
       validFrom,
       validTo,
       categories,
+      couponCode,
+      discount,
+      couponCount,
+      maxAmount,
+      validFromValue,
+      validToValue,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -512,7 +607,7 @@ exports.deleteCouponPage = async (req, res) => {
       limit: limit,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -545,7 +640,7 @@ exports.adminOfferPage = async (req, res) => {
       successMessage,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -553,6 +648,11 @@ exports.adminOfferPage = async (req, res) => {
 exports.addOfferPage = async (req, res) => {
   try {
     const categories = await categoryDB.find({ active: true });
+
+    const categoryCode = req.session.categoryCode;
+    const discount = req.session.discount;
+    const validFromValue = req.session.validFromValue;
+    const validToValue = req.session.validToValue;
 
     const categoryError = req.session.req.session.categoryCodeError;
     const discountError = req.session.discountError;
@@ -589,9 +689,63 @@ exports.addOfferPage = async (req, res) => {
       validTo,
       categories,
       errorMessage,
+      categoryCode,
+      discount,
+      validFromValue,
+      validToValue,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
+  }
+};
+
+//  Update offer Page Render
+exports.updateOfferPage = async (req, res) => {
+  try {
+    const id = req.query.id;
+
+    const offers = await offerDB.find({ _id: id });
+    const categories = await categoryDB.find({ active: true });
+
+    const categoryError = req.session.req.session.categoryCodeError;
+    const discountError = req.session.discountError;
+    const discountRegex = req.session.discountRegex;
+    const validationFrom = req.session.validFromError;
+    const validationTo = req.session.validToError;
+    const categoryMatch = req.session.categoryCodeNotMatch;
+    const offerExists = req.session.offerExists;
+    const validFrom = req.session.validFrom2;
+    const validTo = req.session.validTo2;
+
+    const errorMessage = req.session.errorMessage;
+
+    // Clear the message after fetching it
+    req.session.categoryCodeError = "";
+    req.session.discountError = "";
+    req.session.discountRegex = "";
+    req.session.validFromError = "";
+    req.session.validToError = "";
+    req.session.categoryCodeNotMatch = "";
+    req.session.offerExists = "";
+    req.session.validFrom2 = "";
+    req.session.validTo2 = "";
+
+    return res.render("updateOffer", {
+      offers,
+      categoryError,
+      discountError,
+      discountRegex,
+      validationFrom,
+      validationTo,
+      categoryMatch,
+      offerExists,
+      validFrom,
+      validTo,
+      categories,
+      errorMessage,
+    });
+  } catch (error) {
+    return res.redirect("/AdminServer-Error");
   }
 };
 
@@ -621,8 +775,17 @@ exports.deleteOfferPage = async (req, res) => {
       limit,
     });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    return res.redirect("/AdminServer-Error");
   }
+};
+
+// In adminService or wherever you handle admin-side errors
+exports.ServerError = (req, res, context) => {
+  return res.render("500", {
+    context: context,
+    buttonText: "Go Admin Dashboard",
+    buttonLink: "/admin-Dashboard",
+  });
 };
 
 //  Admin Logout Render

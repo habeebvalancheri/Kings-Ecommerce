@@ -91,6 +91,12 @@ router.get(
   adminService.deleteOfferPage
 );
 router.get("/delete-Offers", adminController.deleteOffer);
+router.get(
+  "/updateOffers",
+  adminMiddleware.adminLoggedOut,
+  adminService.updateOfferPage
+);
+router.post("/update-Offers", adminController.updateOffer);
 
 // Admin User Management
 router.get(
@@ -157,6 +163,12 @@ router.get(
 router.get("/unlist-Category", categoryController.unlistCategory);
 router.get("/restore-category", categoryController.restoreCategory);
 
+// Error Pages
+router.get(
+  "/AdminServer-Error",
+  adminMiddleware.adminLoggedOut,
+  adminService.ServerError
+);
 // Admin Logout
 router.get(
   "/adminLogout",

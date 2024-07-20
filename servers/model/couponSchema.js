@@ -10,6 +10,10 @@ const couponSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  couponCount: {
+    type: Number,
+    required: true,
+  },
   maxAmount: {
     type: Number,
     required: true,

@@ -30,6 +30,7 @@
               <th>Expires At</th>
               <th>Status</th>
               <th>Delete</th>
+              <th>Update</th>
             </tr>
           </thead>
           <tbody>
@@ -46,6 +47,11 @@
                 <td>
                   <a href="/delete-Offers?id=<%= offer._id %>">
                     <i class="fas fa-trash-alt" style="color: black;"></i>
+                  </a>
+                </td>
+                <td>
+                  <a href="/updateOffers?id=<%= offer._id %>">
+                    <i class="bx bx-edit" style="color: black;"></i>
                   </a>
                 </td>
               </tr>

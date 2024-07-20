@@ -1,0 +1,162 @@
+<%- include('include/adminBase.ejs') %>
+<!-- /include footer -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+<!-- MDB -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
+
+<style>
+  .errorP {
+      color: red;
+      font-size: small;
+  }
+</style>
+<!-- CONTENT -->
+<section id="content">
+
+    <!-- MAIN -->
+    <main>
+        <div class="table-data">
+            <div class="order">
+                <div class="head">
+                    <h3>Add Offer</h3>
+
+                    <a href="/admin-Offers">
+                        <button class="btn btn-rounded" style="background-color: #131921 ; color: white;">
+                            <i class='bx bx-exit'></i>Go Back
+                        </button>
+                    </a>
+                </div>
+                <div class="container coupon-container">
+                <% offers.forEach(offer =>{ %>
+                    <form action="/update-Offers?id=<%= offer._id %>" method="post" id="coupon-form">
+                        <div class="form-group">
+                            <label for="category-code">Category Name</label>
+                            <select class="form-control" id="category" name="category">
+                              <option value="" disabled selected><%=  offer.name %></option>
+                                <% categories.forEach(category => { %>
+                                  <option value="<%= category.name %>"><%= category.name %></option>
+                                <% }); %>
+                              </select>
+                            <small id="category-code-error" class="text-danger"></small>
+                            <p class="errorP <%= !categoryError ? 'd-none' : '' %>"><%= categoryError %></p>
+                            <p class="errorP <%= !categoryMatch ? 'd-none' : '' %>"><%= categoryMatch %></p>
+                            <p class="errorP <%= !offerExists ? 'd-none' : '' %>"><%= offerExists %></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="discount">Discount (%)</label>
+                            <input type="number" class="form-control" id="discount" placeholder="Enter Discount Percentage" name="discount" value="<%= offer.discount %>">
+                            <small id="discount-error" class="text-danger"></small>
+                            <p class="errorP <%= !discountError ? 'd-none' : '' %>"><%= discountError %></p>
+                            <p class="errorP <%= !discountRegex ? 'd-none' : '' %>"><%= discountRegex %></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="valid-from">Valid From</label>
+                            <input type="date" class="form-control" id="valid-from" name="validFrom" value="<%= offer.createdAt.toISOString().split('T')[0] %>">
+                            <small id="valid-from-error" class="text-danger"></small>
+                            <p class="errorP <%= !validationFrom ? 'd-none' : '' %>"><%= validationFrom %></p>
+                            <p class="errorP <%= !validFrom ? 'd-none' : '' %>"><%= validFrom %></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="valid-to">Valid To</label>
+                            <input type="date" class="form-control" id="valid-to" name="validTo" value="<%= offer.expiresAt.toISOString().split('T')[0]%>">
+                            <small id="valid-to-error" class="text-danger" ></small>
+                            <p class="errorP <%= !validationTo ? 'd-none' : '' %>"><%= validationTo %></p>
+                            <p class="errorP <%= !validTo ? 'd-none' : '' %>"><%= validTo %></p>
+                        </div>
+                        <h1></h1>
+                        <button type="submit" class="btn" style="background-color: #131921; color: white;">Update Offer</button>
+                    </form>
+               <%  }) %>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- MAIN -->
+</section>
+<!-- CONTENT -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- <script>
+   document.addEventListener('DOMContentLoaded', function () {
+   
+    const errorMessage = "<%= errorMessage %>";
+
+    if (errorMessage) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMessage,
+      });
+    }
+
+    document.getElementById('coupon-form').addEventListener('submit', async function (event) {
+      // Perform validation checks
+      if (!(await validateForm())) {
+        // Prevent form submission if validation fails
+        event.preventDefault();
+      }
+    });
+
+    // Validate form inputs
+    async function validateForm() {
+      const categoryCode = document.getElementById('category').value.trim();
+      const discount = document.getElementById('discount').value.trim();
+      const validFrom = document.getElementById('valid-from').value;
+      const validTo = document.getElementById('valid-to').value;
+      const today = new Date().toISOString().split('T')[0];
+
+      let valid = true;
+      let errors = [];
+
+      if (!categoryCode) {
+        errors.push("Category name is required");
+        valid = false;
+      }
+
+      // Validate discount (Numeric)
+      const discountRegex = /^[0-9]+$/;
+      if (!discountRegex.test(discount) || discount < 0 || discount > 100) {
+        errors.push("Discount should be a numeric value, greater than 0 and less than 100");
+        valid = false;
+      }
+
+      // Validate valid from date
+      if (!validFrom) {
+        errors.push("Valid from date is required");
+        valid = false;
+      } else if (validFrom < today || validFrom > today) {
+        errors.push("Valid from date should not be in the past or future.");
+        valid = false;
+      }
+
+      // Validate valid to date
+      if (!validTo) {
+        errors.push("Valid to date is required");
+        valid = false;
+      } else if (validTo < validFrom) {
+        errors.push("Valid to date should not be before the valid from date.");
+        valid = false;
+      }
+
+      if (errors.length > 0) {
+        showAlert(errors);
+        return valid;
+      }
+
+      return valid;
+    }
+
+    // Function to show SweetAlert2 alert
+    function showAlert(messages) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        html: messages.join('<br>'),
+      });
+    }
+  });
+
+</script> -->
+    </body>
+    </html>

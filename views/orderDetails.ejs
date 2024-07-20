@@ -55,16 +55,16 @@
                                             let price = item.price;
                                             let discount = item.discount;
                                             let totalCost = (price * item.quantity) - (price * item.quantity * discount)/100 + shippingCharge ;
-                                            console.log(totalCost)
+                                          
                                             let couponDiscount = orderDetails.coupon.discount;
                                             
                                             couponDiscountPrice += (totalCost * couponDiscount/ 100)
-                                            console.log(couponDiscountPrice)
+                                            
                                             subTotal += price * item.quantity;
                                             subDiscount += (price * discount/100 ) * item.quantity;
-                                            console.log(subDiscount)
+                                            
                                             couponDiscountPrice ? subDiscount += couponDiscountPrice:subDiscount;
-                                            console.log(subDiscount);
+                                            
                                             
                                         %>
                                         <td>₹<%= orderDetails.totalAmount.toFixed(2) %></td>
