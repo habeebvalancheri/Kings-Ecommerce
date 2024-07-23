@@ -355,6 +355,10 @@ module.exports = {
 
       const products = await productDB.findById(id);
 
+          // Ensure only four images are saved
+    const selectedImages = products.pImages.slice(0, 4);
+
+
       // Check the input against the regex patterns
       if (
         req.session.pNameRegexerror2 ||
@@ -399,6 +403,7 @@ module.exports = {
             stock: stockValue,
             discount: discountValue,
             category: categoryObj._id,
+            pImages:selectedImages,
           },
         }
       );
@@ -413,11 +418,15 @@ module.exports = {
     try {
       const id = req.query.id;
 
-      // Check if the files array exists and contains at least 4 files
-      if (!req.files || req.files.length < 4) {
-        req.session.imageError2 = "Please upload at least four images.";
-        return res.redirect(`/update-Product?id=${id}`);
-      }
+          // Get the current product images
+    const product = await productDB.findById(id);
+    const currentImages = product.pImages || [];
+
+    // Check if the total images after upload exceed 4
+    if (req.files && (currentImages.length + req.files.length > 4)) {
+      req.session.imageError2 = "You can only upload a total of four images.";
+      return res.redirect(`/update-Product?id=${id}`);
+    }
 
       const image = req.files.map((file) => file.filename);
 
@@ -444,13 +453,16 @@ module.exports = {
         { $pull: { pImages: filenameToRemove } }
       );
 
+      const filePath = path.join(__dirname, 'path/to/images', filenameToRemove);
+        fs.unlinkSync(filePath);
+
       // Check if the update was successful
       if (updatedImage.nModified > 0) {
-        res
+        return res
           .status(200)
           .json({ success: true, message: "Image removed successfully" });
       } else {
-        res
+        return res
           .status(404)
           .json({ success: false, message: "Image not found or not removed" });
       }

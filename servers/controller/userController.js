@@ -981,26 +981,37 @@ module.exports = {
 
   walletPayment: async (req, res) => {
     try {
+      const userId = req.session.userId;
+
       const { paymentMethod, total } = req.body;
 
       if (paymentMethod !== "wallet") {
         throw new Error("Invalid payment method");
       }
-      const wallet = await walletDB.findOne({});
 
-      if (!wallet || wallet.walletBalance < total) {
+      const wallet = await walletDB.find({userId:userId});
+
+      if(wallet.length === 0){
+       const newWallet = new walletDB({ userId :userId});
+        newWallet.walletBalance = 0;
+        await newWallet.save();
+      }
+
+      if (wallet[0].walletBalance < total) {
         // Redirect to checkout if wallet balance is insufficient
         return res.status(500).json({ error: "insufficient wallet amount" });
       }
 
-      wallet.walletBalance -= total;
-      wallet.transactions.push({
+      wallet[0].walletBalance -= total;
+
+      wallet[0].transactions.push({
         amount: total,
         debit: true,
         status: "Success",
         transactionId: new mongoose.Types.ObjectId().toString(),
       });
-      await wallet.save();
+      await wallet[0].save()
+
       return res.status(200).json({ success: wallet });
     } catch (error) {
       return res.redirect("/ClientServer-Error");
@@ -1315,7 +1326,6 @@ module.exports = {
       }
 
       // Validation for total amount greater than 1000 and COD payment method
-
       let paymentStatus = "";
       if (paymentMethod === "COD") {
         paymentStatus = "Pending";

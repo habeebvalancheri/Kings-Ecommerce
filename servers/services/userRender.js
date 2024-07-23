@@ -146,7 +146,7 @@ exports.accountDetailsPage = async (req, res) => {
     const category = await categoryDB.find({ active: true });
 
     const defaultAddress = user.addresses.find((address) => address.default);
-
+console.log(defaultAddress)
     const validationErrors = {
       userFullNameRequired: req.session.userFullNameRequired,
       fullNameRegex: req.session.fullNameRegex,
