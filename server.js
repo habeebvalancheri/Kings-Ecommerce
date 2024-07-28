@@ -5,10 +5,10 @@ const cors = require("cors");
 const session = require("express-session");
 const dotenv = require("dotenv");
 const connectDB = require("./servers/database/connection");
-const userRouter = require("./servers/routes/userRouter");
-const adminRouter = require("./servers/routes/adminRouter");
+const userRouter = require("./servers/routes/user/userRouter");
+const adminRouter = require("./servers/routes/admin/adminRouter");
 const morgan = require("morgan");
-const flash = require("express-flash");
+const flash = require("connect-flash");
 
 // Mongodb connection
 connectDB();
@@ -46,7 +46,6 @@ app.use((req, res, next) => {
 
 // Set view engine
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
 
 // Static assets
 app.use(
@@ -64,7 +63,7 @@ app.use("/", userRouter);
 app.use("/", adminRouter);
 
 // Server
-const PORT = 8080;
+const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);
 });

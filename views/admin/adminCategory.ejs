@@ -1,0 +1,114 @@
+<%- include('../include/adminBase.ejs') %>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+<script src="https://kit.fontawesome.com/23d1247997.js" crossorigin="anonymous"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
+
+<section id="content">
+    <main>
+        <a href='/add-Category'><button class="btn btn-dark">Add Categories</button></a>
+        <a href="/unlisted-Categories"><button class="btn btn-dark">Unlisted Categories</button></a>
+        <br>
+        <div class="table-data">
+            <% if(category.length > 0) { %>
+            <div class="order">
+                <div class="head">
+                    <h3>Categories</h3>
+                </div>
+                <table id="categoryTable">
+                    <thead>
+                        <tr>
+                            <th>Si. No</th>
+                            <th>Category</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let i=0;i<category.length;i++){ %>
+                            <tr>
+                                <td><p><%= (page - 1) * limit + i + 1 %></p></td>
+                                <td><p><%= category[i].name %></p></td>
+                                <td>
+                                    <a href="/unlist-Category?category=<%= category[i]._id %>"
+                                       class="btn btn-light border px-2 pt-2 icon-hover" style="margin-right: 3%;">
+                                        <i class="fas fa-trash fa-lg text-secondary px-1"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <% } else { %>
+                <p>There are no Categories Add One</p>
+                <% } %>
+        </div>
+
+        <% if(totalPages > 0) {%>
+        <!-- Pagination Controls -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Page Button -->
+                <% if (page > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/admin-Categorys?page=<%= page - 1 %>&size=<%= limit %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                <% } %>
+
+                <!-- Page Number Buttons -->
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= i === page ? 'active' : '' %>">
+                        <a class="page-link" href="/admin-Categorys?page=<%= i %>&size=<%= limit %>"><%= i %></a>
+                    </li>
+                <% } %>
+
+                <!-- Next Page Button -->
+                <% if (page < totalPages) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/admin-Categorys?page=<%= page + 1 %>&size=<%= limit %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+        <% } %>
+    </main>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const successMessage = "<%- success %>";
+        const errorMessage = "<%- error %>";
+
+        if (successMessage && successMessage.trim() !== '') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: successMessage,
+            });
+        }
+
+        if (errorMessage && errorMessage.trim() !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: errorMessage,
+            });
+        }
+    });
+</script>
+</body>
+</html>

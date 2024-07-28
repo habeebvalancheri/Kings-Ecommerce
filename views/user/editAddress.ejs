@@ -1,0 +1,280 @@
+<!-- include header -->
+<%- include('../include/header') %>
+<!-- /include header -->
+<section class="interactive-section">
+  <div class="container py-5">
+    <!-- <div class="row"> -->
+      <!-- Logout Button (Right Side Top) -->
+      <!-- <div class="col text-end mb-4">
+        <form action="/logout">
+          <button type="submit" class="btn btn-dark" id="logoutButton">Logout</button>
+        </form>
+      </div>
+    </div> -->
+
+    <div class="row">
+      <!-- Left Side Content -->
+      <div class="col-lg-4">
+        <!-- Address Details -->
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <h5 class="my-3" style="color:black;">Account Details</h5>
+            <div class="d-flex justify-content-center mb-2">
+              <!-- Add Address Link -->
+              <button id="addAddressLink" class="btn btn-link" style="text-decoration:none; background-color: black; color: white;" onclick="redirectToAddress()">Profile</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- My Orders Link -->
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <h5 class="my-3">Your Orders</h5>
+            <div class="d-flex justify-content-center mb-2">
+              <!-- My Orders Link -->
+              <a href="/order">
+                <button class="btn btn-warning" style="font-weight: 500;">My Orders</button>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet Details -->
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <h5 class="my-3">Your Wallet</h5>
+            <!-- Add your logic to display wallet details (Credit Card, Balance, etc.) -->
+            <div class="credit-card">
+              <!-- Your wallet content goes here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Form -->
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="mb-4">Edit Address</h5>
+            <form action="/update-address" id="addAddressForm" method="post">
+              <!-- Full Name -->
+              <div class="mb-3">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="fullName" name="fullName" value="<%= address.name %>">
+              </div>
+              <br>
+              <p class="errorP <%= !errorfullName ? 'd-none' : '' %>"><%= errorfullName %></p>
+              <p class="errorP <%= !minFullName ? 'd-none' : '' %>"><%= minFullName %></p>
+
+              <!-- Address -->
+              <div class="mb-3">
+                <label for="addressLine1" class="form-label">Address</label>
+                <input type="text" class="form-control" id="addressLine1" name="address" value="<%= address.address %>">
+              </div>
+              <br>
+              <p class="errorP <%= !errorAddress ? 'd-none' : '' %>"><%= errorAddress %></p>
+              <p class="errorP <%= !addressRegex ? 'd-none' : '' %>"><%= addressRegex %></p>
+              <!-- City -->
+              <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text" class="form-control" id="city" name="city" value="<%= address.city %>" >
+              </div>
+              <br>
+              <p class="errorP <%= !errorCity ? 'd-none' : '' %>"><%= errorCity %></p>
+              <p class="errorP <%= !cityRegex ? 'd-none' : '' %>"><%= cityRegex %></p>
+
+               <!-- house no -->
+               <div class="mb-3">
+                <label for="houseNo" class="form-label">House No</label>
+                <input type="text" class="form-control" id="houseNo" name="houseNo" value="<%= address.houseNo %>" >
+              </div>
+              <br>
+              <p class="errorP <%= !errorHouseNo ? 'd-none' : '' %>"><%= errorHouseNo %></p>
+              <p class="errorP <%= !houseNoRegex ? 'd-none' : '' %>"><%= houseNoRegex %></p>
+
+
+              <!-- State -->
+              <div class="mb-3">
+                <label for="state" class="form-label">State</label>
+                <input type="text" class="form-control" id="state" name="state" value="<%= address.state %>" >
+              </div>
+              <br>
+              <p class="errorP <%= !errorState ? 'd-none' : '' %>"><%= errorState %></p>
+              <p class="errorP <%= !stateRegex ? 'd-none' : '' %>"><%= stateRegex %></p>
+
+              <!-- Zip Code -->
+              <div class="mb-3">
+                <label for="zipCode" class="form-label">Zip Code</label>
+                <input type="text" class="form-control" id="zipCode" name="zipCode" value="<%= address.zipCode %>">
+              </div>
+              <br>
+              <p class="errorP <%= !errorZipCode ? 'd-none' : '' %>"><%= errorZipCode %></p>
+              <p class="errorP <%= !zipCodeRegex ? 'd-none' : '' %>"><%= zipCodeRegex %></p>
+
+              <!-- Country -->
+              <div class="mb-3">
+                <label for="country" class="form-label">Country</label>
+                <input type="text" class="form-control" id="country" name="country" value="<%= address.country %>" >
+              </div>
+              <br>
+              <p class="errorP <%= !errorCountry ? 'd-none' : '' %>"><%= errorCountry %></p>
+              <p class="errorP <%= !countryRegex ? 'd-none' : '' %>"><%= countryRegex %></p>
+
+              <!-- mobile -->
+              <div class="mb-3">
+                <label for="mobile" class="form-label">mobile</label>
+                <input type="text" class="form-control" id="mobile" name="mobile" value="<%= address.mobile %>">
+              </div>
+              <br>
+              <p class="errorP <%= !errorMobile ? 'd-none' : '' %>"><%= errorMobile %></p>
+              <p class="errorP <%= !mobileRegex ? 'd-none' : '' %>"><%= mobileRegex %></p>
+              <p class="errorP <%= !errorAddressExists ? 'd-none' : '' %>"><%= errorAddressExists %></p>
+              <input type="hidden" name="addressId" value="<%= address._id %>">
+              <!-- Submit Button -->
+              <button type="submit" class="btn btn-primary">Update Address</button>
+              <div id="errorData" data-errors=""></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  function redirectToAddress() {
+    // Implement redirection logic here, for example:
+    window.location.href = "/account-details";
+  }
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('addAddressForm');
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent form submission
+        let isValid = true;
+
+        // Validation functions
+        const validateFullName = (fullName) => {
+            const nameRegex = /^[A-Za-z\s]+$/;
+            return nameRegex.test(fullName) && fullName.length >= 3 && fullName.length <= 30;
+        };
+
+        const validateAddress = (address) => {
+            const addressRegex = /^[A-Za-z0-9\s.,()-]+$/;
+            return addressRegex.test(address);
+        };
+
+        const validateCity = (city) => {
+            const cityRegex = /^[A-Za-z]+$/;
+            return cityRegex.test(city);
+        };
+
+        const validateHouseNo = (houseNo) => {
+            const houseNoRegex = /^[a-zA-Z0-9/\\-]+$/;
+            return houseNoRegex.test(houseNo);
+        };
+
+        const validateState = (state) => {
+            const stateRegex = /^[A-Za-z]+$/;
+            return stateRegex.test(state);
+        };
+
+        const validateZipCode = (zipCode) => {
+            const zipCodeRegex = /^[0-9]+$/;
+            return zipCodeRegex.test(zipCode);
+        };
+
+        const validateCountry = (country) => {
+            const countryRegex = /^[A-Za-z]+$/;
+            return countryRegex.test(country);
+        };
+
+        const validateMobile = (mobile) => {
+            const mobileRegex = /^[0-9]+$/;
+            return mobileRegex.test(mobile);
+        };
+
+        // Get input values
+        const fullNameInput = form.fullName.value;
+        const addressInput = form.address.value;
+        const cityInput = form.city.value;
+        const houseNoInput = form.houseNo.value;
+        const stateInput = form.state.value;
+        const zipCodeInput = form.zipCode.value;
+        const countryInput = form.country.value;
+        const mobileInput = form.mobile.value;
+
+        // Array to hold error messages
+        const errorMessages = [];
+
+        // Validate fields and store error messages
+        if (!validateFullName(fullNameInput)) {
+            errorMessages.push('Full name should be between 3 and 30 characters and contain only letters and spaces.');
+        }
+
+        if (!validateAddress(addressInput)) {
+            errorMessages.push('Only letters, numbers, spaces, and punctuation (.,()-) are allowed in the address.');
+        }
+
+        if (!validateCity(cityInput)) {
+            errorMessages.push('City should contain only letters.');
+        }
+
+        if (!validateHouseNo(houseNoInput)) {
+            errorMessages.push('House No should contain only numbers and letters.');
+        }
+
+        if (!validateState(stateInput)) {
+            errorMessages.push('State should contain only letters.');
+        }
+
+        if (!validateZipCode(zipCodeInput)) {
+            errorMessages.push('Zip Code should contain only numbers.');
+        }
+
+        if (!validateCountry(countryInput)) {
+            errorMessages.push('Country should contain only letters.');
+        }
+
+        if (!validateMobile(mobileInput)) {
+            errorMessages.push('Mobile number should contain only numbers.');
+        }
+
+        // Check if there are any error messages
+        if (errorMessages.length > 0) {
+            // Display SweetAlert2 error alert
+            Swal.fire({
+                icon: 'error',
+                title: 'Form Validation Errors',
+                text: errorMessages.join('\n'),
+            });
+        } else {
+           
+          
+              // Show a SweetAlert2 success alert
+              Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Address updated successfully!',
+                showConfirmButton: true
+            }).then(() => {
+                // Optionally, you could perform other actions here if needed
+                // Once the alert is confirmed, submit the form
+             // Submit the form if no errors
+             // Once the alert is confirmed, submit the form
+             form.submit()
+            });
+        }
+    });
+});
+
+</script>
+
+
+<!-- include footer -->
+<%- include('../include/footer') %>
+<!-- /include footer -->

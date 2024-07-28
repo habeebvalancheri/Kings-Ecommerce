@@ -355,9 +355,8 @@ module.exports = {
 
       const products = await productDB.findById(id);
 
-          // Ensure only four images are saved
-    const selectedImages = products.pImages.slice(0, 4);
-
+      // Ensure only four images are saved
+      const selectedImages = products.pImages.slice(0, 4);
 
       // Check the input against the regex patterns
       if (
@@ -403,7 +402,7 @@ module.exports = {
             stock: stockValue,
             discount: discountValue,
             category: categoryObj._id,
-            pImages:selectedImages,
+            pImages: selectedImages,
           },
         }
       );
@@ -418,15 +417,15 @@ module.exports = {
     try {
       const id = req.query.id;
 
-          // Get the current product images
-    const product = await productDB.findById(id);
-    const currentImages = product.pImages || [];
+      // Get the current product images
+      const product = await productDB.findById(id);
+      const currentImages = product.pImages || [];
 
-    // Check if the total images after upload exceed 4
-    if (req.files && (currentImages.length + req.files.length > 4)) {
-      req.session.imageError2 = "You can only upload a total of four images.";
-      return res.redirect(`/update-Product?id=${id}`);
-    }
+      // Check if the total images after upload exceed 4
+      if (req.files && currentImages.length + req.files.length > 4) {
+        req.session.imageError2 = "You can only upload a total of four images.";
+        return res.redirect(`/update-Product?id=${id}`);
+      }
 
       const image = req.files.map((file) => file.filename);
 
@@ -453,8 +452,8 @@ module.exports = {
         { $pull: { pImages: filenameToRemove } }
       );
 
-      const filePath = path.join(__dirname, 'path/to/images', filenameToRemove);
-        fs.unlinkSync(filePath);
+      const filePath = path.join(__dirname, "path/to/images", filenameToRemove);
+      fs.unlinkSync(filePath);
 
       // Check if the update was successful
       if (updatedImage.nModified > 0) {
@@ -645,7 +644,7 @@ module.exports = {
 
         // Check if all products are cancelled
         productToReturn.return = "Returned";
-
+        console.log(totalDiscount, totalPrice, overallTotalPrice);
         const allProductsReturned = order.products.every(
           (item) => item.return === "Returned"
         );
@@ -860,7 +859,7 @@ module.exports = {
       };
 
       // Path to EJS template file
-      const ejsTemplate = path.resolve(__dirname, "../../views/pdf.ejs");
+      const ejsTemplate = path.resolve(__dirname, "../../views/admin/pdf.ejs");
       const templateContent = await fs.readFile(ejsTemplate, "utf-8");
 
       const ejsData = ejs.render(templateContent, { data });

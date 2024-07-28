@@ -1,0 +1,255 @@
+<!-- include header -->
+<%- include('../include/header') %>
+<!-- /include header -->
+
+  <!-- wishlist + summary -->
+  <section class="bg-light my-5">
+    <div class="container">
+      <div class="row">
+        <!-- wishlist -->
+        <div class="col-lg-12">
+          <div class="card border shadow-0">
+            <div class="m-4">
+              <h4 class="card-title mb-4">My Wishlist</h4>
+              <% if (wishListItems && wishListItems.length > 0 ) { %>
+
+                <% let totalItems = 0; %>
+                <% let totalPrice = 0; %>
+                <% wishListItems.forEach(item => { %>
+                  <% let itemPrice = item.productId.price * item.quantity; %>
+                  <% if(item.productId.stock > 0) {%>
+                    <% totalItems += item.quantity; %>
+                    <% totalPrice += itemPrice; %>
+                  <div class="row gy-3 mb-4">
+                    <div class="col-lg-5 outofstock" >
+                      <div class="me-lg-5">
+                        <div class="d-flex">
+                          <img src="/images/<%= item.productId.pImages[0] %>" class="border rounded me-3"
+                            style="width: 96px; height: 96px;" />
+                          <div class="">
+                            <a href="#" class="nav-link">
+                              <%= item.productId.pName %>
+                            </a>
+                            <!-- <p class="text-muted">
+                              
+                            </p> -->
+                         
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-2 col-sm-6 col-6 d-flex flex-row flex-lg-column flex-xl-row text-nowrap">
+
+                      <div class="">
+                        <text class="h6"><%= item.productId.price %></text> <br />
+                        <!-- <small class="text-muted text-nowrap">₹ / per item </small> -->
+                      </div>
+                    </div>
+                    <% }else{ %>
+                      <p style="color: red;">Product Not available </p>
+
+                      <style>
+                        .outofstock {
+                          opacity: 90%;
+                          pointer-events: none;
+                        }
+                      </style>
+                     <% } %>     
+                    <!-- <div class="col-lg-2 col-sm-6 col-6 d-flex flex-row flex-lg-column flex-xl-row text-nowrap">
+                      <div class="col-md-4 col-6 mb-3">
+                        <label class="mb-2 d-block">Quantity:</label>
+                        <div class="input-group mb-3" style="width: 170px;">
+                          <button class="btn btn-white border border-secondary px-3" type="button" id="decrease-btn">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <input type="text" class="form-control text-center border border-secondary" placeholder="1"
+                            aria-label="Example text with button addon" aria-describedby="button-addon1"
+                            id="quantity-input" />
+                          <button class="btn btn-white border border-secondary px-3" type="button" id="increase-btn">
+                            <i class="fas fa-plus"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div> -->
+                    <div
+                      class="col-lg col-sm-6 d-flex justify-content-sm-center justify-content-md-start justify-content-lg-center justify-content-xl-end mb-2">
+                      <div class="float-md-end">
+                        <a href='#' 
+                          class="btn add-to-cart-btn btn-light border text-danger icon-hover-danger"
+                          data-product-id="<%= item.productId._id %>">add To Cart</a>
+                          <a href="#" class="btn btn-wishList-remove btn-cart-remove btn-light border text-danger icon-hover-danger" data-product-id="<%= item.productId._id  %>"> Remove</a>
+                      </div>
+                    </div>
+                  </div>
+                  <% }); %>
+                  <% } else { %>
+                      <!-- Display a message if cart is empty -->
+                      <p>No Items In Wishlist</p>
+                  <% } %>
+            </div>
+
+            <div class="border-top pt-4 mx-4 mb-4">
+              <p><i class="fas fa-truck text-muted fa-lg"></i> Free Delivery within 1-2 weeks</p>
+              <p class="text-muted">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                aliquip
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- cart -->
+        <!-- summary -->
+        <!-- <div class="col-lg-3">
+
+          <div class="card shadow-0 border">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">subtotal:</p>
+                <p class="mb-2" id="subtotal">
+                  ₹ 0.00
+                </p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">Total Items</p>
+                <p class="mb-2 text-success" id="total-items">
+                  0
+                </p>
+              </div>
+              <hr />
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">Total price:</p>
+                <p class="mb-2 fw-bold" id="total-items">
+                  ₹ 0.00
+                </p>
+              </div>
+              <div class="mt-3">
+                <form action="#" method="post">
+                  <input type="hidden" name="totalsum" value="" hidden>
+                  <button class="btn btn-success w-100 shadow-0 mb-2" type="submit">Make Purchase
+                  </button>
+              </form>
+                    <a href=" /products" class="btn btn-light w-100 border mt-2"> Back to shop </a>
+              </div>
+            </div>
+          </div>
+        </div> -->
+        <!-- summary -->
+      </div>
+    </div>
+  </section>
+  <!-- cart + summary -->
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const removeFromWishListButtons = document.querySelectorAll('.btn-wishList-remove');
+      
+      removeFromWishListButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+          event.preventDefault(); // Prevent default link behavior
+          
+          const productId = this.dataset.productId;
+    
+          fetch(`/remove-wishlist?id=${productId}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success',
+                  text: 'Product removed from wishlist successfully'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.reload(); // Reload the page after successful removal
+                  }
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Product is not in wishlist'
+                });
+              }
+            })
+            .catch(error => {
+              console.error('Error removing product from wishlist:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong!'
+              });
+            });
+        });
+      });
+    });
+    </script>
+    
+    
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const addToCart = document.querySelectorAll('.add-to-cart-btn');
+  
+      addToCart.forEach(addToCart => {
+        addToCart.addEventListener('click', function () {
+          // Retrieve product ID from the button's dataset
+          const productId = this.dataset.productId;
+  
+          // Send a POST request to the backend route to add the product to the cart
+          fetch('/addToCart', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId }) // Include productId in the request body
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Product successfully added to cart, show success alert
+              Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Product added to cart successfully'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = '/cart?id=' + productId;
+                }
+              });
+            } else {
+              // Product is already added to cart, show error alert
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Product is already in cart'
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error adding product to cart:', error);
+            // Handle error response
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Something went wrong!'
+            });
+          });
+        });
+      });
+    });
+  </script>
+
+<!-- foooter  -->
+  </body>
+  <!-- include footer -->
+  <%- include('../include/footer') %>
+    <!-- /include footer -->
+    
+

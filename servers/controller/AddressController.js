@@ -31,7 +31,7 @@ module.exports = {
       const country = req.body.country.trim();
       const houseNo = req.body.houseNo.trim();
       const mobile = req.body.mobile.trim();
-
+      const userId = req.session.userId;
       // check if fullName field is empty
       if (!fullName) {
         req.session.errorfullName = "Name is required!";
@@ -157,7 +157,7 @@ module.exports = {
       }
 
       // check user Exists
-      const existingUser = await userDB.findOne({ email: req.session.email });
+      const existingUser = await userDB.findOne({ _id: userId });
 
       if (!existingUser) {
         return res.status(404).send("User not found");
@@ -165,6 +165,7 @@ module.exports = {
 
       // Check if the address already exists in the database
       const existingAddress = await addressDB.findOne({
+        userId: userId,
         name: fullName,
         address: address,
         city: city,
@@ -181,10 +182,11 @@ module.exports = {
       }
 
       let newAddress;
-      const addressExists = await addressDB.find({});
+      const addressExists = await addressDB.find({ userId: userId });
 
       if (addressExists.length > 0) {
         newAddress = new addressDB({
+          userId: userId,
           name: fullName,
           address: address,
           city: city,
@@ -197,6 +199,7 @@ module.exports = {
         await newAddress.save();
       } else {
         newAddress = new addressDB({
+          userId: userId,
           name: fullName,
           address: address,
           city: city,
@@ -215,7 +218,7 @@ module.exports = {
 
       return res.redirect("/account-details");
     } catch (error) {
-      return res.redirect('/ClientServer-Error');
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -391,7 +394,7 @@ module.exports = {
       // Redirect or send response as needed
       return res.redirect("/account-details");
     } catch (error) {
-      return res.redirect('/ClientServer-Error');
+      return res.redirect("/ClientServer-Error");
     }
   },
 
@@ -408,7 +411,7 @@ module.exports = {
         return res.status(404).send("Address not found");
       }
     } catch (error) {
-      return res.redirect('/ClientServer-Error');
+      return res.redirect("/ClientServer-Error");
     }
   },
 };

@@ -1,0 +1,412 @@
+<!-- Include Header -->
+<%- include('../include/header') %>
+<!-- /Include Header -->
+
+<!-- Load CDN Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<!-- /Load CDN Scripts -->
+
+<!-- Section for Orders -->
+
+<section class="my-5" style="background-color: #f5f5f7;">
+    <div class="container">
+        <div class="row" >
+         
+              <div class="card mb-7" style="background-color:#f5f5f7;">
+                <div class="card-header py-3" >
+            <div class="col-12">
+                <h3>Your Orders</h3>
+            </div>
+
+            <!-- Main div for displaying all orders -->
+            <div id="order-list-section" class="col-12">
+                <% if (orders && orders.length > 0) { %>
+                    <% orders.forEach(order => { %>
+                        <!-- Order Card Template -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <!-- Order Details Button -->
+                                <div class="d-flex justify-content-end mb-3">
+                                    <button class="btn btn-info mb-2 order-details-btn" data-order-id="<%= order._id %>">
+                                        Order Details
+                                    </button>
+                                    <button class="btn btn-primary mb-2 ml-2 download-invoice-btn" data-order-id="<%= order._id %>">
+                                        <i class="fas fa-file-invoice"></i> Invoice
+                                    </button>
+                                </div>
+                                <!-- /Order Details Button -->
+
+                                <p class="card-title" style="font-size: 12px;">
+                                    Order ID: <strong><%= order._id %></strong>
+                                </p>
+
+                                <% order.products.forEach(item => { %>
+                                    <!-- Order Details -->
+                                    <div class="row gy-3 mb-2">
+                                        <div class="col-2">
+                                            <img src="/images/<%= item.pImages %>" class="img-fluid" alt="Product Image" width="100"
+                                            height="100"/>
+                                        </div>
+                                        <div class="col-7 d-flex flex-column justify-content-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">
+                                                <%= item.pName %>
+                                                <span class="float-right" style="font-weight: 500; color: #28a745;">
+                                                    <% if (item.status === 'Delivered' && item.return !== "Returned") { %>
+                                                        ✓ Delivered
+                                                    <% } else if(item.status === 'Delivered' && item.return === "Returned") { %>
+                                                      
+                                                        ✓  Returned
+                                                    <% } else {%>
+                                                        <%= item.status %>
+                                                        <%} %>
+                                                </span>
+                                            </h6>
+                                            
+                                            <p class="card-text text-muted">₹<%= item.price %> 
+                                                <span style="margin-left: 20px;">Discount: <%= item.discount %>%</span>
+                                            </p>
+                                        </div>
+                                        <div class="col-3 d-flex flex-column align-items-center justify-content-center">
+                                         
+                                            <!-- Action Buttons -->
+                                            <% if (item.status === 'Pending' || item.status === 'Shipped' ) { %>
+                                                <button class="btn btn-primary cancel-btn" data-toggle="modal" data-target="#cancelConfirmationModal_<%= order._id %>_<%= item.productId %>" data-order-id="<%= order._id %>" data-product-id="<%= item.productId %>">
+                                                    Cancel
+                                                </button>
+                                            <% } %>
+                                                                   <!-- Add the Return Button if the product status is Delivered -->
+<% if (item.status === 'Delivered' && item.return !== 'Pending' && item.return !== 'Returned') { %>
+    <button class="btn btn-secondary return-btn" data-toggle="modal" data-target="#returnConfirmationModal_<%= order._id %>_<%= item.productId %>" data-order-id="<%= order._id %>" data-product-id="<%= item.productId %>">
+        Return
+    </button>
+<% } %>
+                                            <!-- /Action Buttons -->
+                                        </div>
+                                    </div>
+
+             
+
+                                        <!-- Cancel Confirmation Modal -->
+                                        <div class="modal fade" id="cancelConfirmationModal_<%= order._id %>_<%= item.productId %>" tabindex="-1" role="dialog" aria-labelledby="cancelConfirmationModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="cancelConfirmationModalLabel">Confirm Cancellation</h5>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to cancel this order?</p>
+                                                        <!-- Reason options -->
+                                                        <p>Please select a reason for cancellation:</p>
+                                                        <div>
+                                                            <input type="radio" id="changeOfMind_<%= order._id %>_<%= item.productId %>" name="cancelReason_<%= order._id %>_<%= item.productId %>" value="Change of Mind">
+                                                            <label for="changeOfMind_<%= order._id %>_<%= item.productId %>">Change of Mind: I don't want to buy this product</label><br>
+
+                                                            <input type="radio" id="deliveryDelays_<%= order._id %>_<%= item.productId %>" name="cancelReason_<%= order._id %>_<%= item.productId %>" value="Delivery Delays">
+                                                            <label for="deliveryDelays_<%= order._id %>_<%= item.productId %>">Delivery Delays: This product took too long to deliver</label><br>
+
+                                                            <input type="radio" id="betterAlternatives_<%= order._id %>_<%= item.productId %>" name="cancelReason_<%= order._id %>_<%= item.productId %>" value="Better Alternatives">
+                                                            <label for="betterAlternatives_<%= order._id %>_<%= item.productId %>">Better Alternatives: Found better products</label><br>
+
+                                                            <input type="radio" id="incorrectOrDuplicateOrders_<%= order._id %>_<%= item.productId %>" name="cancelReason_<%= order._id %>_<%= item.productId %>" value="Incorrect or Duplicate Orders">
+                                                            <label for="incorrectOrDuplicateOrders_<%= order._id %>_<%= item.productId %>">Incorrect or Duplicate Orders: Order was not expected or placed multiple times</label><br>
+
+                                                            <input type="radio" id="otherReason_<%= order._id %>_<%= item.productId %>" name="cancelReason_<%= order._id %>_<%= item.productId %>" value="Other">
+                                                            <label for="otherReason_<%= order._id %>_<%= item.productId %>">Other</label><br>
+
+                                                            <!-- Text input for custom reason when "Other" is selected -->
+                                                            <textarea id="otherReasonText_<%= order._id %>_<%= item.productId %>" name="otherReasonText" placeholder="Please provide your reason..." class="form-control mt-2" style="display: none;"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary confirm-cancel-btn" data-order-id="<%= order._id %>" data-product-id="<%= item.productId %>">
+                                                            Confirm Cancellation
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /Cancel Confirmation Modal -->
+
+
+
+                                        <!-- Return Confirmation Modal -->
+                                        <div class="modal fade" id="returnConfirmationModal_<%= order._id %>_<%= item.productId %>" tabindex="-1" role="dialog" aria-labelledby="returnConfirmationModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="returnConfirmationModalLabel">Confirm Return</h5>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to return this order?</p>
+                                                        <!-- Reason options -->
+                                                        <p>Please select a reason for return:</p>
+                                                        <div>
+                                                            <input type="radio" id="defectiveProduct_<%= order._id %>_<%= item.productId %>" name="returnReason_<%= order._id %>_<%= item.productId %>" value="Defective Product">
+                                                            <label for="defectiveProduct_<%= order._id %>_<%= item.productId %>">Defective Product</label><br>
+
+                                                            <input type="radio" id="notAsDescribed_<%= order._id %>_<%= item.productId %>" name="returnReason_<%= order._id %>_<%= item.productId %>" value="Not as Described">
+                                                            <label for="notAsDescribed_<%= order._id %>_<%= item.productId %>">Not as Described</label><br>
+
+                                                            <input type="radio" id="betterAlternatives_<%= order._id %>_<%= item.productId %>" name="returnReason_<%= order._id %>_<%= item.productId %>" value="Better Alternatives">
+                                                            <label for="betterAlternatives_<%= order._id %>_<%= item.productId %>">Better Alternatives</label><br>
+
+                                                            <input type="radio" id="incorrectOrDuplicateOrders_<%= order._id %>_<%= item.productId %>" name="returnReason_<%= order._id %>_<%= item.productId %>" value="Incorrect or Duplicate Orders">
+                                                            <label for="incorrectOrDuplicateOrders_<%= order._id %>_<%= item.productId %>">Incorrect or Duplicate Orders</label><br>
+
+                                                            <input type="radio" id="otherReasonReturn_<%= order._id %>_<%= item.productId %>" name="returnReason_<%= order._id %>_<%= item.productId %>" value="Other">
+                                                            <label for="otherReasonReturn_<%= order._id %>_<%= item.productId %>">Other</label><br>
+
+                                                            <!-- Text input for custom reason when "Other" is selected -->
+                                                            <textarea id="otherReasonReturnText_<%= order._id %>_<%= item.productId %>" name="otherReasonTextReturn" placeholder="Please provide your reason..." class="form-control mt-2" style="display: none;"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary confirm-return-btn" data-order-id="<%= order._id %>" data-product-id="<%= item.productId %>">
+                                                            Confirm Return
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /Return Confirmation Modal -->
+
+
+
+
+                                <% }); %>
+                            </div>
+                        </div>
+                        <!-- /Order Card Template -->
+                    <% }); %>
+                <% } else { %>
+                    <!-- Message when no orders are available -->
+                    <p>No Items in Orders</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+   
+  <!-- Pagination Controls -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <!-- Previous Page Button -->
+        <% if (page > 1) { %>
+            <li class="page-item">
+                <a class="page-link" href="/order?page=<%= page - 1 %>&limit=<%= limit %>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        <% } else { %>
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+            </li>
+        <% } %>
+
+        <!-- Page Number Buttons -->
+        <% const startPage = Math.max(1, page - 1); %>
+        <% const endPage = Math.min(startPage + 2, totalPages); %>
+        <% for (let i = startPage; i <= endPage; i++) { %>
+            <li class="page-item <%= i === page ? 'active' : '' %>">
+                <a class="page-link" href="/order?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+            </li>
+        <% } %>
+
+        <!-- Next Page Button -->
+        <% if (page < totalPages) { %>
+            <li class="page-item">
+                <a class="page-link" href="/order?page=<%= page + 1 %>&limit=<%= limit %>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        <% } else { %>
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+            </li>
+        <% } %>
+    </ul>
+</nav>
+
+    <!-- /Pagination Controls -->
+</section>
+<!-- /Section for Orders -->
+
+<!-- Include Footer -->
+<%- include('../include/footer') %>
+<!-- /Include Footer -->
+
+<script>
+// Event listener for order details buttons
+document.querySelectorAll('.order-details-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const orderId = this.getAttribute('data-order-id');
+        // Redirect to the order details page with the order ID as a query parameter
+        window.location.href = `/order-details?orderId=${orderId}`;
+    });
+});
+
+// Show custom reason input when "Other" option is selected
+document.querySelectorAll('input[name^="cancelReason_"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const [orderId, productId] = this.id.split('_').slice(1);
+        const customReasonInput = document.getElementById(`otherReasonText_${orderId}_${productId}`);
+
+        if (this.value === 'Other') {
+            customReasonInput.style.display = 'block';
+        } else {
+            customReasonInput.style.display = 'none';
+        }
+    });
+});
+
+// Event listener for cancel buttons
+document.querySelectorAll('.cancel-btn').forEach(button => {
+    button.addEventListener('click', function(event) {
+        const modalId = button.getAttribute('data-target');
+        const modal = document.querySelector(modalId);
+        const orderId = button.getAttribute('data-order-id');
+        const productId = button.getAttribute('data-product-id');
+
+        // Set the data attributes for the confirm-cancel button in the modal
+        const confirmCancelBtn = modal.querySelector('.confirm-cancel-btn');
+        confirmCancelBtn.setAttribute('data-order-id', orderId);
+        confirmCancelBtn.setAttribute('data-product-id', productId);
+    });
+});
+
+// Event listener for the confirm-cancel button
+document.querySelectorAll('.confirm-cancel-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const orderId = this.getAttribute('data-order-id');
+        const productId = this.getAttribute('data-product-id');
+
+          // Retrieve the selected cancellation reason
+          const reasonName = `cancelReason_${orderId}_${productId}`;
+        const selectedReasonRadio = document.querySelector(`input[name="${reasonName}"]:checked`);
+        const selectedReason = selectedReasonRadio ? selectedReasonRadio.value : null;
+        let customReason = '';
+
+        // Check if the selected reason is "Other" and get the custom reason text
+        if (selectedReason === 'Other') {
+            const customReasonInput = document.querySelector(`#otherReasonText_${orderId}_${productId}`);
+            customReason = customReasonInput.value;
+        }
+        // Make an AJAX request to cancel the order
+        $.ajax({
+            url: '/cancelOrder',
+            method: 'POST',
+            data: {
+                orderId: orderId,
+                productId: productId,
+                reason: selectedReason,
+                customReason: customReason
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Close the modal
+                    const modalId = `#cancelConfirmationModal_${orderId}_${productId}`;
+                    $(modalId).modal('hide');
+
+                    // Reload the page to reflect the cancellation
+                    location.reload();
+                } else {
+                    // Handle error case: Show alert or another form of notification
+                    alert(response.message || 'Failed to cancel the order.');
+                }
+            },
+            error: function() {
+                // Handle request error: Show alert or another form of notification
+                alert('Server error: Failed to cancel the order.');
+            }
+        });
+    });
+});
+
+// Show custom reason input when "Other" option is selected for return
+document.querySelectorAll('input[name^="returnReason_"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const [orderId, productId] = this.id.split('_').slice(1);
+        const customReasonInput = document.getElementById(`otherReasonReturnText_${orderId}_${productId}`);
+
+        if (this.value === 'Other') {
+            customReasonInput.style.display = 'block';
+        } else {
+            customReasonInput.style.display = 'none';
+        }
+    });
+});
+
+
+// Event listener for return buttons
+document.querySelectorAll('.return-btn').forEach(button => {
+    button.addEventListener('click', function(event) {
+        const modalId = button.getAttribute('data-target');
+        const modal = document.querySelector(modalId);
+        const orderId = button.getAttribute('data-order-id');
+        const productId = button.getAttribute('data-product-id');
+
+        // Set the data attributes for the confirm-return button in the modal
+        const confirmReturnBtn = modal.querySelector('.confirm-return-btn');
+        confirmReturnBtn.setAttribute('data-order-id', orderId);
+        confirmReturnBtn.setAttribute('data-product-id', productId);
+    });
+});
+
+// Event listener for the confirm-return button
+document.querySelectorAll('.confirm-return-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const orderId = this.getAttribute('data-order-id');
+        const productId = this.getAttribute('data-product-id');
+
+          // Retrieve the selected return reason
+          const reasonName = `returnReason_${orderId}_${productId}`;
+        const selectedReasonRadio = document.querySelector(`input[name="${reasonName}"]:checked`);
+        const selectedReason = selectedReasonRadio ? selectedReasonRadio.value : null;
+        let customReason = '';
+
+          // Check if the selected reason is "Other" and get the custom reason text
+          if (selectedReason === 'Other') {
+            const customReasonInput = document.querySelector(`#otherReasonReturnText_${orderId}_${productId}`);
+            customReason = customReasonInput.value;
+        }
+
+        // Make an AJAX request to return the order
+        $.ajax({
+            url: '/returnOrder',
+            method: 'POST',
+            data: {
+                orderId: orderId,
+                productId: productId,
+                reason: selectedReason,
+                customReason: customReason
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Close the modal
+                    const modalId = `#returnConfirmationModal_${orderId}_${productId}`;
+                    $(modalId).modal('hide');
+
+                    // Reload the page to reflect the return
+                    location.reload();
+                } else {
+                    // Handle error case: Show alert or another form of notification
+                    alert(response.message || 'Failed to return the order.');
+                }
+            },
+            error: function() {
+                // Handle request error: Show alert or another form of notification
+                alert('Server error: Failed to return the order.');
+            }
+        });
+    });
+});
+
+ // Handle the invoice download button click
+ $('.download-invoice-btn').click(function () {
+        var orderId = $(this).data('order-id');
+        window.location.href =  `/download-invoice?orderId=${orderId}`;// Adjust the URL to match your route
+    });
+</script>

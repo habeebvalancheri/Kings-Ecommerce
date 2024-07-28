@@ -4,7 +4,7 @@ const path = require("path");
 // Multer configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'assets/images');
+    cb(null, "assets/images");
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now();
@@ -16,13 +16,12 @@ const storage = multer.diskStorage({
 
 const imageFilter = (req, file, cb) => {
   if (!file.originalname.match(/\.(jpg|jpeg|png|gif|PNG|webp)$/)) {
-    const error = new Error('Only image files are allowed!');
+    const error = new Error("Only image files are allowed!");
     error.status = 400;
     return cb(error, false);
   }
   cb(null, true);
 };
-
 
 // Multer middleware with configured storage and file filter
 const upload = multer({

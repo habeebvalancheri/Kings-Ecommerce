@@ -1,0 +1,466 @@
+<!-- include header -->
+<%- include('../include/header') %>
+<!-- /include header -->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+
+<!-- cart + summary -->
+<section class="my-5" style="background-color:#f5f5f7;">
+    <div class="container">
+        <div class="row">
+            <!-- cart -->
+            <div class="col-lg-9">
+                <div class="card border shadow-0">
+                    <div class="m-4">
+                        <h4 class="card-title mb-4">Your shopping cart</h4>
+                        <% let totalPrice = 0; %> <!-- Initialize total price variable -->
+                        <% let totalItems = 0; %> <!-- Initialize total items variable -->
+                        <% if (cartItems && cartItems.length > 0 ) { %>
+                        
+                        <% cartItems.forEach(item => { %>
+                        <% let itemPrice = item.productId.price * item.quantity; %> <!-- Calculate item price -->
+                        <% totalPrice += itemPrice; %> <!-- Add item price to total price -->
+                        <% totalItems += item.quantity; %> <!-- Add item quantity to total items -->
+                        <div class="row gy-3 mb-4">
+                            <div class="col-lg-5 outofstock">
+                                <div class="me-lg-5">
+                                    <div class="d-flex">
+                                        <img src="/images/<%= item.productId.pImages[0] %>" class="border rounded me-3" style="width: 96px; height: 96px;" />
+                                        <div class="">
+                                            <a href="#" class="nav-link">
+                                                <%= item.productId.pName %>
+                                            </a>
+                                            <p class="text-muted">
+                                                <%= item.productId.price %>
+                                                <small class="text-muted text-nowrap">₹ / per item</small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-sm-6 col-6 d-flex flex-row flex-lg-column flex-xl-row text-nowrap">
+                                <div class="">
+                                    <text id="indPrice_<%= item.productId._id %>" class="h6" data-product-price="<%= item.productId.price %>">
+                                        ₹ <%= itemPrice %> <!-- Display item price -->
+                                    </text>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-sm-6 col-6 d-flex flex-row flex-lg-column flex-xl-row text-nowrap">
+                                <div class="col-md-4 col-6 mb-3">
+                                    <label class="mb-2 d-block">Quantity:<%= item.quantity %></label>
+                                    <div class="input-group mb-3 quantity-container" style="width: 170px;">
+                                        <button class="btn btn-white border border-secondary px-3 decrease-btn" type="button" data-product-id="<%= item.productId._id %>">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input id="quInput_<%= item.productId._id %>" class="form-control text-center border border-secondary quantity-input" placeholder="<%= item.quantity %>" data-product-id="<%= item.productId._id %>" data-price="<%= item.productId.price %>" data-stock="<%= item.productId.stock %>" min="1" type="number"/>
+                                        <button class="btn btn-white border border-secondary px-3 increase-btn" type="button" data-product-id="<%= item.productId._id %>">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <% if (item.productId.stock === item.quantity) { %>
+                                        <label id='stock_<%= item.productId._id %>' style="color: red;">No More Stock available</label>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="col-lg col-sm-6 d-flex justify-content-sm-center justify-content-md-start justify-content-lg-center justify-content-xl-end mb-2">
+                                <div class="float-md-end">
+                                    <a href="#" class="btn btn-light border px-2 icon-hover-primary add-to-wishList-btn" data-product-id="<%= item.productId._id %>">
+                                        <i class="fas fa-heart fa-lg px-1 text-secondary"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-cart-remove btn-light border text-danger icon-hover-danger" data-product-id="<%= item.productId._id %>"> Remove</a>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <% }); %>
+                        <% } else { %>
+                            <!-- Display a message if cart is empty -->
+                            <p>No Items In Cart</p>
+                            <% } %>
+
+                    </div>
+
+                    <div class="border-top pt-4 mx-4 mb-4">
+                        <p><i class="fas fa-truck text-muted fa-lg"></i> Free Delivery within 1-2 weeks</p>
+                        <p class="text-muted">
+                          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+                          dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                          aliquip
+                        </p>
+                      </div>
+                </div>
+            </div>
+            
+            <!-- cart -->
+            <!-- summary -->
+            <div class="col-lg-3">
+                <div class="card shadow-0 border">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <p class="mb-2">subtotal:</p>
+                            <p class="mb-2" id="subtotal">
+                                ₹ 0.00
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <p class="mb-2">Total Items</p>
+                            <p class="mb-2 text-success" id="total-items">
+                              0
+                            </p>
+                        </div>
+                        <hr />
+                        <div id="item-total-price" class="d-flex justify-content-between">
+                            <p class="mb-2">Total price:</p>
+                            <p class="mb-2 fw-bold" id="total-price">
+                                ₹ 0.00
+                            </p>
+                        </div>
+                       
+
+                    
+                        <div class="mt-3">
+                            <form action="/check-out?id=<%= cartItems.map(item => item.productId._id).join(',') %>" method="post">
+                                <input type="hidden" name="productIds" id="productIds" value="<%= cartItems.map(items => items.productId._id).join(',') %>">
+                              <input type="hidden" name="totalsum" value="<%= totalPrice %>" hidden>
+                              <button class="btn btn-success w-100 shadow-0 mb-2" type="submit">Make Purchase
+                              </button>
+                              <!-- Add this inside your existing form -->
+<input type="hidden" id="noProductInCartMessage" value="<%= noProductsInCart %>">
+
+                          </form>
+                                <a href="/products" class="btn btn-light w-100 border mt-2"> Back to shop </a>
+                          </div>
+                    </div>
+                </div>
+            </div>
+            <!-- summary -->
+        </div>
+    </div>
+</section>
+<!-- cart + summary -->
+
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.0/sweetalert2.all.min.js"></script>
+   
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        const noProductInCartMessage = document.getElementById('noProductInCartMessage').value;
+
+        if (noProductInCartMessage) {
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: noProductInCartMessage
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('SweetAlert confirmed');
+                    clearQuantityState(); // Call the function to clear local storage
+                } else {
+                    console.log('SweetAlert not confirmed');
+                }
+            });
+        } else {
+            console.log('No product in cart message not detected');
+        }
+    });
+
+    // Function to save quantity state to local storage
+    function saveQuantityState() {
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            localStorage.setItem(input.dataset.productId, input.value);
+        });
+    }
+
+    // Function to restore quantity state from local storage
+    function restoreQuantityState() {
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            const storedValue = localStorage.getItem(input.dataset.productId);
+            if (storedValue) {
+                input.value = storedValue;
+            }
+        });
+    }
+
+    // Function to clear quantity state from local storage
+    function clearQuantityState() {
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            localStorage.removeItem(input.dataset.productId);
+        });
+    }
+
+    // Restore the quantity state when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', restoreQuantityState);
+
+    // Save the quantity state before the window is unloaded
+    window.addEventListener('beforeunload', saveQuantityState);
+
+</script>
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+          const removeFromCartButtons = document.querySelectorAll('.btn-cart-remove');
+          
+          removeFromCartButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+              event.preventDefault(); // Prevent default link behavior
+              
+              const productId = this.dataset.productId;
+              const productRow = this.closest('.row');
+              
+              fetch(`/remove-cart?id=${productId}`)
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  if (data.success) {
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Success',
+                      text: 'Product removed from cart successfully'
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        window.location.reload(); // Reload the page after successful removal
+                      }
+                    });
+                    productRow.remove();
+
+                      // Remove the quantity state from local storage
+            localStorage.removeItem(productId);
+            
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: 'Product is not in cart'
+                    });
+                  }
+                })
+                .catch(error => {
+                  console.error('Error removing product from cart:', error);
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!'
+                  });
+                });
+            });
+          });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to update item subtotal and total price
+            function updatePrices() {
+                let subtotal = 0;
+                let totalItems = 0;
+                const quantityContainers = document.querySelectorAll('.quantity-container');
+                quantityContainers.forEach(container => {
+                    const inputField = container.querySelector('.quantity-input');
+                    const quantity = Number(inputField.value);
+                    const price = Number(inputField.dataset.price);
+                    const itemPrice = quantity * price; 
+                    subtotal += quantity * price;
+                    totalItems += quantity;
+    
+                    // Update the price element for this item
+                    const priceElementId = 'indPrice_' + inputField.dataset.productId;
+                    const priceElement = document.getElementById(priceElementId);
+                    if (priceElement) {
+                        priceElement.textContent = '₹ ' + itemPrice.toFixed(2);
+                    }
+    
+                    // Send the updated quantity to the server
+                    const productId = inputField.dataset.productId;
+                    updateCartQuantity(productId, quantity);
+                    console.log(productId,quantity,"HELLO")
+                });
+    
+                // Update subtotal and total price in the summary
+                document.getElementById('subtotal').textContent = '₹ ' + subtotal.toFixed(2);
+                document.getElementById('total-price').textContent = '₹ ' + subtotal.toFixed(2);
+                document.getElementById('total-items').textContent = totalItems;
+            }
+    
+            // Function to update cart quantity via HTTP POST request
+            async function updateCartQuantity(productId, quantity) {
+                try {
+                    const response = await fetch('/updateCart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            productId: productId,
+                            quantity: quantity
+                        })
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to update cart quantity');
+                    }
+                    const data = await response.json();
+                    console.log(data.message);
+                } catch (error) {
+                    console.error('Error updating cart quantity:', error);
+                }
+            }
+    
+         // Function to handle click event on increase button
+async function handleIncreaseClick(event) {
+    const inputField = event.target.closest('.quantity-container').querySelector('.quantity-input');
+    const productId = inputField.dataset.productId;
+    let quantity = Number(inputField.value) + 1;
+    const maxStock = Number(inputField.dataset.stock); // Get the maximum stock from data attribute
+    const maxUserLimit = 10;
+    if (quantity > maxStock) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Reached the stock limit!'
+        });
+    } else if (quantity > maxUserLimit) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'You can only have up to 10 quantities of this product in your cart'
+        });
+    } else {
+        inputField.value = quantity;
+        updatePrices();
+        await updateCartQuantity(productId, quantity);
+        saveQuantityState();
+    }
+}
+
+// Function to handle click event on decrease button
+async function handleDecreaseClick(event) {
+    const inputField = event.target.closest('.quantity-container').querySelector('.quantity-input');
+    const productId = inputField.dataset.productId;
+    let quantity = Number(inputField.value) - 1;
+    if (quantity >= 1) {
+        inputField.value = quantity;
+        updatePrices(); // Update prices when quantity changes
+        await updateCartQuantity(productId, quantity); // Update cart quantity in the backend
+        saveQuantityState();
+    }
+}
+
+            // Function to save quantity state to local storage
+            function saveQuantityState() {
+                const quantityInputs = document.querySelectorAll('.quantity-input');
+                quantityInputs.forEach(input => {
+                    localStorage.setItem(input.dataset.productId, input.value);
+                });
+            }
+    
+            // Function to restore quantity state from local storage
+            function restoreQuantityState() {
+                const quantityInputs = document.querySelectorAll('.quantity-input');
+                quantityInputs.forEach(input => {
+                    const storedValue = localStorage.getItem(input.dataset.productId);
+                    if (storedValue !== null) {
+                        input.value = storedValue;
+                    } else {
+                        // Set default value to 1 if not found in local storage
+                        input.value = 1;
+                    }
+                });
+            }
+    
+            // Attach event listeners to increase buttons
+            const increaseButtons = document.querySelectorAll('.increase-btn');
+            increaseButtons.forEach(button => {
+                button.addEventListener('click', handleIncreaseClick);
+            });
+    
+            // Attach event listeners to decrease buttons
+            const decreaseButtons = document.querySelectorAll('.decrease-btn');
+            decreaseButtons.forEach(button => {
+                button.addEventListener('click', handleDecreaseClick);
+            });
+    
+            // Restore quantity state from local storage
+            restoreQuantityState();
+    
+            // Initial price update
+            updatePrices();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const addToWishListButtons = document.querySelectorAll('.add-to-wishList-btn');
+      
+          addToWishListButtons.forEach(addToWishListButtons => {
+            addToWishListButtons.addEventListener('click', function () {
+              // Retrieve product ID from the button's dataset
+              event.preventDefault();
+              const productId = this.dataset.productId;
+      
+              // Send a POST request to the backend route to add the product to the wishList
+              fetch('/addToWishList', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId }) // Include productId in the request body
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  // Product successfully added to wishList, show success alert
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Product added to wishList successfully'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.href = '/Wish-list?id=' + productId;
+                    }
+                  });
+                } else {
+                  // Product is already added to wishList, show error alert
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Product is already in wishList'
+                  });
+                }
+              })
+              .catch(error => {
+                console.error('Error adding product to wishList:', error);
+                // Handle error response
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Something went wrong!'
+                });
+              });
+            });
+          });
+        });
+      </script>
+         <script>
+            function clearCartQuantityState() {
+    const cartProducts = JSON.parse(localStorage.getItem('cartProducts')) || [];
+    cartProducts.forEach(product => {
+        localStorage.removeItem(product.productId);
+    });
+}
+         </script>
+         
+         
+
+<!-- include footer -->
+<%- include('../include/footer') %>
+<!-- /include footer -->
+</html>

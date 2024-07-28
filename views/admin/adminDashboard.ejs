@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  </head>
+  <body>
+    <!-- include adminBase -->
+    <%- include('../include/adminBase.ejs') %>
+    <!-- include adminBase -->
+
+    <!-- CONTENT -->
+    <section id="content">
+      <main>
+        <div class="head-title">
+          <div class="left">
+            <h1>Dashboard</h1>
+            <ul class="breadcrumb">
+              <li>
+                <a href="#">Admin Dashboard</a>
+              </li>
+              <li><i class="bx bx-chevron-right"></i></li>
+              <li>
+                <a class="active" href="#">Home</a>
+              </li>
+            </ul>
+          </div>
+          <button type="button" class="btn-download">
+            <i class="bx bxs-cloud-download"></i>
+            <span class="text">Download Excel & PDF</span>
+          </button>
+        </div>
+        <ul class="box-info">
+          <a href="/admin-Orders">
+            <li>
+              <i class="bx bxs-calendar-check"></i>
+              <span class="text">
+                <h3 class="counter"><%= orderCount %></h3>
+                <p>Total Orders</p>
+              </span>
+            </li>
+          </a>
+          <a href="/admin-Users">
+            <li>
+              <i class="bx bxs-group"></i>
+              <span class="text">
+                <h3 class="counter"><%= userCount %></h3>
+                <p>Total Users</p>
+              </span>
+            </li>
+          </a>
+          <li>
+            <i class="bx bxs-dollar-circle"></i>
+            <span class="text">
+              <h3 class="counter"><%= totalSalesCount %></h3>
+              <p>Total Sales</p>
+            </span>
+          </li>
+        </ul>
+
+        <div class="dropdown">
+          <button
+            class="btn btn-secondary dropdown-toggle"
+            type="button"
+            id="dateRangeDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Select Date Range
+          </button>
+          <!-- Add onclick function to dropdown items -->
+          <ul class="dropdown-menu" aria-labelledby="dateRangeDropdown">
+            <li><a class="dropdown-item" href="#" onclick="fetchSalesData('daily')">Daily</a></li>
+            <li><a class="dropdown-item" href="#" onclick="fetchSalesData('weekly')">Weekly</a></li>
+            <li><a class="dropdown-item" href="#" onclick="fetchSalesData('monthly')">Monthly</a></li>
+            <li><a class="dropdown-item" href="#" onclick="fetchSalesData('yearly')">Yearly</a></li>
+          </ul>
+        </div>
+
+        <!-- Div for Sales Chart -->
+        <div class="sales-chart">
+          <canvas id="salesChart" height="100"></canvas>
+
+          <div class="row">
+            <!-- Left Column: Top 10 Products -->
+            <div class="col-md-6">
+              <div class="top-products bg-white p-3 rounded">
+                <h4>Top 10 Best Selling Products</h4>
+                <ul class="list-group">
+                  <% for (let i = 0; i < topSellingProducts.length; i++) { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <%= topSellingProducts[i].productDetails.pName %>
+                      <span class="badge bg-primary rounded-pill"><%= topSellingProducts[i].totalSold %> Sales</span>
+                    </li>
+                  <% } %>
+                </ul>
+              </div>
+            </div>
+    
+            <!-- Right Column: Top 10 Categories -->
+            <div class="col-md-6">
+              <div class="top-category-products bg-white p-3 rounded">
+                <h4>Top 10 Best Selling Categories</h4>
+                <ul class="list-group">
+                  <% for (let i = 0; i < topSellingCategories.length; i++) { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <%= topSellingCategories[i].categoryDetails.name %>
+                      <span class="badge bg-primary rounded-pill"><%= topSellingCategories[i].totalSold %> Sales</span>
+                    </li>
+                  <% } %>
+                </ul>
+              </div>
+            </div>
+          </div>
+    
+      </main>
+
+      <!-- Bootstrap modal for date range selection -->
+      <div
+        class="modal fade"
+        id="dateRangeModal"
+        tabindex="-1"
+        aria-labelledby="dateRangeModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="dateRangeModalLabel">Date Range</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="dateRangeForm" onsubmit="return false;">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="startDate"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="endDate"
+                    required
+                  />
+                </div>
+                <button type="button" class="btn btn-primary" onclick="downloadExcel()">Download Excel</button>
+                <!-- Add PDF download button -->
+<button type="button" class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- CONTENT -->
+
+    <!-- JavaScript section -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      $(document).ready(function () {
+        // Fetch yearly sales data by default
+        fetchSalesData('yearly');
+    
+        // Event listener for the download button
+        $('.btn-download').click(function () {
+          $('#dateRangeModal').modal('show');
+        });
+      });
+    
+      function downloadExcel() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const today = new Date().toISOString().split('T')[0];
+        
+        if(!startDate || !endDate){
+          Swal.fire({
+            icon:"error",
+            title:'Feild is Empty',
+            text:'Fill the field'
+          })
+          return; // Prevent further execution
+        }
+        // Validate date range
+        if (startDate > today || endDate > today || endDate < startDate) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid Date Range',
+            text: 'Please select a valid date range where both dates are not in the future and the start date is not after the end date.'
+          });
+        } else {
+          // Redirect to the backend endpoint to download the Excel file
+          window.location.href = `/exportOrder?startDate=${startDate}&endDate=${endDate}`;
+        }
+      }
+    </script>
+    <script>
+      // Function to handle PDF download
+      function downloadPDF() {
+          const startDate = document.getElementById('startDate').value;
+          const endDate = document.getElementById('endDate').value;
+          const today = new Date().toISOString().split('T')[0];
+          
+          if (!startDate || !endDate) {
+              Swal.fire({
+                  icon: "error",
+                  title: 'Field is Empty',
+                  text: 'Please fill in both start and end dates.'
+              });
+              return; // Prevent further execution
+          }
+  
+          // Validate date range
+          if (startDate > today || endDate > today || endDate < startDate) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Invalid Date Range',
+                  text: 'Please select a valid date range where both dates are not in the future and the start date is not after the end date.'
+              });
+          } else {
+              // Redirect to the backend endpoint to download the PDF file
+              window.location.href = `/exportOrderPDF?startDate=${startDate}&endDate=${endDate}`;
+          }
+      }
+  </script>  
+
+    <script>
+      let salesChart;
+
+      async function fetchSalesData(type) {
+        try {
+          const response = await fetch('/sales');
+          const data = await response.json();
+          processData(data.data, data.ordersDate, type);
+        } catch (error) {
+          console.error('Error fetching sales data:', error);
+        }
+      }
+
+      function processData(salesData, ordersDate, type) {
+    let chartData = {};
+    const currentDate = new Date();
+
+    // Create a mapping of order dates to their total quantities
+    const dateQuantityMap = {};
+    ordersDate.forEach((date, index) => {
+        const orderDate = new Date(date).toISOString().split('T')[0];
+        if (!dateQuantityMap[orderDate]) {
+            dateQuantityMap[orderDate] = 0;
+        }
+        dateQuantityMap[orderDate] += salesData[index] ? salesData[index].totalQuantity : 0;
+    });
+
+    if (type === 'daily') {
+        const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+        chartData = Array.from({ length: daysInMonth }, () => 0);
+
+        Object.keys(dateQuantityMap).forEach((date) => {
+            const orderDate = new Date(date);
+            if (orderDate.getMonth() === currentDate.getMonth() && orderDate.getFullYear() === currentDate.getFullYear()) {
+                chartData[orderDate.getDate() - 1] += dateQuantityMap[date];
+            }
+        });
+        renderChart(chartData, 'day');
+    } else if (type === 'weekly') {
+        const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        chartData = weekDays.reduce((acc, day) => ({ ...acc, [day]: 0 }), {});
+
+        Object.keys(dateQuantityMap).forEach((date) => {
+            const orderDate = new Date(date);
+            const weekDay = weekDays[orderDate.getDay()];
+            if (orderDate.getMonth() === currentDate.getMonth() && orderDate.getFullYear() === currentDate.getFullYear()) {
+                chartData[weekDay] += dateQuantityMap[date];
+            }
+        });
+        renderChart(chartData, 'week');
+    } else if (type === 'monthly') {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        chartData = months.reduce((acc, month) => ({ ...acc, [month]: 0 }), {});
+
+        Object.keys(dateQuantityMap).forEach((date) => {
+            const orderDate = new Date(date);
+            const month = months[orderDate.getMonth()];
+            if (orderDate.getFullYear() === currentDate.getFullYear()) {
+                chartData[month] += dateQuantityMap[date];
+            }
+        });
+        renderChart(chartData, 'month');
+    } else if (type === 'yearly') {
+        chartData = {};
+
+        Object.keys(dateQuantityMap).forEach((date) => {
+            const orderDate = new Date(date);
+            const year = orderDate.getFullYear();
+            if (!chartData[year]) {
+                chartData[year] = 0;
+            }
+            chartData[year] += dateQuantityMap[date];
+        });
+        renderChart(chartData, 'year');
+    }
+}
+
+function renderChart(data, labelType) {
+    if (salesChart) {
+        salesChart.destroy();
+    }
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labelType === 'day' 
+                ? Array.from({ length: data.length }, (_, i) => i + 1) // for daily
+                : Object.keys(data),
+            datasets: [{
+                label: 'Total Sales',
+                data: Object.values(data),
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Sales Data (' + labelType + ')'
+                }
+            }
+        }
+    });
+}
+
+    </script>
+  </body>
+</html>

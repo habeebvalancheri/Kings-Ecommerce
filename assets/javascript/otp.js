@@ -33,7 +33,6 @@ function startResendTimer() {
 
   resendButton.style.display = "none";
 
-
   // Get the stored countdown time from local storage
   let storedTime = localStorage.getItem("countDown");
   if (storedTime) {
@@ -76,6 +75,11 @@ document.addEventListener("DOMContentLoaded", () => {
 document.querySelector("form").addEventListener("submit", (event) => {
   if (timerEnded) {
     event.preventDefault();
-    alert("The OTP has expired. Please request a new one.");
+    Swal.fire({
+      title: "Expired OTP",
+      text: "The OTP has expired. Please request a new one.",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
   }
 });

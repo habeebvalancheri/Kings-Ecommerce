@@ -1,0 +1,140 @@
+<!-- Include Header -->
+<%- include('../include/header') %>
+<!-- /Include Header -->
+
+<!-- Load CDN Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<!-- /Load CDN Scripts -->
+
+<!-- Section for Orders -->
+<section class="my-5" style="background-color: #f5f5f7;">
+    <!-- Order Details Section -->
+    <div id="order-details-section" class="my-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h5>Order Details</h5>
+
+                    <% if (orderDetails && orderDetails.products && orderDetails.products.length > 0) { %>
+                        <p class="card-title" style="font-size: 12px;">
+                            Order ID: <strong><%= orderDetails._id %></strong>
+                        </p>
+                        
+
+                        
+                        <table class="table table-bordered bg-white shadow-sm rounded" id="order-details-table">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Discount</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            
+                            <% let subTotal = 0; %>
+                            <% let subDiscount = 0; %>
+                            <% let couponDiscountPrice = 0; %>
+                            <% let shippingCharge = 40; %>
+                            
+                            <tbody id="order-details-tbody">
+                                <% orderDetails.products.forEach(item => { %>
+                                    <tr>
+                                        <td>
+                                            <img src="/images/<%= item.pImages %>" alt="Product Image"  height="100" />
+                                        </td>
+                                        <td><%= item.pName %></td>
+                                        <td><%= item.quantity %> qt</td>
+                                        <td>₹<%= item.price %></td>
+                                        <td><%= item.discount %>%</td>
+
+                                        <% 
+                                            let price = item.price;
+                                            let discount = item.discount;
+                                            let totalCost = (price * item.quantity) - (price * item.quantity * discount)/100 + shippingCharge ;
+                                          
+                                            let couponDiscount = orderDetails.coupon.discount;
+                                            
+                                            couponDiscountPrice += (totalCost * couponDiscount/ 100)
+                                            
+                                            subTotal += price * item.quantity;
+                                            subDiscount += (price * discount/100 ) * item.quantity;
+                                            
+                                            couponDiscountPrice ? subDiscount += couponDiscountPrice:subDiscount;
+                                            
+                                            
+                                        %>
+                                        <td>₹<%= orderDetails.totalAmount.toFixed(2) %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+
+                                                <!-- Display shipping address, order date, and payment method once -->
+                                                <div>
+                                                  <p><strong>Shipping Address:</strong>
+                                                      <% if (orderDetails.shippingAddress) { %>
+                                                          <% const shippingAddress = orderDetails.shippingAddress; %>
+                                                          <span id="shipping-address">
+                                                              <%= `${shippingAddress.addresses}, ${shippingAddress.city}, ${shippingAddress.houseNo}, ${shippingAddress.postalCode}, ${shippingAddress.alternativeNumber}` %>
+                                                          </span>
+                                                      <% } else { %>
+                                                          <span id="shipping-address">Not available</span>
+                                                      <% } %>
+                                                  </p>
+                                                  <% if(orderDetails.coupon) {%>
+                                                  <p ><strong>Coupon Code:</strong> <span style="color:green" id="order-date"><%= orderDetails.coupon.code %></span></p>
+                                                  <% } else { %>
+                                                    <p><strong>Coupon Code:</strong> <span style="color:red" id="order-date">N/A</span></p>
+                                                    <% } %>
+                                                  <p><strong>Order Date:</strong> <span id="order-date"><%= orderDetails.orderDate %></span></p>
+                                                  <p><strong>Payment Method:</strong> <span id="payment-method"><%= orderDetails.paymentMethod %></span></p>
+                                              </div>
+                        
+                        <!-- Optionally display the order summary such as total and discount -->
+                        <div>
+                        
+                            <p><strong>Shipping cost:</strong> ₹<%= shippingCharge.toFixed(2) %></p>
+                            <p><strong>Sub Total:</strong> ₹<%= subTotal.toFixed(2) %></p>
+                            <p><strong>Sub Discount:</strong> ₹<%= subDiscount.toFixed(2) %></p>
+                            <% if(orderDetails.coupon) {%>
+                              
+                                <p><strong>Coupon Discount:</strong> ₹<%= couponDiscountPrice.toFixed(2) %></p>
+                                <% } else { %>
+                                  <p><strong>Coupon Discount:</strong>N/A</p>
+                                  <% } %>
+                            <!-- Optionally, you can calculate and display the grand total -->
+                        </div>
+
+                    <% } else { %>
+                        <!-- Message when no orders are available -->
+                        <div>
+                            <p class="text-center p-5">No Items in Orders</p>
+                        </div>
+                    <% } %>
+
+                    <button class="btn btn-secondary" id="back-to-orders">Back to Orders</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Order Details Section -->
+</section>
+
+<!-- Include Footer -->
+<%- include('../include/footer') %>
+<!-- /Include Footer -->
+
+<!-- Client-side script to handle back to orders button -->
+<script>
+    $(document).ready(function() {
+        $('#back-to-orders').click(function() {
+            // Implement the logic to navigate back to the orders page
+            // It could be a page reload or navigation to a specific URL
+            window.history.back();
+        });
+    });
+</script>

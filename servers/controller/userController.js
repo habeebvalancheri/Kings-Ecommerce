@@ -447,7 +447,7 @@ module.exports = {
 
       const categorys = await categoryDB.find({ active: true });
 
-      return res.render("ourStore", {
+      return res.render("user/ourStore", {
         products: products,
         category: categorys,
         page: page,
@@ -690,15 +690,19 @@ module.exports = {
       const userId = req.session.userId; // Assuming you have the user's ID in the session
 
       // Find the user's cart based on the user ID
-      let userCart = await cartDB.findOne({ userId });
+      let userCart = await cartDB
+        .findOne({ userId })
+        .populate("product.productId");
 
       // Calculate total quantity of all products
       let totalQuantity = 0;
       if (userCart && userCart.product.length > 0) {
-        totalQuantity = userCart.product.reduce(
-          (acc, item) => acc + item.quantity,
-          0
-        );
+        totalQuantity = userCart.product.reduce((acc, item) => {
+          if (item.productId && item.productId.active) {
+            return acc + item.quantity;
+          }
+          return acc;
+        }, 0);
       }
 
       return res.status(200).json({ totalQuantity });
@@ -712,15 +716,19 @@ module.exports = {
       const userId = req.session.userId; // Assuming you have the user's ID in the session
 
       // Find the user's wishList based on the user ID
-      let userWishList = await wishListDB.findOne({ userId });
+      let userWishList = await wishListDB
+        .findOne({ userId })
+        .populate("product.productId");
 
       // Calculate total quantity of all products
       let totalQuantity = 0;
       if (userWishList && userWishList.product.length > 0) {
-        totalQuantity = userWishList.product.reduce(
-          (acc, item) => acc + item.quantity,
-          0
-        );
+        totalQuantity = userWishList.product.reduce((acc, item) => {
+          if (item.productId && item.productId.active) {
+            return acc + item.quantity;
+          }
+          return acc;
+        }, 0);
       }
 
       return res.status(200).json({ totalQuantity });
@@ -812,17 +820,12 @@ module.exports = {
       req.session.userFullNameRequired = "";
       req.session.fullNameRegex = "";
       req.session.userEmailRequired = "";
-      req.session.emailRegex = "";
       req.session.userPhoneRequired = "";
       req.session.phoneRegex = "";
 
       // trim inpt fields
       const fullName = req.body.fullName;
-      const email = req.body.email;
       const phone = req.body.phone;
-      const currentPassword = req.body.currentPassword;
-      const newPassword = req.body.newPassword;
-      const confirmPassword = req.body.confirmPassword;
 
       // backend form validation
       if (!fullName) {
@@ -856,55 +859,113 @@ module.exports = {
         existingUser.name = fullName;
         existingUser.phone = phone;
 
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-
-        if (!currentPassword) {
-          req.session.errorCurrentPassword = "Current Password is required";
-        } else if (!passwordRegex.test(currentPassword)) {
-          req.session.currentPasswordRegex =
-            "Please enter a password that is at least 8 characters long and contains at least one letter and one number.";
-        } else {
-          const passwordMatch = await bcrypt.compare(
-            currentPassword,
-            existingUser.password
-          );
-
-          if (!passwordMatch) {
-            req.session.notMatchingCurrentPassword =
-              "Current Password is incorrect";
-            return res.redirect("/account-details");
-          } else {
-            if (!newPassword) {
-              req.session.errorNewPassword = "New Password is required";
-            } else if (!passwordRegex.test(newPassword)) {
-              req.session.newPasswordRegex =
-                "Please enter a password that is at least 8 characters long and contains at least one letter and one number.";
-            } else {
-              if (!confirmPassword) {
-                req.session.errorConfirmPassword =
-                  "Confirm Password is required";
-              } else if (!passwordRegex.test(confirmPassword)) {
-                req.session.confirmPasswordRegex =
-                  "Please enter a password that is at least 8 characters long and contains at least one letter and one number.";
-              } else {
-                if (newPassword !== confirmPassword) {
-                  req.session.notEqualPassword =
-                    "The new passsword confirm password are not matching";
-                } else if (newPassword && confirmPassword === currentPassword) {
-                  req.session.alreadyUsedPassword =
-                    "This password is already used";
-                } else {
-                  const hashedPassword = await bcrypt.hash(newPassword, 10);
-                  existingUser.password = hashedPassword;
-                }
-              }
-            }
-          }
-        }
         await existingUser.save();
 
         return res.redirect("/account-details");
       }
+    } catch (error) {
+      return res.redirect("/ClientServer-Error");
+    }
+  },
+
+  newPassword: async (req, res) => {
+    try {
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+
+      const userId = req.session.userId;
+
+      // Fetch user from DB
+      const existingUser = await userDB.findById(userId);
+
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+      if (!currentPassword) {
+        req.session.errorCurrentPassword = "Current Password is required";
+        return res.json({
+          success: false,
+          message: "Current Password is required",
+        });
+      } else if (!passwordRegex.test(currentPassword)) {
+        req.session.currentPasswordRegex =
+          "Please enter a password that is at least 8 characters long and contains at least one letter and one number.";
+        return res.json({
+          success: false,
+          message:
+            "Please enter a password that is at least 8 characters long and contains at least one letter and one number.",
+        });
+      } else {
+        const passwordMatch = await bcrypt.compare(
+          currentPassword,
+          existingUser.password
+        );
+
+        if (!passwordMatch) {
+          req.session.notMatchingCurrentPassword =
+            "Current Password is incorrect";
+          return res.json({
+            success: false,
+            message: "Current Password is incorrect",
+          });
+        } else {
+          if (!newPassword) {
+            req.session.errorNewPassword = "New Password is required";
+            return res.json({
+              success: false,
+              message: "New Password is required",
+            });
+          } else if (!passwordRegex.test(newPassword)) {
+            req.session.newPasswordRegex =
+              "Please enter a password that is at least 8 characters long and contains at least one letter and one number.";
+            return res.json({
+              success: false,
+              message:
+                "Please enter a password that is at least 8 characters long and contains at least one letter and one number.",
+            });
+          } else {
+            if (!confirmPassword) {
+              req.session.errorConfirmPassword = "Confirm Password is required";
+              return res.json({
+                success: false,
+                message: "Confirm Password is required",
+              });
+            } else if (!passwordRegex.test(confirmPassword)) {
+              req.session.confirmPasswordRegex =
+                "Please enter a password that is at least 8 characters long and contains at least one letter and one number.";
+              return res.json({
+                success: false,
+                message:
+                  "Please enter a password that is at least 8 characters long and contains at least one letter and one number.",
+              });
+            } else {
+              if (newPassword !== confirmPassword) {
+                req.session.notEqualPassword =
+                  "The new passsword confirm password are not matching";
+                return res.json({
+                  success: false,
+                  message:
+                    "The new passsword confirm password are not matching",
+                });
+              } else if (newPassword && confirmPassword === currentPassword) {
+                req.session.alreadyUsedPassword =
+                  "This password is already used";
+                return res.json({
+                  success: false,
+                  message: "This password is already used",
+                });
+              } else {
+                const hashedPassword = await bcrypt.hash(newPassword, 10);
+                existingUser.password = hashedPassword;
+              }
+            }
+          }
+        }
+      }
+
+      await existingUser.save();
+      return res.json({
+        success: true,
+        message: "Password changed successfully.",
+      });
     } catch (error) {
       return res.redirect("/ClientServer-Error");
     }
@@ -915,7 +976,6 @@ module.exports = {
       const productIds = req.query.id;
 
       req.session.productIdInCheckout = productIds
-
         .split(",")
         .map((id) => id.trim());
 
@@ -923,8 +983,18 @@ module.exports = {
         .findOne({ userId })
         .populate("product.productId");
 
+      // Filter out inactive products from cart items
+      const activeCartItems = cart?.product.filter(
+        (item) => item.productId.active
+      );
+
+      if (!activeCartItems || activeCartItems.length === 0) {
+        req.session.noProductInCart = "There are no products in cart to buy";
+        return res.redirect("/cart");
+      }
+
       let total = 0;
-      cart.product.forEach((item) => {
+      activeCartItems.forEach((item) => {
         let price = item.productId.price;
         let discount = item.productId.discount || 0;
         let subTotal = price * item.quantity;
@@ -945,14 +1015,14 @@ module.exports = {
       const { paymentMethod, couponCode, total } = req.body; // Retrieve payment method from request body
 
       if (paymentMethod !== "Online_Payment") {
-        throw new Error("Invalid payment method");
+        return res.status(500).json({ error: "Invalid payment method" });
       }
 
       // Convert total to paise and ensure it's an integer
       let amount = Math.round(total * 100);
 
       if (isNaN(amount) || amount <= 0) {
-        throw new Error("Invalid total amount");
+        return res.status(500).json({ error: "Invalid amount." });
       }
 
       if (couponCode) {
@@ -965,7 +1035,7 @@ module.exports = {
         if (coupon) {
           amount = amount;
         } else {
-          throw new Error("Invalid coupon code");
+          return res.status(500).json({ error: "Invalid coupon code" });
         }
       }
       const order = await razorPayInstance.orders.create({
@@ -986,16 +1056,19 @@ module.exports = {
       const { paymentMethod, total } = req.body;
 
       if (paymentMethod !== "wallet") {
-        throw new Error("Invalid payment method");
+        return res.status(500).json({ error: "Wallet not found." });
       }
 
-      const wallet = await walletDB.find({userId:userId});
+      let wallet = await walletDB.find({ userId: userId });
 
-      if(wallet.length === 0){
-       const newWallet = new walletDB({ userId :userId});
+      if (wallet.length === 0) {
+        const newWallet = new walletDB({ userId: userId });
         newWallet.walletBalance = 0;
+
         await newWallet.save();
       }
+
+      wallet = await walletDB.find({ userId: userId });
 
       if (wallet[0].walletBalance < total) {
         // Redirect to checkout if wallet balance is insufficient
@@ -1010,7 +1083,7 @@ module.exports = {
         status: "Success",
         transactionId: new mongoose.Types.ObjectId().toString(),
       });
-      await wallet[0].save()
+      await wallet[0].save();
 
       return res.status(200).json({ success: wallet });
     } catch (error) {
@@ -1019,6 +1092,7 @@ module.exports = {
   },
   couponCodeApply: async (req, res) => {
     try {
+      const userId = req.session.userId;
       const couponCode = req.body.coupon.trim();
       const productId = req.session.productIdInCheckout;
       let total = parseFloat(req.body.total);
@@ -1033,6 +1107,7 @@ module.exports = {
 
       const products = await productDB.find({
         _id: { $in: productId.map((id) => new mongoose.Types.ObjectId(id)) },
+        active: true,
       });
 
       if (!products || products.length === 0) {
@@ -1048,7 +1123,7 @@ module.exports = {
       if (!coupons) {
         return res.json({ error: "The entered coupon code is not valid." });
       }
-
+      
       let isValid = false;
       let discountAmount = 0;
       let couponDiscount = 0;
@@ -1096,6 +1171,7 @@ module.exports = {
 
               // Check if the coupon has already been applied
               const appliedCoupon = await orderDB.findOne({
+                "user.userId": userId,
                 "coupon.couponApplied": coupons._id.toString(),
               });
 
@@ -1292,6 +1368,37 @@ module.exports = {
       req.session.cartProducts = cartProducts;
       // const productDBId = await productDB.find({})
 
+      const activeProducts = [];
+      // Check stock availability and create orders
+      for (const product of cartProducts.product) {
+        const productInDB = await productDB.findById(product.productId._id); // Fetch product from DB
+        if (productInDB && productInDB.active) {
+          // Check if stock is available
+          if (productInDB.stock < product.quantity) {
+            req.session.stockError = `Insufficient stock for ${product.productId.pName}. Available: ${productInDB.stock}`;
+
+            return res.redirect("/checkout");
+          }
+          activeProducts.push({
+            productId: product.productId._id,
+            pName: product.productId.pName,
+            pImages: product.productId.pImages[0],
+            category: product.productId.category,
+            description: product.productId.description,
+            price: product.productId.price,
+            discount: product.productId.discount,
+            quantity: product.quantity,
+            status: "Pending",
+          });
+        }
+      }
+
+      if (activeProducts.length === 0) {
+        req.session.errorActiveProducts =
+          "No active products available for purchase.";
+        return res.redirect("/checkout");
+      }
+
       let couponDiscount = 0; // Initialize coupon discount to 0
       let couponId = ""; // Initialize coupon name to an empty string
       let couponCategory = ""; // Initialize coupon category
@@ -1311,18 +1418,6 @@ module.exports = {
         couponDiscount = coupon.discount;
         couponId = coupon._id;
         couponCategory = coupon.category;
-      }
-
-      // Check stock availability and create orders
-      for (const product of cartProducts.product) {
-        const productInDB = await productDB.findById(product.productId._id); // Fetch product from DB
-
-        // Check if stock is available
-        if (productInDB.stock < product.quantity) {
-          req.session.stockError = `Insufficient stock for ${product.productId.pName}. Available: ${productInDB.stock}`;
-          console.log(`Insufficient stock for ${product.productId.name}`);
-          return res.redirect("/checkout");
-        }
       }
 
       // Validation for total amount greater than 1000 and COD payment method
@@ -1349,14 +1444,14 @@ module.exports = {
           email: email,
           phone: phone,
         },
-        products: cartProducts.product.map((item) => ({
-          productId: item.productId._id, // Assuming you're storing the ID of the product
-          pName: item.productId.pName,
-          pImages: item.productId.pImages[0],
-          category: item.productId.category,
-          description: item.productId.description,
-          price: item.productId.price,
-          discount: item.productId.discount,
+        products: activeProducts.map((item) => ({
+          productId: item.productId, // Assuming you're storing the ID of the product
+          pName: item.pName,
+          pImages: item.pImages,
+          category: item.category,
+          description: item.description,
+          price: item.price,
+          discount: item.discount,
           quantity: item.quantity, // Use the quantity from cart directly
           status: "Pending",
           // Include other necessary fields from product as needed
@@ -1502,7 +1597,7 @@ module.exports = {
 
         order.totalAmount = ttlsum;
 
-        let wallet = await walletDB.findOne({});
+        let wallet = await walletDB.findOne({ userId: userId });
 
         if (!wallet) {
           wallet = new walletDB({ userId }); // Create a new wallet document if none exists

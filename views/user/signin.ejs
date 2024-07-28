@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kings</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/stylesheet/userSignin.css">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"></script>
+  <style>
+    .errorP {
+      color: red;
+      font-size: small;
+    }
+  </style>
+</head>
+
+<body>
+  <section class="vh-100" style="background-color: #fff;">
+    <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+      <div class="container h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+            <div class="card" style="border-radius: 15px;">
+              <div class="card-body p-5" style="border-radius: 39px; background: rgba(220, 220, 220, 0.4); box-shadow: 5px 15px 15px rgba(0, 0, 0, 0.2);">
+                <h2 class="text-uppercase text-center mb-5" style="color: #000; font-weight: bold;">Login</h2>
+                <form method="post" action="/api/signinUser">
+                  <div class="form mb-4">
+                    <input type="email" name="email" id="form3Example3cg" class="form-control form-control-lg <%= (invalidEmail2 || notExists || accountBlocked) ? 'border-danger' : '' %>" placeholder="Email" />
+                    <br>
+                    <p class="errorP <%= !emailRequired2 ? 'd-none' : '' %>"><%= emailRequired2 %></p>
+                    <p class="errorP <%= !invalidEmail2 ? 'd-none' : '' %>"><%= invalidEmail2 %></p>
+                    <p class="errorP <%= !notExists ? 'd-none' : '' %>"><%= notExists %></p>
+                    <p class="errorP <%= !accountBlocked ? 'd-none' : '' %>"><%= accountBlocked %></p>
+                  </div>
+                  <div class="form mb-4">
+                    <input type="password" name="password" id="form3Example4cg" class="form-control form-control-lg <%= passwordRequired2 ? 'border-danger' : '' %>" placeholder="Password" />
+                    <br>
+                    <p class="errorP <%= !passwordRequired2 ? 'd-none' : '' %>"><%= passwordRequired2 %></p>
+                    <p class="errorP <%= !passwordNotValid ? 'd-none' : '' %>"><%= passwordNotValid %></p>
+                    <p class="errorP <%= !passInclude2 ? 'd-none' : '' %>"><%= passInclude2 %></p>
+                  </div>
+                  <a href="/forgot-password" class="fw-bold text-body d-block mb-3"><u>Forgot Password?</u></a>
+                  <div class="d-flex justify-content-center">
+                    <button class="btn btn-success btn-block btn-lg" style="border: 1px solid #000; background: #00DCFA; color: #000; width: 100%; height: 70px;">Sign In</button>
+                  </div>
+                  <p class="text-center text-muted mt-5 mb-0">Don't have an account? <a href="/signup" class="fw-bold text-body"><u>Signup here</u></a></p>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+
+</html>

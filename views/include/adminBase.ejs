@@ -9,6 +9,16 @@
   <!-- My CSS -->
   <link rel="stylesheet" href="/stylesheet/adminDashboard.css">
   <title>Admin</title>
+  <style>
+    .side-menu .active {
+  background-color: #f0f0f0; /* Change to your desired highlight color */
+  color: #333; /* Change to your desired text color */
+}
+.side-menu .active .text {
+  font-weight: bold; /* Make the text bold for the active item */
+}
+
+  </style>
 </head>
 <body>
   <!-- SIDEBAR -->
@@ -97,6 +107,30 @@
     <!-- NAVBAR -->
     <!-- MAIN -->
   </section>
+  <script>
+  // Get all sidebar menu items
+  const menuItems = document.querySelectorAll('.side-menu li a');
+
+  // Add click event listener to each menu item
+  menuItems.forEach(item => {
+    item.addEventListener('click', (event) => {
+      // Remove active class from all menu items
+      menuItems.forEach(i => i.parentElement.classList.remove('active'));
+
+      // Add active class to the clicked menu item
+      event.currentTarget.parentElement.classList.add('active');
+    });
+  });
+
+  // Optionally, highlight the menu item based on the current URL
+  const currentPath = window.location.pathname;
+  menuItems.forEach(item => {
+    if (item.getAttribute('href') === currentPath) {
+      item.parentElement.classList.add('active');
+    }
+  });
+</script>
+
   <!-- CONTENT -->
 </body>
 </html>
