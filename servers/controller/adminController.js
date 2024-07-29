@@ -12,7 +12,7 @@ const upload = require("../controller/multerSetup");
 const multer = require("multer");
 const path = require("path");
 const ejs = require("ejs");
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 const PDFDocument = require("pdfkit");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid"); // Import uuidv4 from the uuid package
@@ -867,7 +867,7 @@ module.exports = {
       // const ejsData = await ejs.renderFile(ejsTemplate, data);
 
       // Launch a new instance of Puppeteer
-      const browser = await puppeteer.launch({ headless: true });
+      const browser = await puppeteer.launch({ headless: "new", executablePath: '/snap/bin/chromium' });
       const page = await browser.newPage();
       await page.setContent(ejsData, { waitUntil: "networkidle0" });
 
