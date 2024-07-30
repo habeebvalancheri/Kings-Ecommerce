@@ -210,6 +210,7 @@ exports.updateProductsPage = async (req, res) => {
     const discountRegexerror2 = req.session.discountRegexerror2;
     const categoryError2 = req.session.categoryError2;
     const generalError = req.session.generalError;
+    const imageCount = req.session.imageCount;
 
     // Read the session form data
     const formData = req.session.formData || {};
@@ -224,6 +225,7 @@ exports.updateProductsPage = async (req, res) => {
     req.session.generalError = "";
     // Clear the session error message after reading
     req.session.imageError2 = "";
+    req.session.imageCount = "";
 
     return res.render("admin/updateProducts", {
       id: id,
@@ -238,6 +240,7 @@ exports.updateProductsPage = async (req, res) => {
       discountRegexerror2,
       categoryError2,
       generalError,
+      imageCount,
       categoryName,
       formData,
     });
@@ -663,7 +666,6 @@ exports.addOfferPage = async (req, res) => {
     const offerExists = req.session.offerExists;
     const validFrom = req.session.validFrom2;
     const validTo = req.session.validTo2;
-
     const errorMessage = req.session.errorMessage;
 
     // Clear the message after fetching it
@@ -676,6 +678,10 @@ exports.addOfferPage = async (req, res) => {
     req.session.offerExists = "";
     req.session.validFrom2 = "";
     req.session.validTo2 = "";
+    req.session.categoryCode = "";
+    req.session.discount = "";
+    req.session.validFromValue = "";
+    req.session.validToValue = "";
 
     return res.render("admin/addOffer", {
       categoryError,

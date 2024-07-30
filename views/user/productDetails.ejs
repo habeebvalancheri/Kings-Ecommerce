@@ -65,6 +65,9 @@
 <!-- Thumbnail Images with Added Gap -->
 <div class="d-flex justify-content-center mb-3">
   <% for (let i = 0; i < Math.min(4, products.pImages.length); i++) { %>
+    <% let itemPrice = products.price * 1; %>
+    <% let itemDiscount = products.discount * 1 %>
+    <% total = itemPrice - (itemPrice * itemDiscount /100) %>
     <a data-fslightbox="mygalley" class="border mx-2 rounded-2 thumbnail-link" data-type="image" data-index="<%= i %>"
       href="/images/<%= products.pImages[i] %>">
       <img width="60" height="60" class="rounded-2" src="/images/<%= products.pImages[i] %>" />
@@ -98,7 +101,7 @@
             
             <div class="mb-3">
               <span class="h5">
-                ₹<%= products.price.toLocaleString('en-IN')  %> 
+                ₹<%= total.toLocaleString('en-IN')  %> 
               </span>
               <span class="text-muted"></span>
             </div>

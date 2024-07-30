@@ -948,19 +948,19 @@
                   body: JSON.stringify({
                     paymentMethod: paymentMethod,
                     formData,
-                    total,
+                    total:total = 0,
                     couponCode,
                   }), // Include payment method in the request body
                 })
                   .then((response) => {
                     // Clear cart quantity data from local storage
 
-                    // Clear cart quantity data from local storage
-
-                    localStorage.removeItem(productId);
-                    localStorage.clear();
-
                     window.location.href = "/order";
+
+                     // Clear cart quantity data from local storage
+
+                     localStorage.removeItem(productId);
+                    localStorage.clear();
                   })
 
                   .catch((error) => {

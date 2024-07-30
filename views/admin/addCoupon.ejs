@@ -31,7 +31,7 @@
               <p class="errorP <%= !couponCodeError ? 'd-none' : '' %>"><%= couponCodeError %></p>
               <p class="errorP <%= !couponCodeRegex ? 'd-none' : '' %>"><%= couponCodeRegex %></p>
               <p class="errorP <%= !couponExists ? 'd-none' : '' %>"><%= couponExists %></p>
-              <p class="errorP <%= !categoryNotFound ? 'd-none' : '' %>"><%= categoryNotFound %></p>
+              
             </div>
             <div class="form-group">
               <label for="discount">Discount (%)</label>
@@ -50,6 +50,7 @@
               </select>
               <small id="category-error" class="text-danger"></small>
               <p class="errorP <%= !categoryError ? 'd-none' : '' %>"><%= categoryError %></p>
+              <p class="errorP <%= !categoryNotFound ? 'd-none' : '' %>"><%= categoryNotFound %></p>
             </div>
             <div class="form-group">
               <label for="max-amount">coupon count</label>

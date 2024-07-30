@@ -196,11 +196,21 @@ exports.productDetailsPage = async (req, res) => {
   try {
     id = req.query.id;
 
+    const userLoggedEmail = req.session.userLoggedIn;
+
     const productsDetails = await productDB.findById(id);
     const users = await userDB.find({ verified: true }, { block: false });
     const category = await categoryDB.find({ active: true });
 
+    // Find the user with the provided email
+    const user = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     return res.render("user/productDetails", {
+      user: user || null,
       products: productsDetails,
       users,
       category,
@@ -266,6 +276,7 @@ exports.accountDetailsPage = async (req, res) => {
 
 exports.wishlistPage = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
     const userId = req.session.userId;
     const wishListItems = await wishListDB
       .findOne({ userId })
@@ -277,7 +288,15 @@ exports.wishlistPage = async (req, res) => {
     );
     const category = await categoryDB.find({ active: true });
 
+    // Find the user with the provided email
+    const user = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     return res.render("user/wishlist", {
+      user: user || null,
       category: category,
       wishListItems: activeWishListItems,
     });
@@ -288,6 +307,7 @@ exports.wishlistPage = async (req, res) => {
 
 exports.cartPage = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
     const userId = req.session.userId;
 
     // Find cart items and populate product details
@@ -305,9 +325,17 @@ exports.cartPage = async (req, res) => {
     // Fetch active categories
     const category = await categoryDB.find({ active: true });
 
+    // Find the user with the provided email
+    const user = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     req.session.noProductInCart = "";
 
     return res.render("user/cart", {
+      user: user || null,
       category: category,
       cartItems: activeCartItems, // Pass active cart items to the template
       noProductsInCart,
@@ -319,6 +347,7 @@ exports.cartPage = async (req, res) => {
 
 exports.addressPage = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
     const userId = req.session.userId;
 
     const user = await userDB.findById({ _id: userId }).populate("addresses");
@@ -336,7 +365,15 @@ exports.addressPage = async (req, res) => {
 
     const category = await categoryDB.find({ active: true });
 
+    // Find the user with the provided email
+    const users = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     return res.render("user/addresses", {
+      user: users || null,
       category,
       addressesOnPage: addressesOnPage,
       totalPages: totalPages,
@@ -349,6 +386,8 @@ exports.addressPage = async (req, res) => {
 
 exports.addAddressPage = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
+
     const errorfullName = req.session.errorfullName;
     const minFullName = req.session.minFullName;
     const errorAddress = req.session.errorAddress;
@@ -368,6 +407,13 @@ exports.addAddressPage = async (req, res) => {
 
     const category = await categoryDB.find({ active: true });
 
+    // Find the user with the provided email
+    const user = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     req.session.errorfullName = "";
     req.session.minFullName = "";
     req.session.errorAddress = "";
@@ -386,6 +432,7 @@ exports.addAddressPage = async (req, res) => {
     req.session.mobileRegex = "";
 
     return res.render("user/addAddress", {
+      user: user || null,
       errorfullName,
       minFullName,
       errorAddress,
@@ -412,6 +459,8 @@ exports.addAddressPage = async (req, res) => {
 
 exports.addressEdit = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
+
     const errorfullName = req.session.errorfullName;
     const minFullName = req.session.minFullName;
     const errorAddress = req.session.errorAddress;
@@ -434,6 +483,13 @@ exports.addressEdit = async (req, res) => {
     const address = await addressDB.findOne({ _id: addressId });
     const category = await categoryDB.find({ active: true });
 
+    // Find the user with the provided email
+    const user = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     req.session.errorfullName = "";
     req.session.minFullName = "";
     req.session.errorAddress = "";
@@ -452,6 +508,7 @@ exports.addressEdit = async (req, res) => {
     req.session.mobileRegex = "";
 
     return res.render("user/editAddress", {
+      user: user || null,
       errorfullName,
       minFullName,
       errorAddress,
@@ -479,6 +536,8 @@ exports.addressEdit = async (req, res) => {
 
 exports.checkoutPage = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
+
     req.session.shippinCostAdded = "";
 
     const userId = req.session.userId;
@@ -514,6 +573,13 @@ exports.checkoutPage = async (req, res) => {
     }
 
     const category = await categoryDB.find({ active: true });
+
+    // Find the user with the provided email
+    const users = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
 
     const errorfullName = req.session.errorfullName;
     const minFullName = req.session.minFullName;
@@ -561,6 +627,7 @@ exports.checkoutPage = async (req, res) => {
     req.session.errorActiveProducts = "";
 
     return res.render("user/checkOut", {
+      user: users || null,
       category: category,
       user: user,
       cart: activeCartItems,
@@ -602,6 +669,8 @@ exports.checkoutPage = async (req, res) => {
 
 exports.orderPage = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
+
     const userId = req.session.userId;
 
     // Retrieve the page and size parameters from the query string
@@ -619,6 +688,13 @@ exports.orderPage = async (req, res) => {
       .skip(offset)
       .limit(limit);
 
+    // Find the user with the provided email
+    const user = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     // Count the total number of orders for the user
     const totalOrders = await orderDB.countDocuments();
 
@@ -626,6 +702,7 @@ exports.orderPage = async (req, res) => {
     const totalPages = Math.ceil(totalOrders / size);
 
     return res.render("user/order", {
+      user: user || null,
       category: category,
       orders: orders,
       page: page,
@@ -639,6 +716,8 @@ exports.orderPage = async (req, res) => {
 
 exports.walletPage = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
+
     const userId = req.session.userId;
 
     const category = await categoryDB.find({ active: true });
@@ -661,7 +740,15 @@ exports.walletPage = async (req, res) => {
       wallet.currentPage = page;
     }
 
+    // Find the user with the provided email
+    const user = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     return res.render("user/wallet", {
+      user: user || null,
       category: category,
       wallet: wallet || { transactions: [], totalPages: 0, currentPage: 1 },
     });
@@ -672,6 +759,8 @@ exports.walletPage = async (req, res) => {
 
 exports.orderDetails = async (req, res) => {
   try {
+    const userLoggedEmail = req.session.userLoggedIn;
+
     const orderId = req.query.orderId;
 
     const category = await categoryDB.find({ active: true });
@@ -680,7 +769,15 @@ exports.orderDetails = async (req, res) => {
       .findOne({ _id: orderId })
       .populate("products.productId");
 
+    // Find the user with the provided email
+    const user = await userDB.findOne({
+      email: userLoggedEmail,
+      block: false,
+      verified: true,
+    });
+
     return res.render("user/orderDetails", {
+      user: user || null,
       category: category,
       orderDetails: orderDetails,
     });

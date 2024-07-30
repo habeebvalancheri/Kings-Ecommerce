@@ -228,28 +228,6 @@
           <!-- Left links -->
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <!-- Navbar dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
-                data-mdb-toggle="dropdown" aria-expanded="false" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
-                line-height: 18px;
-                font-weight: 400;
-                text-transform: uppercase;
-                letter-spacing: .3px;">
-                SHOW CATEGORIES
-              </a>
-              <!-- Dropdown menu -->
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <% for(let i=0; i<categories.length;i++) {%>
-                  <li>
-                    <a class="dropdown-item "
-                      style="color: white; background-color: #232F3E;font-family: 'Rubik', sans-serif"
-                      href="/products?category=<%= categories[i]._id  %>">
-                      <%= categories[i].name %>
-                    </a>
-                  </li>
-                  <% } %>
-              </ul>
-            </li>
 
             <li class="nav-item">
               <a class="nav-link text-white" href="#" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
@@ -323,6 +301,9 @@
     
         <div class="row">
           <% for(let i = 0; i < Math.min(products.length, 12); i++) { %>
+            <% var discount=products[i].discount %>
+                  <% var originalPrice=products[i].price %>
+                  <% var discountedPrice=originalPrice - (originalPrice * discount / 100) %>
             <div class="col-lg-2 mt-3 col-md-3 col-sm-4 d-flex">
               <a href="/product-Details?id=<%= products[i]._id %>" class="product-link"> 
               <div id="card" class="card w-100 my-2 border" style="box-shadow: 0 0 10px #0000001a;">
@@ -343,9 +324,13 @@
                   <h6 class="card-title" style="color: #1c1b1b; font-family: 'Rubik', sans-serif; font-size: 15px; font-weight: 600;">
                     <%= products[i].pName %>
                   </h6>
-    
-                  <p class="card-text" style="font-weight: 400; font-size: 16px; letter-spacing: .3px; color: #1c1b1b; font-family: 'Rubik', sans-serif;">
-                    ₹<%= products[i].price %>
+                  <p class="card-text" style="color: #e02b40;">
+                    <% if(discount > 0) {%>
+                      <span class="original-price"
+                        style="color: #131921; text-decoration: line-through;">₹<%= originalPrice %>
+                      </span>
+                      <% } %>
+                        ₹<%= discountedPrice  %>
                   </p>
                 </div>
     

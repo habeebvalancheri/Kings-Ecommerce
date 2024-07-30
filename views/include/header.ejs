@@ -149,16 +149,41 @@
           <div class="order-lg-last col-lg-5 col-sm-8 col-8">
             <div class="d-flex float-end">
              
-              <a href="/Wish-list" class="me-1  py-1 px-3 nav-link"
-              style="color: #1E3050;" > <i class="fas fa-heart m-1 me-md-2"></i>
-                <p class="d-none d-md-block mb-0">Wishlist <span id="total-wishList-items" class= "badge rounded-circle bg-danger position-absolute" >0</span></p>
-              </a>
-             
-              <a href="/cart" class=" py-1 px-3 nav-link" 
-              style="color: #1E3050;" > <i class="fas fa-shopping-cart m-1 me-md-2 " ></i>
-              
-              <p class="d-none d-md-block mb-0">Cart <span id="total-cart-items" class= "badge rounded-circle bg-danger position-absolute" >0</span></p> 
-            </a>
+              <% if(user) {%>
+                <a href="/account-details" class="me-1 py-1 px-3 nav-link" style="color: #1E3050;">
+                  <i class="fas fa-user-alt m-1 me-md-2"></i>
+                  <p class="d-none d-md-block mb-0">Account</p>
+                </a>
+                <% } else { %>
+                  <a href="/signin" class="me-1  py-1 px-3 nav-link" style="color: #1E3050;"> <i
+                      class="fas fa-user-alt m-1 me-md-2"></i>
+                    <p class="d-none d-md-block mb-0">Login in</p>
+                  </a>
+                  <% } %>
+                  <% if(user) {%>
+                    <a href="/Wish-list" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
+                        class="fas fa-heart m-1 me-md-2 "></i>
+
+                      <p class="d-none d-md-block mb-0">Wishlist <span id="total-wishList-items" class= "badge rounded-circle bg-danger position-absolute" >0</span></p>
+                    </a>
+                    <% }else{ %>
+                      <a href="/signin" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
+                          class="fas fa-heart m-1 me-md-2 "></i>
+                        <p class="d-none d-md-block mb-0">Wishlist</p>
+                      </a>
+                      <% } %>
+                        <% if(user) {%>
+                          <a href="/cart" class=" py-1 px-3 nav-link" 
+                          style="color: #1E3050;" > <i class="fas fa-shopping-cart m-1 me-md-2 " ></i>
+                          
+                          <p class="d-none d-md-block mb-0">Cart <span id="total-cart-items" class= "badge rounded-circle bg-danger position-absolute" >0</span></p> 
+                        </a>
+                          <% }else{ %>
+                            <a href="/signin" class=" py-1 px-3 nav-link" style="color: #1E3050;"> <i
+                                class="fas fa-shopping-cart m-1 me-md-2 "></i>
+                              <p class="d-none d-md-block mb-0">cart</p>
+                            </a>
+                            <% } %>
              
             </div>
           </div>
@@ -203,28 +228,6 @@
         <!-- Left links -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <!-- Navbar dropdown -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
-              data-mdb-toggle="dropdown" aria-expanded="false" style="font-family: 'Rubik', sans-serif;    font-size: 14px;
-              line-height: 18px;
-              font-weight: 400;
-              text-transform: uppercase;
-              letter-spacing: .3px;">
-              SHOW CATEGORIES
-            </a>
-            <!-- Dropdown menu -->
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <% for(let i=0; i<category.length;i++) {%>
-                <li>
-                  <a class="dropdown-item "
-                    style="color: white; background-color: #232F3E;font-family: 'Rubik', sans-serif"
-                    href="/products?category=<%= category[i]._id  %>">
-                    <%= category[i].name %>
-                  </a>
-                </li>
-                <% } %>
-            </ul>
-          </li>
 
           <li class="nav-item">
             <a class="nav-link text-white" href="/" style="font-family: 'Rubik', sans-serif;    font-size: 14px;

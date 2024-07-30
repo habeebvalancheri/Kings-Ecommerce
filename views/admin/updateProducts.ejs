@@ -162,6 +162,7 @@
               <input type="file" class="form-control-file" id="image" name="image" multiple accept="image/*">
             </div>
             <p class="errorP <%= !imageError2 ? 'd-none' : '' %>"><%= imageError2 %></p>
+            <p class="errorP <%= !imageCount ? 'd-none' : '' %>"><%= imageCount %></p>
             <br>
             <button type="submit" class="btn btn-primary">Upload Images</button>
           </form>

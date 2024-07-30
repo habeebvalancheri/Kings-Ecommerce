@@ -387,6 +387,14 @@ module.exports = {
       const email = req.session.email;
       const minPrice = req.query.minPrice || 0;
       const maxPrice = req.query.maxPrice || Number.MAX_SAFE_INTEGER;
+      const userLoggedEmail = req.session.userLoggedIn;
+
+      // Find the user with the provided email
+      const user = await userDB.findOne({
+        email: userLoggedEmail,
+        block: false,
+        verified: true,
+      });
 
       // Check if category is "All" and adjust the query accordingly
       let categoryDetails;
@@ -404,25 +412,10 @@ module.exports = {
       req.session.categoryy =
         category === "All" ? ["All"] : category.split(",");
 
-      // Split and parse the sort parameter
-      let sortBy = {};
-      if (
-        sort === "price,asc" ||
-        sort === "price,desc" ||
-        sort === "createdAt,desc"
-      ) {
-        const [sortField, sortOrder] = sort.split(",");
-        sortBy[sortField] = sortOrder;
-      } else {
-        // Default sorting by price if invalid or no sorting parameter provided
-        sortBy["price"] = "asc";
-      }
-
       // Query products based on search, category, price range, and pagination
       let query = {
         active: true,
         categoryStats: true,
-        price: { $gte: minPrice, $lte: maxPrice },
       };
 
       if (search) {
@@ -434,20 +427,55 @@ module.exports = {
         .where("category")
         .in(categoryDetails)
         .populate("category")
-        .sort(sortBy)
-        .skip((page - 1) * itemsPerPage)
-        .limit(itemsPerPage);
+        .lean();
+
+      // Calculate discountedPrice for each product
+      products = products
+        .map((product) => {
+          product.discountedPrice =
+            product.price - (product.price * product.discount) / 100;
+          return product;
+        })
+        .filter(
+          (product) =>
+            product.discountedPrice >= minPrice &&
+            product.discountedPrice <= maxPrice
+        );
+
+      // Split and parse the sort parameter
+      let sortBy = {};
+      if (sort === "price,asc" || sort === "price,desc") {
+        const [sortField, sortOrder] = sort.split(",");
+        sortBy["discountedPrice"] = sortOrder === "asc" ? 1 : -1;
+      } else if (sort === "createdAt,desc") {
+        sortBy["createdAt"] = -1;
+      } else {
+        // Default sorting by price (asc) if invalid or no sorting parameter provided
+        sortBy["discountedPrice"] = 1;
+      }
+
+      // Sort the products based on the sortBy criteria
+      products.sort((a, b) => {
+        for (let key in sortBy) {
+          if (a[key] < b[key]) return sortBy[key] === 1 ? -1 : 1;
+          if (a[key] > b[key]) return sortBy[key] === 1 ? 1 : -1;
+        }
+        return 0;
+      });
 
       const total = await productDB.countDocuments({
         category: { $in: categoryDetails },
         ...query,
       });
 
+      products = products.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
       const noPages = Math.ceil(total / itemsPerPage);
 
       const categorys = await categoryDB.find({ active: true });
 
       return res.render("user/ourStore", {
+        users: user || null,
         products: products,
         category: categorys,
         page: page,
@@ -1123,7 +1151,7 @@ module.exports = {
       if (!coupons) {
         return res.json({ error: "The entered coupon code is not valid." });
       }
-      
+
       let isValid = false;
       let discountAmount = 0;
       let couponDiscount = 0;
@@ -1479,7 +1507,7 @@ module.exports = {
       // Save the order document to the database
       const savedOrder = await newOrder.save();
       req.session.orderId = savedOrder._id;
-
+      
       if (couponCode) {
         await couponDB.findOneAndUpdate(
           {
@@ -1614,7 +1642,12 @@ module.exports = {
         });
         await wallet.save();
       }
-      // Save the updated order
+
+      // Update the status of the specific product to "Cancelled"
+      productToCancel.status = "Cancelled";
+
+      productToCancel.cancelReason = reason === "Other" ? customReason : reason; // Set the cancellation reason
+
       // Save the updated order and product
       await Promise.all([order.save(), productInDB.save()]);
 
@@ -1705,6 +1738,7 @@ module.exports = {
         orders.products.forEach((product) => {
           doc.fontSize(12).text(`Product Name:${product.pName}`);
           doc.text(`Product Price: ₹${product.price.toFixed(2)}`);
+          doc.text(`Product Discount: ${product.discount}%`);
           doc.text(`Product Quantity: ${product.quantity}`);
         });
 

@@ -16,10 +16,13 @@
                         <h4 class="card-title mb-4">Your shopping cart</h4>
                         <% let totalPrice = 0; %> <!-- Initialize total price variable -->
                         <% let totalItems = 0; %> <!-- Initialize total items variable -->
+                        <% let total = 0; %>
                         <% if (cartItems && cartItems.length > 0 ) { %>
                         
                         <% cartItems.forEach(item => { %>
-                        <% let itemPrice = item.productId.price * item.quantity; %> <!-- Calculate item price -->
+                        <% let itemPrice = item.productId.price * item.quantity; %> 
+                        <% let itemDiscount = item.productId.discount * item.quantity %><!-- Calculate item price -->
+                        <% total = itemPrice - (itemPrice * itemDiscount /100) %>
                         <% totalPrice += itemPrice; %> <!-- Add item price to total price -->
                         <% totalItems += item.quantity; %> <!-- Add item quantity to total items -->
                         <div class="row gy-3 mb-4">
@@ -32,7 +35,7 @@
                                                 <%= item.productId.pName %>
                                             </a>
                                             <p class="text-muted">
-                                                <%= item.productId.price %>
+                                                <%= total %>
                                                 <small class="text-muted text-nowrap">₹ / per item</small>
                                             </p>
                                         </div>
@@ -53,7 +56,7 @@
                                         <button class="btn btn-white border border-secondary px-3 decrease-btn" type="button" data-product-id="<%= item.productId._id %>">
                                             <i class="fas fa-minus"></i>
                                         </button>
-                                        <input id="quInput_<%= item.productId._id %>" class="form-control text-center border border-secondary quantity-input" placeholder="<%= item.quantity %>" data-product-id="<%= item.productId._id %>" data-price="<%= item.productId.price %>" data-stock="<%= item.productId.stock %>" min="1" type="number"/>
+                                        <input id="quInput_<%= item.productId._id %>" class="form-control text-center border border-secondary quantity-input" placeholder="<%= item.quantity %>" data-product-id="<%= item.productId._id %>" data-price="<%= item.productId.price %>" data-discount="<%= item.productId.discount %>" data-stock="<%= item.productId.stock %>" min="1" type="number"/>
                                         <button class="btn btn-white border border-secondary px-3 increase-btn" type="button" data-product-id="<%= item.productId._id %>">
                                             <i class="fas fa-plus"></i>
                                         </button>
@@ -269,9 +272,12 @@
                     const inputField = container.querySelector('.quantity-input');
                     const quantity = Number(inputField.value);
                     const price = Number(inputField.dataset.price);
-                    const itemPrice = quantity * price; 
-                    subtotal += quantity * price;
-                    totalItems += quantity;
+                    const discount = Number(inputField.dataset.discount); // Get the discount value
+            const discountedPrice = price - (price * discount / 100); // Calculate the discounted price
+
+            const itemPrice = quantity * discountedPrice; 
+            subtotal += itemPrice;
+            totalItems += quantity;
     
                     // Update the price element for this item
                     const priceElementId = 'indPrice_' + inputField.dataset.productId;

@@ -357,7 +357,9 @@ module.exports = {
 
       // Ensure only four images are saved
       const selectedImages = products.pImages.slice(0, 4);
-
+      if (products.pImages.length < 4) {
+        req.session.imageCount = "You must upload at least four images.";
+      }
       // Check the input against the regex patterns
       if (
         req.session.pNameRegexerror2 ||
@@ -366,7 +368,8 @@ module.exports = {
         req.session.stockRegexerror2 ||
         req.session.discountRegexerror2 ||
         req.session.categoryError2 ||
-        req.session.imageError
+        req.session.imageError ||
+        req.session.imageCount
       ) {
         return res.redirect(`/update-Product?id=${products._id}`);
       }
@@ -387,6 +390,7 @@ module.exports = {
         active: true,
       });
       if (!categoryObj) {
+        req.session.categoryError2 = "Category does not exist.";
         return res.redirect("/update-Product");
       }
 
@@ -574,6 +578,16 @@ module.exports = {
             message: `Invalid status transition from ${productToChange.status} to ${status}`,
           });
       }
+    
+      if (status === "Delivered" && order.paymentMethod === 'COD') {
+        const shippingCost = 40;
+        const productPrice = productToChange.price;
+        const productDiscount = productToChange.discount || 0;
+        let discountedPrice =
+          productPrice - (productPrice * productDiscount) / 100;
+        discountedPrice += shippingCost;
+        order.totalAmount += discountedPrice;
+      }
 
       // Save the updated order
       await order.save();
@@ -644,7 +658,7 @@ module.exports = {
 
         // Check if all products are cancelled
         productToReturn.return = "Returned";
-        console.log(totalDiscount, totalPrice, overallTotalPrice);
+        
         const allProductsReturned = order.products.every(
           (item) => item.return === "Returned"
         );
@@ -867,7 +881,10 @@ module.exports = {
       // const ejsData = await ejs.renderFile(ejsTemplate, data);
 
       // Launch a new instance of Puppeteer
-      const browser = await puppeteer.launch({ headless: "new", executablePath: '/snap/bin/chromium' });
+      const browser = await puppeteer.launch({
+        headless: "new",
+        executablePath: "/snap/bin/chromium",
+      });
       const page = await browser.newPage();
       await page.setContent(ejsData, { waitUntil: "networkidle0" });
 
@@ -1278,42 +1295,36 @@ module.exports = {
       const categoryCode = req.body.category;
       const discount = req.body.discount;
       const today = new Date().toISOString().split("T")[0];
-
+      
       // Form validation
       if (!categoryCode) {
         req.session.categoryCodeError = "Category field is required";
-        req.session.categoryCode = categoryCode;
       }
 
       if (!discount) {
         req.session.discountError = "Discount field is required";
-        req.session.discount = discount;
       }
 
       let discountRegex = /^[0-9]+$/;
       if (!discountRegex.test(discount) || discount < 0 || discount > 100) {
         req.session.discountRegex =
           "Discount should be a numeric value, greater than 0 and less than 100";
-        req.session.discount = discount;
       }
 
       if (!validFrom) {
         req.session.validFromError = "Valida from field is required";
-        req.session.validFromValue = validFrom;
       } else if (validFrom < today || validFrom > today) {
         req.session.validFrom2 =
           "Valid from date should not be in the past or future.";
-        req.session.validFromValue = validFrom;
       }
 
       if (!validTo) {
         req.session.validToError = "Valid to field is required";
-        req.session.validToValue = validTo;
       } else if (validTo < validFrom) {
         req.session.validTo2 =
           "Valid to date should not be before the valid from date.";
-        req.session.validToValue = validTo;
       }
+     
       // validation error
       if (
         req.session.categoryCodeError ||
@@ -1326,11 +1337,7 @@ module.exports = {
       ) {
         req.session.errorMessage =
           "Validation failed. Please check the fields.";
-        req.session.categoryCode = categoryCode;
-        req.session.discount = discount;
-        req.session.validFromValue = validFrom;
-        req.session.validToValue = validTo;
-        return res.redirect("/addOffers");
+        return res.redirect("/updateOffers");
       }
 
       // Find category
@@ -1338,19 +1345,15 @@ module.exports = {
         name: categoryCode,
         active: true,
       });
-
+   
       if (!category) {
         req.session.categoryCodeNotMatch =
           "Category code does not exist or is inactive";
         req.session.errorMessage =
           "Category code does not exist or is inactive.";
-        req.session.categoryCode = categoryCode;
-        req.session.discount = discount;
-        req.session.validFromValue = validFrom;
-        req.session.validToValue = validTo;
-        return res.redirect("/addOffers");
+        return res.redirect("/updateOffers");
       }
-
+     
       const categoryOffer = await offerDB.findOne({ _id: id });
 
       let validDiscount = true;
@@ -1360,7 +1363,7 @@ module.exports = {
         category: category,
         active: true,
       });
-
+    
       offerProducts.forEach((products) => {
         let combinedDiscount = products.discount - categoryOffer.discount;
         if (combinedDiscount <= 60) {
@@ -1370,6 +1373,7 @@ module.exports = {
           validDiscount = false;
         }
       });
+    
       // Save updated products
       await Promise.all(updatedProducts.map((product) => product.save()));
       // Set success message in session

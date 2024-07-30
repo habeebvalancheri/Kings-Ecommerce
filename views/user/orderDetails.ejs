@@ -31,7 +31,6 @@
                                     <th>Quantity</th>
                                     <th>Price</th>
                                     <th>Discount</th>
-                                    <th>Total</th>
                                 </tr>
                             </thead>
                             
@@ -67,10 +66,17 @@
                                             
                                             
                                         %>
-                                        <td>₹<%= orderDetails.totalAmount.toFixed(2) %></td>
+                                        
                                     </tr>
                                 <% }); %>
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5" style="text-align: right;">
+                                        Total: ₹<%= orderDetails.totalAmount.toFixed(2) %>
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
 
                                                 <!-- Display shipping address, order date, and payment method once -->

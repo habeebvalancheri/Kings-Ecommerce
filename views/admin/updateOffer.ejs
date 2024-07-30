@@ -20,7 +20,7 @@
         <div class="table-data">
             <div class="order">
                 <div class="head">
-                    <h3>Add Offer</h3>
+                    <h3>Update Offer</h3>
 
                     <a href="/admin-Offers">
                         <button class="btn btn-rounded" style="background-color: #131921 ; color: white;">
@@ -40,31 +40,32 @@
                                 <% }); %>
                               </select>
                             <small id="category-code-error" class="text-danger"></small>
-                            <p class="errorP <%= !categoryError ? 'd-none' : '' %>"><%= categoryError %></p>
-                            <p class="errorP <%= !categoryMatch ? 'd-none' : '' %>"><%= categoryMatch %></p>
-                            <p class="errorP <%= !offerExists ? 'd-none' : '' %>"><%= offerExists %></p>
                         </div>
+                        <p class="errorP <%= !categoryError ? 'd-none' : '' %>"><%= categoryError %></p>
+                        <p class="errorP <%= !categoryMatch ? 'd-none' : '' %>"><%= categoryMatch %></p>
                         <div class="form-group">
                             <label for="discount">Discount (%)</label>
                             <input type="number" class="form-control" id="discount" placeholder="Enter Discount Percentage" name="discount" value="<%= offer.discount %>">
                             <small id="discount-error" class="text-danger"></small>
-                            <p class="errorP <%= !discountError ? 'd-none' : '' %>"><%= discountError %></p>
-                            <p class="errorP <%= !discountRegex ? 'd-none' : '' %>"><%= discountRegex %></p>
                         </div>
+                        <p class="errorP <%= !discountError ? 'd-none' : '' %>"><%= discountError %></p>
+                        <p class="errorP <%= !discountRegex ? 'd-none' : '' %>"><%= discountRegex %></p>
                         <div class="form-group">
                             <label for="valid-from">Valid From</label>
                             <input type="date" class="form-control" id="valid-from" name="validFrom" value="<%= offer.createdAt.toISOString().split('T')[0] %>">
                             <small id="valid-from-error" class="text-danger"></small>
-                            <p class="errorP <%= !validationFrom ? 'd-none' : '' %>"><%= validationFrom %></p>
-                            <p class="errorP <%= !validFrom ? 'd-none' : '' %>"><%= validFrom %></p>
+                            
                         </div>
+                        <p class="errorP <%= !validationFrom ? 'd-none' : '' %>"><%= validationFrom %></p>
+                            <p class="errorP <%= !validFrom ? 'd-none' : '' %>"><%= validFrom %></p>
                         <div class="form-group">
                             <label for="valid-to">Valid To</label>
                             <input type="date" class="form-control" id="valid-to" name="validTo" value="<%= offer.expiresAt.toISOString().split('T')[0]%>">
                             <small id="valid-to-error" class="text-danger" ></small>
-                            <p class="errorP <%= !validationTo ? 'd-none' : '' %>"><%= validationTo %></p>
-                            <p class="errorP <%= !validTo ? 'd-none' : '' %>"><%= validTo %></p>
+                         
                         </div>
+                        <p class="errorP <%= !validationTo ? 'd-none' : '' %>"><%= validationTo %></p>
+                        <p class="errorP <%= !validTo ? 'd-none' : '' %>"><%= validTo %></p>
                         <h1></h1>
                         <button type="submit" class="btn" style="background-color: #131921; color: white;">Update Offer</button>
                     </form>
@@ -77,7 +78,7 @@
 </section>
 <!-- CONTENT -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- <script>
+<script>
    document.addEventListener('DOMContentLoaded', function () {
    
     const errorMessage = "<%= errorMessage %>";
@@ -157,6 +158,6 @@
     }
   });
 
-</script> -->
+</script>
     </body>
     </html>

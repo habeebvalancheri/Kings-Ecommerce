@@ -15,8 +15,11 @@
 
                 <% let totalItems = 0; %>
                 <% let totalPrice = 0; %>
+                <% let total = 0; %>
                 <% wishListItems.forEach(item => { %>
                   <% let itemPrice = item.productId.price * item.quantity; %>
+                  <% let itemDiscount = item.productId.discount * item.quantity %>
+                  <% total = itemPrice - (itemPrice * itemDiscount /100) %>
                   <% if(item.productId.stock > 0) {%>
                     <% totalItems += item.quantity; %>
                     <% totalPrice += itemPrice; %>
@@ -41,7 +44,7 @@
                     <div class="col-lg-2 col-sm-6 col-6 d-flex flex-row flex-lg-column flex-xl-row text-nowrap">
 
                       <div class="">
-                        <text class="h6"><%= item.productId.price %></text> <br />
+                        <text class="h6"><%= total %></text> <br />
                         <!-- <small class="text-muted text-nowrap">₹ / per item </small> -->
                       </div>
                     </div>
