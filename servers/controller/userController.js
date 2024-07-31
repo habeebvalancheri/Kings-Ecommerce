@@ -187,8 +187,7 @@ module.exports = {
         req.session.checkPassword ||
         req.session.passInclude ||
         req.session.terms ||
-        req.session.userExists ||
-      
+        req.session.userExists
       ) {
         return res.redirect("/signup");
       }
@@ -196,7 +195,6 @@ module.exports = {
       // Hashing password
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
-
 
       // Create new user
       const user = new userDB({
@@ -263,13 +261,11 @@ module.exports = {
         req.session.errorEmail2 ||
         req.session.errorPassword2 ||
         req.session.errorPattern2 ||
-        req.session.passInclude2 ||
-        req.session.userNotVerified
+        req.session.passInclude2
       ) {
         return res.redirect("/signin");
       }
       const user = await userDB.findOne({ email: inputEmail });
-      
 
       if (!user || user.block === true) {
         // User not found or blocked

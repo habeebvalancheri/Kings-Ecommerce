@@ -166,7 +166,6 @@ exports.changePasswordPage = async (req, res) => {
 };
 exports.homePage = async (req, res) => {
   try {
-    
     const userLoggedEmail = req.session.userLoggedIn;
     const newUser = req.session.isAuthenticated;
     // Find the user with the provided email
