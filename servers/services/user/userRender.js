@@ -76,7 +76,6 @@ exports.otpLoginPage = async (req, res) => {
     const codeExpired = req.session.codeExpired;
     const invalidCode = req.session.InvalidCode;
 
-    req.session.email = "";
     req.session.id = "";
     req.session.emptyDetails = "";
     req.session.noRecords = "";
@@ -105,6 +104,7 @@ exports.signinPage = async (req, res) => {
     const passwordNotValid = req.session.isNotValidate;
     const passInclude2 = req.session.passInclude2;
     const accountBlocked = req.session.accountBlocked;
+    const userNotVerified = req.session.userNotVerified;
 
     req.session.userNotRegistered = "";
     req.session.errorPattern2 = "";
@@ -113,6 +113,7 @@ exports.signinPage = async (req, res) => {
     req.session.isNotValidate = "";
     req.session.passInclude2 = "";
     req.session.accountBlocked = "";
+    req.session.userNotVerified = "";
 
     return res.render("user/signin", {
       notExists,
@@ -122,6 +123,7 @@ exports.signinPage = async (req, res) => {
       passwordNotValid,
       passInclude2,
       accountBlocked,
+      userNotVerified
     });
   } catch (error) {
     return res.redirect("/ClientServer-Error");
@@ -164,6 +166,7 @@ exports.changePasswordPage = async (req, res) => {
 };
 exports.homePage = async (req, res) => {
   try {
+    
     const userLoggedEmail = req.session.userLoggedIn;
     const newUser = req.session.isAuthenticated;
     // Find the user with the provided email
