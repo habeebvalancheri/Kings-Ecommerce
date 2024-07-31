@@ -241,7 +241,7 @@ module.exports = {
       }
       const trimmedEmail = inputEmail.trim();
 
-      if (!/^[A-Za-z0-9]+@[a-zA-Z]+\.(com|in)$/.test(trimmedEmail)) {
+      if (!/^[a-zA-Z0-9._-]+@[a-zA-Z]+\.(com|in)$/.test(trimmedEmail)) {
         req.session.errorPattern2 = "Invalid email pattern!";
       } else if (trimmedEmail !== inputEmail) {
         req.session.errorPattern2 =
