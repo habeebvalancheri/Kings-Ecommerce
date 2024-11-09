@@ -72,10 +72,18 @@ Managing product categories and stock levels.
 Technologies Used
 
 EJS: Used for rendering dynamic HTML views on the frontend, providing a smooth, interactive user experience.
+
 JavaScript: The core programming language used for both frontend and backend logic.
+
 Node.js: Backend server framework used to handle requests, interact with MongoDB, and manage the application’s business logic.
+
 MongoDB: A NoSQL database used to store and manage the application’s data, including user profiles, products, orders, and payment information.
+
 Razorpay: Integrated payment gateway for handling secure online payments.
+
 AWS: Cloud hosting for scalability, performance, and availability of the application. Key services include EC2, S3.
+
 Git: Version control used to manage the project’s source code and collaboration.
+
+
 
